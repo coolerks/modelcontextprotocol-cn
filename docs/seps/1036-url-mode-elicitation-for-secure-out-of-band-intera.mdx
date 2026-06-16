@@ -1,7 +1,7 @@
 ---
-title: "SEP-1036: 用于安全带外交互的 URL 模式引出"
-sidebarTitle: "SEP-1036: 用于安全带外交互的 URL 模式引出"
-description: "用于安全带外交互的 URL 模式引出"
+title: "SEP-1036: URL Mode Elicitation for secure out-of-band interactions"
+sidebarTitle: "SEP-1036: URL Mode Elicitation for secure out-of-…"
+description: "URL Mode Elicitation for secure out-of-band interactions"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "用于安全带外交互的 URL 模式引出"
 
 ## Abstract
 
-本 SEP 为现有的引出客户端能力引入了一种新的 `url` 模式，支持绕过 MCP 客户端的安全带外交互。URL 模式引出解决了表单模式引出无法处理的高敏感用例，例如收集敏感凭据、为外部（第三方）授权执行 OAuth 流程以及处理支付，同时*不会*将敏感数据暴露给 MCP 客户端。通过引导用户在浏览器中访问受信任的 URL，此模式在保持安全边界的同时，实现了与第三方服务的丰富集成。
+This SEP introduces a new `url` mode for the existing elicitation client capability, enabling secure out-of-band interactions that bypass the MCP client. URL mode elicitation addresses sensitive use cases that form mode elicitation cannot, such as gathering sensitive credentials, performing OAuth flows for external (3rd-party) authorization, and handling payments, _without_ exposing sensitive data to the MCP client. By directing users to trusted URLs in their browser, this mode maintains security boundaries while enabling rich integrations with third-party services.
 
 ## Motivation
 

@@ -1,7 +1,7 @@
 ---
-title: "SEP-1319: 将请求负载与 RPC 方法定义解耦"
-sidebarTitle: "SEP-1319: 将请求负载与 RPC 方法定义解耦"
-description: "将请求负载与 RPC 方法定义解耦"
+title: "SEP-1319: Decouple Request Payload from RPC Methods Definition"
+sidebarTitle: "SEP-1319: Decouple Request Payload from RPC Metho…"
+description: "Decouple Request Payload from RPC Methods Definition"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "将请求负载与 RPC 方法定义解耦"
 
 ## Abstract
 
-本 SEP 提议对模型上下文协议（MCP）规范进行结构性重构。核心更改是将请求的负载（例如 CallToolRequest）定义为独立的定义，并让 RPC 方法定义引用这些模型。这将数据负载的定义与传输它的远程过程的定义解耦，从而使规范更清晰、更模块化、更易于维护。
+This SEP proposes a structural refactoring of the Model Context Protocol (MCP) specification. The core change is to define payload of requests (e.g., CallToolRequest) as independent definitions and have the RPC method definitions refer to these models. This decouples the definition of the data payload from the definition of the remote procedure that transports it, leading to a clearer, more modular, and more maintainable specification.
 
 ## Motivation
 

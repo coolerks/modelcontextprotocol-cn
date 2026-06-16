@@ -1,7 +1,7 @@
 ---
-title: "SEP-973: 为实现、资源、工具和提示暴露额外的元数据"
-sidebarTitle: "SEP-973: 为实现、资源、工具和提示暴露额外的元数据"
-description: "为实现、资源、工具和提示暴露额外的元数据"
+title: "SEP-973: Expose additional metadata for Implementations, Resources, Tools and Prompts"
+sidebarTitle: "SEP-973: Expose additional metadata for Implemen…"
+description: "Expose additional metadata for Implementations, Resources, Tools and Prompts"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "为实现、资源、工具和提示暴露额外的元数据"
 
 ## Abstract
 
-本 SEP 提议添加两个可选字段——`icons` 和 `websiteUrl`。`icons` 和 `websiteUrl` 将被添加到 `Implementation` 模式中，以便客户端能够直观地识别第三方实现并直接链接到其文档。`icons` 参数也将被添加到 `Tool`、`Resource` 和 `Prompt` 模式中。虽然服务器和客户端都可以在所有实现中使用它，但我们预计它将首先用于服务器提供的实现。
+This SEP proposes adding two optional fields—`icons` and `websiteUrl`. The `icons` and `websiteUrl` would be added to the `Implementation` schema so that clients can visually identify third-party implementations and link directly to their documentation. The `icons` parameter will also be added to the `Tool`, `Resource` and `Prompt` schemas. While this can be used by both servers and clients for all implementations, we expect it to be used initially for server-provided implementations.
 
 ## Motivation
 

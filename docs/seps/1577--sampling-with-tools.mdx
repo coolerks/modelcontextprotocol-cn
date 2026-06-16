@@ -1,7 +1,7 @@
 ---
-title: "SEP-1577: 带工具的采样"
-sidebarTitle: "SEP-1577: 带工具的采样"
-description: "带工具的采样"
+title: "SEP-1577: Sampling With Tools"
+sidebarTitle: "SEP-1577: Sampling With Tools"
+description: "Sampling With Tools"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "带工具的采样"
 
 ## Abstract
 
-本 SEP 为 `sampling/createMessage` 引入了 `tools` 和 `toolChoice` 参数，并软弃用了 `includeContext`（将 `thisServer` 和 `allServers` 限制在某个能力下）。这使得 MCP 服务器能够使用客户端的令牌运行自己的代理循环（仍在用户监督下），并降低了客户端实现的复杂性（上下文支持变为明确可选）。
+This SEP introduces `tools` & `toolChoice` params to `sampling/createMessage` and soft-deprecates `includeContext` (fences `thisServer` & `allServers` under a capability). This allows MCP servers to run their own agentic loops using the client's tokens (still under the user supervision), and reduces the complexity of client implementations (context support becoming explicitly optional).
 
 ## Motivation
 
