@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "mkdir -p public && cd docs && npx mint export --output ../public/docs.zip && cd ../public && unzip -q docs.zip && rm docs.zip",
+  "outputDirectory": "public",
+  "cleanUrls": true
+}
