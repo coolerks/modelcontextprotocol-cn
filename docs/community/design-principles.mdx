@@ -1,48 +1,48 @@
 ---
-title: Design Principles
-description: The core design principles that guide the development of the Model Context Protocol.
+title: 设计原则
+description: 指导 Model Context Protocol 发展的核心设计原则。
 ---
 
-These principles guide how we evaluate protocol proposals, weigh tradeoffs, and evolve MCP. They reflect lessons from building and maintaining the project. They are meant as guidance by and for the community when developing [Spec Enhancement Proposals](/community/sep-guidelines) (SEPs) and [extensions](/extensions/overview).
+这些原则指导我们如何评估协议提案、权衡取舍和发展 MCP。它们反映了从构建和维护该项目中汲取的经验教训。它们是社区在制定[规范增强提案](/community/sep-guidelines) (SEP) 和[扩展](/extensions/overview)时使用的指南。
 
-## Convergence over choice
+## 趋同优于选择
 
-There should be one way to solve a problem in MCP. Rather than supporting multiple approaches that fragment the ecosystem, we choose a single well-designed path — accepting harder decisions upfront to deliver a more cohesive protocol.
+在 MCP 中，解决问题应该只有一种方式。我们不支持多种导致生态系统碎片化的方法，而是选择单一精心设计的路径——接受前期的艰难决策，以交付更具一致性的协议。
 
-[Extensions](/extensions/overview) are where convergence gets tested; the specification is where it gets committed.
+[扩展](/extensions/overview)是趋同得到测试的地方；规范是趋同得到确定的地方。
 
-## Composability over specificity
+## 可组合性优于特化
 
-MCP provides foundational primitives: resources, tools, prompts, and tasks. We don't add protocol features for use cases that can be constructed from these existing building blocks. This keeps the surface area small and implementations simple.
+MCP 提供基础原语：资源、工具、提示和任务。我们不会为可以通过这些现有构建块构建的用例添加协议功能。这保持了较小的协议表面积和简单的实现。
 
-When someone asks why MCP doesn't support a feature directly, the answer is usually that it can be built from what MCP already provides. Extensions like [MCP Apps](/extensions/apps/overview) capture the patterns that emerge.
+当有人问为什么 MCP 不直接支持某个功能时，答案通常是这可以通过 MCP 已提供的内容来构建。像 [MCP Apps](/extensions/apps/overview) 这样的扩展捕获了出现的模式。
 
-## Interoperability over optimization
+## 互操作性优于优化
 
-MCP runs across clients, servers, and models of widely varying sophistication. We favor features that degrade gracefully over those that only work when every participant is equally capable. Capability negotiation makes this concrete: participants declare what they support, and the protocol adapts rather than assumes.
+MCP 运行在各种不同复杂程度的客户端、服务器和模型之上。我们倾向于优雅降级的功能，而不是那些只有在每个参与者都同等有能力时才有效的功能。能力协商使这变得具体：参与者声明他们支持什么，协议进行适应而非假设。
 
-## Stability over velocity
+## 稳定性优于速度
 
-Adding to a protocol as widely adopted as MCP is easy. Removing from it is nearly impossible. Every addition is a permanent commitment and a cost for client implementers to support. We move deliberately, knowing that "no" today leaves the door open while "yes" closes it forever.
+向像 MCP 这样广泛采用的协议添加内容很容易。从中移除内容几乎是不可能的。每次添加都是永久的承诺，也是客户端实现者支持的负担。我们谨慎行事，知道今天的"不"留有余地，而"是"则永远关闭了大门。
 
-Contributors accustomed to rapid shipping may find this pace frustrating, but sustainable standards require sustainable decision-making. We optimize for decades, not quarters.
+习惯于快速发布的贡献者可能会觉得这种节奏令人沮丧，但可持续的标准需要可持续的决策。我们优化的是数十年，而不是几个季度。
 
-## Capability over compensation
+## 能力优于补偿
 
-Models improve faster than protocols evolve. We avoid adding permanent structure to work around limitations that are likely temporary — the limitation fades, but the complexity remains.
+模型改进的速度快于协议演进的速度。我们避免添加永久性的结构来解决可能暂时存在的限制——限制会消失，但复杂性仍然存在。
 
-This is not license to ignore today's reality. Optional context that weaker models lean on and stronger ones ignore costs nothing. But when a proposal exists primarily because current models struggle without it, we ask whether they will outgrow the need before we can shed the weight.
+这不是忽视当前现实的借口。较弱模型依赖而较强模型忽略的可选上下文不会增加成本。但是，当提案的存在主要是因为当前模型没有它就难以运行时，我们会问：在我们能够卸下这个负担之前，它们是否会超越这种需求。
 
-## Demonstration over deliberation
+## 演示优于商议
 
-MCP values working implementations over theoretical debates. When evaluating proposals, we prioritize evidence from real usage over hypothetical arguments. We encourage contributors to prototype, experiment, and demonstrate rather than design by committee. Implementation reveals what discussion cannot.
+MCP 重视工作实现而非理论辩论。在评估提案时，我们优先考虑来自实际使用的证据，而非假设性论证。我们鼓励贡献者进行原型设计、实验和演示，而不是委员会式设计。实现揭示了讨论无法发现的问题。
 
-## Pragmatism over purity
+## 实用主义优于纯粹性
 
-MCP makes practical tradeoffs in service of adoption and usability. We don't pursue theoretical elegance at the cost of real-world utility. When a "correct" design creates friction for implementers, we consider whether a "good enough" design better serves the ecosystem. This means accepting some inconsistency, some historical accidents, and some decisions we might make differently with hindsight.
+MCP 为了采纳和可用性而做出实际的权衡。我们不以牺牲实际效用为代价追求理论优雅。当"正确"的设计给实现者带来摩擦时，我们会考虑"足够好"的设计是否更好地服务于生态系统。这意味着接受一些不一致、一些历史遗留问题，以及一些事后看来我们可能会做出不同选择的决定。
 
-## Standardization over innovation
+## 标准化优于创新
 
-MCP standardizes patterns that have already proven valuable. We look for conventions that work across multiple implementations and codify them, rather than inventing new paradigms and hoping they'll be adopted.
+MCP 标准化已经被证明有价值的模式。我们寻找跨多个实现有效的约定并将其规范化，而不是发明新的范式并希望它们被采用。
 
-We encourage the use of [MCP extensions](/extensions/overview) as a way to experiment with new patterns that may eventually lead to standardization.
+我们鼓励使用 [MCP 扩展](/extensions/overview) 作为实验可能最终导致标准化的新模式的方式。

@@ -1,35 +1,28 @@
 ---
-title: Resources
+title: 资源
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to expose
-resources to clients. Resources allow servers to share data that provides context to
-language models, such as files, database schemas, or application-specific information.
-Each resource is uniquely identified by a
-[URI](https://datatracker.ietf.org/doc/html/rfc3986).
+Model Context Protocol (MCP) 提供了标准化的方式让服务器向客户端暴露资源。资源允许服务器共享为语言模型提供上下文的数据，如文件、数据库 schemas 或应用程序特定信息。每个资源由 [URI](https://datatracker.ietf.org/doc/html/rfc3986) 唯一标识。
 
-## User Interaction Model
+## 用户交互模型
 
-Resources in MCP are designed to be **application-driven**, with host applications
-determining how to incorporate context based on their needs.
+MCP 中的资源设计为**应用程序驱动**，主机应用程序根据其需要决定如何合并上下文。
 
-For example, applications could:
+例如，应用程序可以：
 
-- Expose resources through UI elements for explicit selection, in a tree or list view
-- Allow the user to search through and filter available resources
-- Implement automatic context inclusion, based on heuristics or the AI model's selection
+- 通过 UI 元素以树状或列表视图暴露资源供显式选择
+- 允许用户搜索和过滤可用资源
+- 基于启发式规则或 AI 模型的选择实现自动上下文包含
 
-![Example of resource context picker](/specification/draft/server/resource-picker.png)
+![资源上下文选择器示例](/specification/draft/server/resource-picker.png)
 
-However, implementations are free to expose resources through any interface pattern that
-suits their needs&mdash;the protocol itself does not mandate any specific user
-interaction model.
+然而，实现可以自由地通过适合其需求的任何界面模式来暴露资源 — 协议本身不强制任何特定的用户交互模型。
 
-## Capabilities
+## 能力
 
-Servers that support resources **MUST** declare the `resources` capability:
+支持资源的服务器 **MUST** 声明 `resources` 能力：
 
 ```json
 {
@@ -71,12 +64,11 @@ per-connection or as a side effect of other requests on the connection. The set
 only the resources the caller's granted scopes permit — since credentials are
 per-request input, not connection state.
 
-## Protocol Messages
+## 协议消息
 
-### Listing Resources
+### 列出资源
 
-To discover available resources, clients send a `resources/list` request. This operation
-supports [pagination](/specification/draft/server/utilities/pagination) and [caching](/specification/draft/server/utilities/caching).
+要发现可用的资源，客户端发送 `resources/list` 请求。此操作支持[分页](/specification/draft/server/utilities/pagination)和[缓存](/specification/draft/server/utilities/caching)。
 
 **Request:**
 
@@ -122,10 +114,9 @@ supports [pagination](/specification/draft/server/utilities/pagination) and [cac
 }
 ```
 
-### Reading Resources
+### 读取资源
 
-To retrieve resource contents, clients send a `resources/read` request. This operation
-supports [caching](/specification/draft/server/utilities/caching).
+要检索资源内容，客户端发送 `resources/read` 请求。此操作支持[缓存](/specification/draft/server/utilities/caching)。
 
 **Request:**
 
@@ -169,12 +160,9 @@ Servers **MAY** also respond to `resources/read` with an [`InputRequiredResult`]
 
 Alternatively, if the scheme of `uri` is `https://`, clients may fetch the resource directly from the web. See the [Common URI Schemes section](#https%3A%2F%2F) for more information.
 
-### Resource Templates
+### 资源模板
 
-Resource templates allow servers to expose parameterized resources using
-[URI templates](https://datatracker.ietf.org/doc/html/rfc6570). Arguments may be
-auto-completed through [the completion API](/specification/draft/server/utilities/completion).
-This operation supports [pagination](/specification/draft/server/utilities/pagination) and [caching](/specification/draft/server/utilities/caching).
+资源模板允许服务器使用 [URI 模板](https://datatracker.ietf.org/doc/html/rfc6570) 暴露参数化的资源。参数可以通过[补全 API](/specification/draft/server/utilities/completion) 自动补全。此操作支持[分页](/specification/draft/server/utilities/pagination)和[缓存](/specification/draft/server/utilities/caching)。
 
 **Request:**
 
@@ -220,10 +208,9 @@ This operation supports [pagination](/specification/draft/server/utilities/pagin
 }
 ```
 
-### List Changed Notification
+### 列表变更通知
 
-When the list of available resources changes, servers that declared the `listChanged`
-capability **SHOULD** send a notification:
+当可用资源列表发生变化时，声明了 `listChanged` 能力的服务器 **SHOULD** 发送通知：
 
 ```json
 {
@@ -232,13 +219,9 @@ capability **SHOULD** send a notification:
 }
 ```
 
-### Subscriptions
+### 订阅
 
-Clients subscribe to change notifications for specific resources by sending a
-[`subscriptions/listen`][subscriptions-listen] request with the resource URIs listed in
-`notifications.resourceSubscriptions`. The server delivers
-`notifications/resources/updated` on the resulting stream whenever a watched resource
-changes.
+客户端通过发送 [`subscriptions/listen`][subscriptions-listen] 请求（其中包含 `notifications.resourceSubscriptions` 中列出的资源 URI）来订阅特定资源的变更通知。当被监视的资源发生变化时，服务器在生成的流上传递 `notifications/resources/updated`。
 
 ```json
 {

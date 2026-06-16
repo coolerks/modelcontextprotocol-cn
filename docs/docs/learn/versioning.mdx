@@ -1,54 +1,46 @@
 ---
-title: Versioning
+title: 版本管理
 type: docs
 weight: 10
 ---
 
-The Model Context Protocol uses string-based version identifiers following the format
-`YYYY-MM-DD`, to indicate the last date backwards incompatible changes were made.
+Model Context Protocol 使用基于字符串的版本标识符，格式为
+`YYYY-MM-DD`，表示最后一次向后不兼容变更的日期。
 
 <Info>
 
-The protocol version will _not_ be incremented when the
-protocol is updated, as long as the changes maintain backwards compatibility. This allows
-for incremental improvements while preserving interoperability.
+只要变更保持向后兼容性，协议版本在更新时*不会*递增。这允许在保持互操作性的同时进行增量改进。
 
 </Info>
 
-## Revisions
+## 修订版本
 
-Revisions may be marked as:
+修订版本可以标记为：
 
-- **Draft**: in-progress specifications, not yet ready for consumption.
-- **Current**: the current protocol version, which is ready for use and may continue to
-  receive backwards compatible changes.
-- **Final**: past, complete specifications that will not be changed.
+- **草稿（Draft）**：进行中的规范，尚未准备好使用。
+- **当前（Current）**：当前协议版本，已准备就绪并可继续接收向后兼容的变更。
+- **最终（Final）**：过去的完整规范，将不再更改。
 
-The **current** protocol version is [**2025-11-25**](/specification/2025-11-25/).
+**当前**协议版本是 [**2025-11-25**](/specification/2025-11-25/)。
 
-## Feature States
+## 功能状态
 
-Individual features of the specification may additionally be marked as
-**Deprecated** under the
-[feature lifecycle and deprecation policy](/community/feature-lifecycle):
-the feature remains part of the specification, but is scheduled for removal.
-Deprecated features document a migration path (or state that none is required)
-and remain in the specification for at least twelve months, or at least
-ninety days under the policy's
-[expedited-removal exception](/community/feature-lifecycle#expedited-removal),
-before they become eligible for removal, after which they may be **Removed**
-in a future revision.
+规范的个别功能还可以根据[功能生命期和弃用政策](/community/feature-lifecycle)标记为
+**已弃用（Deprecated）**：
+该功能仍然是规范的一部分，但计划删除。
+已弃用的功能会记录迁移路径（或说明不需要迁移路径），
+并在规范中保留至少十二个月，或根据政策的
+[快速删除例外](/community/feature-lifecycle#expedited-removal)至少保留九十天，
+之后它们才符合删除条件，之后可能在未来的修订版本中被**移除（Removed）**。
 
-Features that are currently Deprecated are listed in the
-[deprecated features registry](/specification/draft/deprecated).
+当前已弃用的功能列在
+[已弃用功能注册表](/specification/draft/deprecated)中。
 
-## Negotiation
+## 协商
 
-Version negotiation happens during
-[initialization](/specification/latest/basic/lifecycle#initialization). Clients and
-servers **MAY** support multiple protocol versions simultaneously, but they **MUST**
-agree on a single version to use for the session.
+版本协商在
+[初始化](/specification/latest/basic/lifecycle#initialization)期间进行。Clients 和
+servers **MAY（可以）** 同时支持多个协议版本，但它们 **MUST（必须）** 就会话使用的单一版本达成一致。
 
-The protocol provides appropriate error handling if version negotiation fails, allowing
-clients to gracefully terminate connections when they cannot find a version compatible
-with the server.
+如果版本协商失败，该协议提供适当的错误处理，允许
+clients 在找不到与 server 兼容的版本时优雅地终止连接。

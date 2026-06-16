@@ -1,18 +1,17 @@
 ---
-title: Authorization Server Discovery
+title: 授权服务器发现
 ---
 
 <div id="enable-section-numbers" />
 
-This document describes the mechanisms by which MCP servers advertise their associated
-authorization servers to MCP clients, as well as the discovery process through which MCP
-clients can determine authorization server endpoints and supported capabilities.
+本文档描述了 MCP 服务器向 MCP 客户端通告其关联授权服务器的机制，
+以及 MCP 客户端可以确定授权服务器端点和支持的能力的发现过程。
 
-## Authorization Server Location
+## 授权服务器位置
 
-MCP servers **MUST** implement the OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728))
-specification to indicate the locations of authorization servers. The Protected Resource Metadata document returned by the MCP server **MUST** include
-the `authorization_servers` field containing at least one authorization server.
+MCP 服务器 **MUST** 实现 OAuth 2.0 受保护资源元数据（[RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)）
+规范以指示授权服务器的位置。MCP 服务器返回的受保护资源元数据文档 **MUST** 包含
+至少一个授权服务器的 `authorization_servers` 字段。
 
 The specific use of `authorization_servers` is beyond the scope of this specification; implementers should consult
 OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)) for
@@ -34,9 +33,9 @@ another. See
 [Authorization Server Binding](/specification/draft/basic/authorization/client-registration#authorization-server-binding)
 for the requirements on associating client credentials with the authorization server that issued them.
 
-## Protected Resource Metadata Discovery Requirements
+## 受保护资源元数据发现要求
 
-MCP servers **MUST** implement one of the following discovery mechanisms to provide authorization server location information to MCP clients:
+MCP 服务器 **MUST** 实现以下发现机制之一，以向 MCP 客户端提供授权服务器位置信息：
 
 1. **WWW-Authenticate Header**: Include the resource metadata URL in the `WWW-Authenticate` HTTP header under `resource_metadata` when returning `401 Unauthorized` responses, as described in [RFC9728 Section 5.1](https://datatracker.ietf.org/doc/html/rfc9728#name-www-authenticate-response).
 
@@ -52,13 +51,9 @@ Servers can also include a `scope` parameter in the `WWW-Authenticate` challenge
 scopes required for accessing the resource; the scope semantics and the associated client behavior
 are defined in the [Scope Selection Strategy](/specification/draft/basic/authorization#scope-selection-strategy) section.
 
-## Authorization Server Metadata Discovery
+## 授权服务器元数据发现
 
-MCP uses the default `oauth-authorization-server` well-known URI
-suffix defined in
-[RFC 8414 Section 3.1](https://datatracker.ietf.org/doc/html/rfc8414#section-3.1)
-for authorization server metadata discovery. MCP does not define
-an application-specific well-known URI suffix.
+MCP 使用 [RFC 8414 第 3.1 节](https://datatracker.ietf.org/doc/html/rfc8414#section-3.1) 中定义的默认 `oauth-authorization-server` well-known URI 后缀进行授权服务器元数据发现。MCP 未定义应用程序特定的 well-known URI 后缀。
 
 To handle different issuer URL formats and ensure
 interoperability with both OAuth 2.0 Authorization Server

@@ -1,58 +1,58 @@
 ---
-title: "Building to Last: A New Governance Model for MCP"
+title: "行稳致远：MCP 的新治理模型"
 date: "2025-07-31T00:00:00Z"
-description: "Introducing MCP's formal governance model: Specification Enhancement Proposals (SEPs), a maintainer structure, and a community-driven process for evolving the protocol."
+description: "介绍 MCP 的正式治理模型：规范增强提案 (SEP)、维护者结构以及社区驱动的协议演进流程。"
 author:
-  - David Soria Parra (Lead Maintainer)
+  - David Soria Parra（首席维护者）
 tags:
-  - announcement
-  - governance
-  - community
+  - 公告
+  - 治理
+  - 社区
 ---
 
-Since its open source release in November of 2024, the Model Context Protocol project has grown faster than we could have ever imagined. That's a wonderful problem to have, but with growth come growing pains. Our existing processes, which worked well for a small team, have started to show their limits.
+自 2024 年 11 月开源发布以来，Model Context Protocol 项目的增长速度超出了我们的想象。这是一个美妙的问题，但增长也伴随着成长的烦恼。我们现有的流程在小团队中运作良好，但现在已开始显现其局限性。
 
-Today, we're taking a big step to ensure MCP can continue to grow and thrive. We're introducing a formal governance model designed to bring clarity to the development process while preserving the collaborative, open source spirit that has made MCP successful.
+今天，我们迈出了重要一步，以确保 MCP 能够继续增长和蓬勃发展。我们引入了一个正式的治理模型，旨在为开发过程带来清晰度，同时保留使 MCP 成功的协作式开源精神。
 
-## Specification Enhancement Proposals (SEPs)
+## 规范增强提案 (SEP)
 
-One of the first major changes we're introducing is [Specification Enhancement Proposals](https://modelcontextprotocol.io/community/sep-guidelines) (SEPs). This will be the primary mechanism for anyone to propose changes to MCP. SEPs are inspired by other projects, like [Python PEPs](https://peps.python.org/) or [Rust RFCs](https://github.com/rust-lang/rfcs). We aim to make the process for suggesting changes to Model Context Protocol as straightforward as possible:
+我们引入的首要重大变化之一是[规范增强提案](https://modelcontextprotocol.io/community/sep-guidelines) (SEP)。这将是为任何人提议 MCP 变更的主要机制。SEP 的灵感来自其他项目，如 [Python PEPs](https://peps.python.org/) 或 [Rust RFCs](https://github.com/rust-lang/rfcs)。我们的目标是使向 Model Context Protocol 提出变更建议的过程尽可能简单：
 
-1. Following the [SEP guidelines](https://modelcontextprotocol.io/community/sep-guidelines), submit a proposal as [a GitHub issue](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) to start the conversation.
-2. Our maintainers and core maintainers regularly review proposals and tag SEPs for review and sponsorship. You can also reach out and collaborate with contributing folks on [Discord](https://discord.gg/6CSzBmMkjX) or [GitHub](https://github.com/modelcontextprotocol/modelcontextprotocol). Refer to [`MAINTAINERS.md`](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) for a list of currently active maintainers and their focus areas.
-3. Work with the sponsor and the MCP community to move your proposal through draft, review, and implementation stages.
+1. 遵循 [SEP 指南](https://modelcontextprotocol.io/community/sep-guidelines)，以 [GitHub issue](https://github.com/modelcontextprotocol/modelcontextprotocol/issues) 形式提交提案，开启讨论。
+2. 我们的维护者和核心维护者定期审查提案，并将 SEP 标记为待审查和赞助。您也可以在 [Discord](https://discord.gg/6CSzBmMkjX) 或 [GitHub](https://github.com/modelcontextprotocol/modelcontextprotocol) 上联系和协作。请参阅 [`MAINTAINERS.md`](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) 获取当前活跃维护者及其关注领域的列表。
+3. 与赞助者和 MCP 社区合作，将您的提案推进到草案、审查和实施阶段。
 
-SEPs provide a clear, documented path for evolving the protocol, ensuring that every major change is well-vetted by the community.
+SEP 为协议演进提供了清晰、有记录的路径，确保每个重大变更都经过社区的充分审查。
 
-## Leadership Roles
+## 领导角色
 
-The new model also establishes three types of leadership roles, ensuring both focused ownership and broad community representation:
+新模型还确立了三种类型的领导角色，确保专注的所有权和广泛的社区代表性：
 
-- **Maintainers** manage specific components like SDKs, our documentation, and individual repositories.
-- **Core Maintainers** guide the overall direction of the project and the evolution of the MCP specification.
-- **Lead Maintainers** serve as the final decision-makers and ensure the project's long-term health.
+- **Maintainers（维护者）** 管理特定组件，如 SDK、文档和各个仓库。
+- **Core Maintainers（核心维护者）** 指导项目的总体方向和 MCP 规范的演进。
+- **Lead Maintainers（首席维护者）** 担任最终决策者，确保项目的长期健康。
 
-All maintainers form the **MCP steering group**. To ensure a structured and timely review of incoming proposals, our core and lead maintainers will meet bi-weekly to review submitted [SEPs](#specification-enhancement-proposals-seps). Meeting notes and decisions will always be public. For example the [notes from the core maintainer meeting on July 23rd, 2025](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1061).
+所有维护者组成 **MCP 指导组**。为确保对收到的提案进行结构化和及时的审查，我们的核心和首席维护者将每两周召开一次会议，审查已提交的 [SEP](#规范增强提案-sep)。会议记录和决策将始终公开。例如[2025 年 7 月 23 日核心维护者会议记录](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1061)。
 
-## Get Involved
+## 参与其中
 
-We need your help to build the future of MCP, and everyone is welcome here. Whether you're a seasoned open source veteran or just curious about how to get started, there's a place for you in our community.
+我们需要您的帮助来构建 MCP 的未来，欢迎每个人加入。无论您是经验丰富的开源老手，还是刚开始探索的好奇心者，我们的社区都有您的位置。
 
-Many of our maintainers began with a single small contribution—sometimes just fixing a typo or asking a thoughtful question. Every journey starts somewhere, and we're excited to help you take your first step.
+我们的许多维护者都是从一个小小的贡献开始的——有时只是修正一个拼写错误或提出一个有深度的问题。每段旅程都始于某个起点，我们很高兴能帮助您迈出第一步。
 
-- **New Contributors**: Unsure where to begin? Start by helping with documentation, fixing bugs, or building out examples. Every contribution matters, and we're here to support you. Check out issues tagged with [`good first issue`](https://github.com/modelcontextprotocol/modelcontextprotocol/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) - they're perfect for getting started, and you'll find friendly faces ready to help.
-- **SDK Developers**: Have a favorite programming language? As MCP grows, we need your expertise to build and maintain the protocol SDKs. Your work could empower entire new communities to use MCP.
-- **Documentation Writers**: Clear, comprehensive [documentation](https://modelcontextprotocol.io/introduction) is what turns a good project into a great one. If you love explaining things or making guides, your contributions will help others succeed.
-- **Future Maintainers**: We believe in growing our team from within. The path to becoming a maintainer starts with consistent, quality contributions and a commitment to the project's success. Imagine yourself guiding new contributors and shaping the future of MCP.
+- **新贡献者**：不确定从哪里开始？从帮助文档、修复 bug 或构建示例开始。每项贡献都很重要，我们在这里支持您。查看标记了 [`good first issue`](https://github.com/modelcontextprotocol/modelcontextprotocol/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) 的 issues - 它们非常适合入门，您会发现友善的面孔随时准备提供帮助。
+- **SDK 开发者**：有偏爱的编程语言吗？随着 MCP 的发展，我们需要您的专业知识来构建和维护协议的 SDK。您的工作可以让全新的社区使用 MCP。
+- **文档作者**：清晰、全面的[文档](https://modelcontextprotocol.io/introduction)是优秀项目与卓越项目之间的分水岭。如果您喜欢解释事物或制作指南，您的贡献将帮助他人取得成功。
+- **未来的维护者**：我们相信从内部培养团队。成为维护者的道路始于持续、高质量的贡献和对项目成功的承诺。想象一下您指导新贡献者并塑造 MCP 的未来。
 
-No matter your background or experience, you belong here. Join our [Discord](https://discord.gg/6CSzBmMkjX) to connect with other contributors, ask questions, and find mentorship. Whether you're fixing a typo or proposing a major change to the protocol, your voice is valued and your efforts make a difference.
+无论您的背景或经验如何，您都属于这里。加入我们的 [Discord](https://discord.gg/6CSzBmMkjX) 与其他贡献者交流、提问并寻找指导。无论您是在修正拼写错误还是提议对协议进行重大变更，您的声音都受到重视，您的努力都会带来改变。
 
-For all the details, please see our full [governance documentation](https://modelcontextprotocol.io/community/governance).
+有关所有详细信息，请参阅我们的完整[治理文档](https://modelcontextprotocol.io/community/governance)。
 
-## Thank You
+## 感谢
 
-None of this would be possible without the incredible community that has rallied around MCP. From the early adopters who believed in the vision, to the developers building MCP clients and servers, to the maintainers dedicating their time and expertise. Every contribution has been essential to making the Model Context Protocol the success it is today.
+没有围绕 MCP 凝聚起来的非凡社区，这一切都不可能实现。从相信愿景的早期采用者，到构建 MCP clients 和 servers 的开发者，再到贡献时间和专业知识的维护者。每项贡献对于 Model Context Protocol 取得今天的成功都至关重要。
 
-You've helped us identify issues, improve documentation, build SDKs, create compelling examples, and push the boundaries of what's possible with platform integration. Your feedback, bug reports, feature requests, and code contributions have shaped MCP into something far better than we could have built alone.
+你们帮助我们识别问题、改进文档、构建 SDK、创建引人注目的示例，并推动了平台集成的可能性边界。你们的反馈、bug 报告、功能请求和代码贡献已将 MCP 塑造成了一个远优于我们独自构建的成果。
 
-As we embark on this next chapter with formal governance, we're more committed than ever to fostering the open, inclusive community that has made MCP thrive. Thank you for being part of this journey - we can't wait to see what we'll build together next.
+在我们开启正式治理的新篇章之际，我们比以往任何时候都更致力于培育使 MCP 蓬勃发展的开放、包容的社区。感谢您成为这段旅程的一部分——我们迫不及待地想看到我们接下来一起构建什么。

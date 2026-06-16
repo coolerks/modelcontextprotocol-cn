@@ -1,7 +1,7 @@
 ---
-title: "SEP-991: Enable URL-based Client Registration using OAuth Client ID Metadata Documents"
-sidebarTitle: "SEP-991: Enable URL-based Client Registration us…"
-description: "Enable URL-based Client Registration using OAuth Client ID Metadata Documents"
+title: "SEP-991: 使用 OAuth 客户端 ID 元数据文档启用基于 URL 的客户端注册"
+sidebarTitle: "SEP-991: 使用 OAuth 客户端 ID 元数据文档启用基于 URL 的客户端注册"
+description: "使用 OAuth 客户端 ID 元数据文档启用基于 URL 的客户端注册"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "Enable URL-based Client Registration using OAuth Client ID Metadat
 
 ## Abstract
 
-This SEP proposes adopting OAuth Client ID Metadata Documents as specified in [draft-parecki-oauth-client-id-metadata-document-03](https://datatracker.ietf.org/doc/draft-parecki-oauth-client-id-metadata-document/) as an additional client registration mechanism for the Model Context Protocol (MCP). This approach allows OAuth clients to use HTTPS URLs as client identifiers, where the URL points to a JSON document containing client metadata. This specifically addresses the common MCP scenario where servers and clients have no pre-existing relationship, enabling servers to trust clients without pre-coordination while maintaining full control over access policies.
+本 SEP 提议采用 [draft-parecki-oauth-client-id-metadata-document-03](https://datatracker.ietf.org/doc/draft-parecki-oauth-client-id-metadata-document/) 中规定的 OAuth 客户端 ID 元数据文档，作为模型上下文协议（MCP）的额外客户端注册机制。该方法允许 OAuth 客户端使用 HTTPS URL 作为客户端标识符，URL 指向包含客户端元数据的 JSON 文档。这专门解决了 MCP 中服务器和客户端之间没有预先关系的常见场景，使服务器无需预先协调即可信任客户端，同时保持对访问策略的完全控制。
 
 ## Motivation
 

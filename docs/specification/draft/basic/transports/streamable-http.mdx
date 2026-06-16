@@ -6,118 +6,70 @@ title: Streamable HTTP
 
 <Info>
 
-Streamable HTTP was introduced in protocol version 2025-03-26 as a replacement
-for the [HTTP+SSE transport][http-sse] from protocol version 2024-11-05.
+Streamable HTTP 是在协议版本 2025-03-26 中引入的，用于替代
+协议版本 2024-11-05 中的 [HTTP+SSE 传输][http-sse]。
 
 </Info>
 
 <Info>
 
-Revision 2026-07-28 changed the behavior of Streamable HTTP. Clients must
-ensure they handle backwards compatibility correctly. Changes included:
+修订版 2026-07-28 更改了 Streamable HTTP 的行为。客户端必须确保正确处理向后兼容性。更改包括：
 
-- Removal of the GET stream endpoint.
-- Removal of protocol-level sessions.
+- 移除了 GET 流端点。
+- 移除了协议级会话。
 
-See the [changelog](/specification/draft/changelog) and
-[Backward Compatibility](#backward-compatibility) below.
+请参见下面的[更改日志](/specification/draft/changelog)和[向后兼容性](#backward-compatibility)。
 
 </Info>
 
-In the **Streamable HTTP** transport, the server operates as an independent
-process that can handle multiple client connections. At a glance:
+在 **Streamable HTTP** 传输中，服务器作为一个独立进程运行，可以处理多个客户端连接。概览：
 
-- The server exposes a single HTTP endpoint (the **MCP endpoint**) that
-  accepts POST.
-- The client sends every JSON-RPC request or notification as its own HTTP
-  POST.
-- The server answers each request with either a single JSON object or a
-  [Server-Sent Events][sse] (SSE) stream scoped to that request, carrying
-  request-related notifications followed by the final response.
-- Server-to-client interactions (sampling, elicitation, roots) are embedded
-  in results as input requests per
-  [Multi Round-Trip Requests (MRTR)][mrtr] ([SEP-2322][sep-2322]).
-- Long-lived change notifications (such as list changes and resource updates)
-  are delivered on the response stream of a
-  [`subscriptions/listen`][subscriptions-listen] request.
+- 服务器暴露一个接受 POST 的单个 HTTP 端点（**MCP 端点**）。
+- 客户端将每个 JSON-RPC 请求或通知作为自己的 HTTP POST 发送。
+- 服务器用单个 JSON 对象或限定于该请求的 [Server-Sent Events][sse] (SSE) 流响应每个请求，携带请求相关的通知，然后是最终响应。
+- 服务器到客户端的交互（采样、引导、roots）根据[多轮请求 (MRTR)][mrtr] ([SEP-2322][sep-2322]) 作为输入请求嵌入在结果中。
+- 长期存在的变更通知（如列表变更和资源更新）在 [`subscriptions/listen`][subscriptions-listen] 请求的响应流上传递。
 
-See [Message Flow](#message-flow) for sequence diagrams of these
-interactions.
+有关这些交互的序列图，请参见[消息流](#message-flow)。
 
-The server **MUST** provide a single HTTP endpoint path (hereafter referred to
-as the **MCP endpoint**) that supports POST. For example, this could be a URL
-like `https://example.com/mcp`.
+服务器 **MUST** 提供一个支持 POST 的单个 HTTP 端点路径（以下简称 **MCP 端点**）。例如，这可以是像 `https://example.com/mcp` 这样的 URL。
 
 [http-sse]: /specification/2024-11-05/basic/transports#http-with-sse
 [sse]: https://en.wikipedia.org/wiki/Server-sent_events
 
-## Security & Endpoint
+## 安全与端点
 
-When implementing Streamable HTTP transport:
+实现 Streamable HTTP 传输时：
 
-1. Servers **MUST** validate the `Origin` header on all incoming connections
-   to prevent DNS rebinding attacks.
-   - If the `Origin` header is present and invalid, servers **MUST** respond
-     with HTTP 403 Forbidden. The HTTP response body **MAY** comprise a
-     JSON-RPC _error response_ that has no `id`.
-2. When running locally, servers **SHOULD** bind only to localhost
-   (127.0.0.1) rather than all network interfaces (0.0.0.0).
-3. Servers **SHOULD** implement proper authentication for all connections.
+1. 服务器 **MUST** 验证所有传入连接的 `Origin` 头部，以防止 DNS 重绑定攻击。
+   - 如果 `Origin` 头部存在且无效，服务器 **MUST** 以 HTTP 403 Forbidden 响应。HTTP 响应体 **MAY** 包含一个没有 `id` 的 JSON-RPC _错误响应_。
+2. 在本地运行时，服务器 **SHOULD** 仅绑定到 localhost (127.0.0.1)，而不是所有网络接口 (0.0.0.0)。
+3. 服务器 **SHOULD** 为所有连接实现适当的身份验证。
 
-Without these protections, attackers could use DNS rebinding to interact with
-local MCP servers from remote websites.
+没有这些保护措施，攻击者可能使用 DNS 重绑定从远程网站与本地 MCP 服务器交互。
 
-## Sending Messages
+## 发送消息
 
-Every JSON-RPC message sent from the client **MUST** be a new HTTP POST
-request to the MCP endpoint.
+从客户端发送的每个 JSON-RPC 消息 **MUST** 是对 MCP 端点的新 HTTP POST 请求。
 
-1. The client **MUST** use HTTP POST to send JSON-RPC messages.
-2. The client **MUST** include an `Accept` header listing both
-   `application/json` and `text/event-stream` as supported content types.
-3. The client **MUST** include the [request metadata headers](#request-metadata)
-   on each POST request.
-4. The body of the HTTP POST **MUST** be a single JSON-RPC _request_ or
-   _notification_. The client **MUST NOT** send JSON-RPC _responses_.
-5. If the body is a JSON-RPC _notification_:
-   - If the server accepts it, the server **MUST** return HTTP status code
-     `202 Accepted` with no body.
-   - If the server cannot accept it, it **MUST** return an HTTP error status
-     code (e.g., `400 Bad Request`). The HTTP response body **MAY** comprise
-     a JSON-RPC _error response_ that has no `id`.
-6. If the body is a JSON-RPC _request_, the server **MUST** return either
-   `Content-Type: application/json` (a single JSON object) or
-   `Content-Type: text/event-stream` (an SSE response stream). The client
-   **MUST** support both.
+1. 客户端 **MUST** 使用 HTTP POST 发送 JSON-RPC 消息。
+2. 客户端 **MUST** 包含一个 `Accept` 头部，列出 `application/json` 和 `text/event-stream` 作为支持的内容类型。
+3. 客户端 **MUST** 在每个 POST 请求上包含[请求元数据头部](#request-metadata)。
+4. HTTP POST 的消息体 **MUST** 是单个 JSON-RPC _请求_ 或 _通知_。客户端 **MUST NOT** 发送 JSON-RPC _响应_。
+5. 如果消息体是 JSON-RPC _通知_：
+   - 如果服务器接受它，服务器 **MUST** 返回 HTTP 状态码 `202 Accepted`，无消息体。
+   - 如果服务器无法接受它，它 **MUST** 返回 HTTP 错误状态码（例如 `400 Bad Request`）。HTTP 响应体 **MAY** 包含一个没有 `id` 的 JSON-RPC _错误响应_。
+6. 如果消息体是 JSON-RPC _请求_，服务器 **MUST** 返回 `Content-Type: application/json`（单个 JSON 对象）或 `Content-Type: text/event-stream`（SSE 响应流）。客户端 **MUST** 同时支持两者。
 
-## Receiving Messages
+## 接收消息
 
-When the server returns an SSE response stream
-(`Content-Type: text/event-stream`):
+当服务器返回 SSE 响应流（`Content-Type: text/event-stream`）时：
 
-- The server **MAY** send JSON-RPC _notifications_ — for example,
-  [`notifications/progress`][notifications-progress]
-  or [`notifications/message`][notifications-message] —
-  before the final response. These notifications **MUST** relate to the
-  originating client request.
-- The server **MUST NOT** send independent JSON-RPC _requests_ on this stream.
-  Server-to-client interactions (sampling, elicitation, list-roots) are
-  embedded as input requests inside an
-  [`InputRequiredResult`][input-required-result] per
-  [MRTR][mrtr] ([SEP-2322][sep-2322]), not delivered as separate requests on
-  this or any other stream. This is a change from Streamable HTTP in protocol
-  versions `2025-03-26` through `2025-11-25`, where servers could send such
-  requests on SSE streams.
-- The final JSON-RPC _response_ **SHOULD** terminate the stream.
+- 服务器 **MAY** 在最终响应之前发送 JSON-RPC _通知_ — 例如，[`notifications/progress`][notifications-progress] 或 [`notifications/message`][notifications-message]。这些通知 **MUST** 与原始客户端请求相关。
+- 服务器 **MUST NOT** 在此流上发送独立的 JSON-RPC _请求_。服务器到客户端的交互（采样、引导、list-roots）根据 [MRTR][mrtr] ([SEP-2322][sep-2322]) 作为输入请求嵌入在 [`InputRequiredResult`][input-required-result] 内部，不作为单独的请求在此流或任何其他流上传递。这与协议版本 `2025-03-26` 到 `2025-11-25` 中的 Streamable HTTP 有所不同，在这些版本中服务器可以在 SSE 流上发送此类请求。
+- 最终的 JSON-RPC _响应_ **SHOULD** 终止流。
 
-Long-lived notification streams are obtained by sending a
-[`subscriptions/listen`][subscriptions-listen]
-request. The server's response is itself an SSE stream that stays open and
-delivers the change notifications the client opted in to (such as
-`notifications/tools/list_changed` or `notifications/resources/updated`).
-Request-scoped notifications like `notifications/progress` and
-`notifications/message` are **not** delivered on the listen stream — they
-flow only on the response stream of the request they relate to.
+长期存在的通知流通过发送 [`subscriptions/listen`][subscriptions-listen] 请求获得。服务器的响应本身是一个保持开放的 SSE 流，传递客户端选择加入的变更通知（如 `notifications/tools/list_changed` 或 `notifications/resources/updated`）。请求作用域的通知如 `notifications/progress` 和 `notifications/message` **不会** 在 listen 流上传递 — 它们仅在与它们相关的请求的响应流上流动。
 
 When initiating an SSE stream, servers **SHOULD** include the
 `X-Accel-Buffering: no` header in the HTTP response. This instructs reverse
@@ -203,29 +155,21 @@ sequenceDiagram
     note over Client,Server: Until the client or server closes the stream
 ```
 
-## Cancellation
+## 取消
 
-Closing the SSE response stream **MUST** be treated by the server as
-cancellation of that request. Because each request has its own response
-stream, the transport-level disconnect is unambiguous. The server **SHOULD**
-stop work on the cancelled request as soon as practical and **MUST NOT** send
-any further messages for it. See
-[Cancellation][cancellation] for the full rules.
+关闭 SSE 响应流 **MUST** 被服务器视为取消该请求。由于每个请求都有自己的响应流，传输级别的断开连接是明确的。服务器 **SHOULD** 尽快停止处理已取消的请求，并且 **MUST NOT** 再为其发送任何消息。请参见[取消][cancellation]了解完整规则。
 
 [cancellation]: /specification/draft/basic/patterns/cancellation
 
-## Request Metadata
+## 请求元数据
 
-The Streamable HTTP transport mirrors selected JSON-RPC body fields into HTTP
-headers so that intermediaries (load balancers, gateways, observability
-tooling) can route and inspect requests without parsing the body.
+Streamable HTTP 传输将选定的 JSON-RPC 消息体字段镜像到 HTTP 头部中，以便中间件（负载均衡器、网关、可观测性工具）可以在不解析消息体的情况下路由和检查请求。
 
-### Protocol Version Header
+### 协议版本头部
 
-Every POST request to the MCP endpoint **MUST** include an
-`MCP-Protocol-Version` header.
+对 MCP 端点的每个 POST 请求 **MUST** 包含 `MCP-Protocol-Version` 头部。
 
-For example: `MCP-Protocol-Version: 2026-07-28`
+例如：`MCP-Protocol-Version: 2026-07-28`
 
 The header value **MUST** match the
 `io.modelcontextprotocol/protocolVersion` field carried in the request body's
@@ -256,14 +200,14 @@ the header per [Server Validation](#server-validation).
 [unsupported-version]: /specification/draft/schema#unsupportedprotocolversionerror
 [lifecycle-version]: /specification/draft/basic/versioning#protocol-version-negotiation
 
-### Standard Request Headers
+### 标准请求头部
 
-| Header Name  | Source Field                  | Required For                                           |
-| ------------ | ----------------------------- | ------------------------------------------------------ |
-| `Mcp-Method` | `method`                      | All requests and notifications                         |
-| `Mcp-Name`   | `params.name` or `params.uri` | `tools/call`, `resources/read`, `prompts/get` requests |
+| 头部名称     | 源字段                        | 适用范围                                           |
+| ------------ | ----------------------------- | -------------------------------------------------- |
+| `Mcp-Method` | `method`                      | 所有请求和通知                                     |
+| `Mcp-Name`   | `params.name` 或 `params.uri` | `tools/call`、`resources/read`、`prompts/get` 请求 |
 
-These headers are **REQUIRED** for compliance.
+这些头部是合规性 **REQUIRED** 的。
 
 **`tools/call` request:**
 
@@ -322,49 +266,28 @@ Mcp-Name: file:///projects/myapp/config.json
 }
 ```
 
-### Custom Headers from Tool Parameters
+### 来自工具参数的自定义头部
 
-MCP servers **MAY** designate specific tool parameters to be mirrored into
-HTTP headers using an `x-mcp-header` extension property in the parameter's
-schema within the tool's `inputSchema`. See
-[Tool Definitions][tool-definitions] for
-details on how to annotate tool parameters.
+MCP 服务器 **MAY** 通过在工具 `inputSchema` 内参数的 schema 中使用 `x-mcp-header` 扩展属性，指定要将特定工具参数镜像到 HTTP 头部。有关如何注释工具参数的详细信息，请参见[工具定义][tool-definitions]。
 
-While the use of `x-mcp-header` is optional for servers, clients **MUST**
-support this feature. When a server's tool definition includes
-`x-mcp-header` annotations, conforming clients **MUST** mirror the
-designated parameter values into HTTP headers.
+虽然 `x-mcp-header` 的使用对于服务器是可选的，但客户端 **MUST** 支持此功能。当服务器的工具定义包含 `x-mcp-header` 注释时，符合规范的客户端 **MUST** 将指定的参数值镜像到 HTTP 头部中。
 
 [tool-definitions]: /specification/draft/server/tools#x-mcp-header
 
-#### Schema Extension
+#### Schema 扩展
 
-The `x-mcp-header` property specifies the name portion used to construct
-the header name `Mcp-Param-{name}`.
+`x-mcp-header` 属性指定用于构造头部名称 `Mcp-Param-{name}` 的名称部分。
 
-**Constraints on `x-mcp-header` values**:
+**`x-mcp-header` 值的约束**：
 
-- **MUST NOT** be empty
-- **MUST** match HTTP field-name token syntax (`1*tchar`, [RFC 9110 Section 5.1](https://datatracker.ietf.org/doc/html/rfc9110#section-5.1))
-- **MUST NOT** contain control characters, including carriage return (CR, `\r`)
-  or line feed (LF, `\n`)
-- **MUST** be case-insensitively unique among all `x-mcp-header` values in
-  the `inputSchema`
-- **MUST** only be applied to parameters with primitive types (integer,
-  string, boolean). Parameters with type `number` are not permitted.
-  Integer values **MUST** be within the safe range for JavaScript
-  (−2<sup>53</sup>+1 to 2<sup>53</sup>−1)
-- **MAY** be applied to properties at any nesting depth within the
-  `inputSchema`, not only top-level properties
+- **MUST NOT** 为空
+- **MUST** 匹配 HTTP 字段名令牌语法（`1*tchar`，[RFC 9110 第 5.1 节](https://datatracker.ietf.org/doc/html/rfc9110#section-5.1)）
+- **MUST NOT** 包含控制字符，包括回车符（CR，`\r`）或换行符（LF，`\n`）
+- **MUST** 在 `inputSchema` 中所有 `x-mcp-header` 值中不区分大小写地唯一
+- **MUST** 仅应用于原始类型（整数、字符串、布尔值）的参数。不允许使用 `number` 类型的参数。整数值 **MUST** 在 JavaScript 的安全范围内（−2<sup>53</sup>+1 到 2<sup>53</sup>−1）
+- **MAY** 应用于 `inputSchema` 内任何嵌套深度的属性，不仅限于顶层属性
 
-Clients using the Streamable HTTP transport **MUST** reject tool definitions
-where any `x-mcp-header` value violates these constraints. Rejection means
-the client **MUST** exclude the invalid tool from the result of `tools/list`.
-Clients **SHOULD** log a warning when rejecting a tool definition, including
-the tool name and the reason for rejection. This ensures that a single
-malformed tool definition does not prevent other valid tools from being used.
-Clients using other transports (e.g., stdio) **MAY** ignore `x-mcp-header`
-annotations entirely.
+使用 Streamable HTTP 传输的客户端 **MUST** 拒绝任何 `x-mcp-header` 值违反这些约束的工具定义。拒绝意味着客户端 **MUST** 从 `tools/list` 的结果中排除无效的工具。客户端 **SHOULD** 在拒绝工具定义时记录警告，包括工具名称和拒绝原因。这确保了单个格式错误的工具定义不会阻止其他有效工具被使用。使用其他传输（例如，stdio）的客户端 **MAY** 完全忽略 `x-mcp-header` 注释。
 
 **Example tool definition:**
 

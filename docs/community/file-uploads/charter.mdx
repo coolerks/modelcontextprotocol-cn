@@ -1,111 +1,102 @@
 ---
-title: File Uploads Charter
-description: Charter for the MCP File Uploads Working Group.
+title: 文件上传章程
+description: MCP 文件上传工作组的章程。
 ---
 
-## Group Type
+## 小组类型
 
-**Working Group**
+**工作组**
 
-## Mission Statement
+## 使命宣言
 
-The File Uploads Working Group exists to define how MCP tools and elicitation requests declare file
-inputs so that hosts can present native file pickers and pass user-selected file content to servers.
-Today, servers that need a file from the user resort to prose instructions asking for base64 strings
-or local paths, which produces inconsistent UX and pushes encoding details onto end users. This WG
-will specify a minimal, schema-level mechanism for declaring file inputs and the wire format for
-delivering them, anchored on [SEP-2356](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2356).
+文件上传工作组旨在定义 MCP 工具和引导请求如何声明文件输入，以便主机可以呈现原生文件选择器并将用户选择的文件内容传递给服务器。
+目前，需要从用户获取文件的服务器只能通过文字说明要求 base64 字符串或本地路径，
+这产生了不一致的用户体验并将编码细节推给了最终用户。本工作组
+将指定一个最小化的、模式级别的机制来声明文件输入及其传输的线路格式，
+基于 [SEP-2356](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2356)。
 
-## Scope
+## 范围
 
-### In Scope
+### 范围内
 
-- **Specification Work**: SEPs defining declarative file input descriptors on tool input schemas and
-  elicitation request schemas, the wire encoding for file content, and host-side handling
-  requirements.
-- **Reference Implementations**: SDK types and helpers for `FileInputDescriptor`, data URI encoding,
-  and a sample host flow demonstrating picker invocation and value substitution.
-- **Cross-Cutting Concerns**: Coordination with the MCP Apps WG where embedded UI surfaces present
-  their own file pickers, and with the Security WG on host-side validation requirements.
-- **Documentation**: Specification sections covering file input declaration and a migration guide
-  for servers currently using ad-hoc base64 instructions.
+- **规范工作**：定义工具输入模式和引导请求模式上的声明性文件输入描述符、
+  文件内容的线路编码以及主机端处理要求的 SEP。
+- **参考实现**：用于 `FileInputDescriptor`、数据 URI 编码的 SDK 类型和助手，
+  以及演示选择器调用和值替换的示例主机流程。
+- **跨领域问题**：与 MCP Apps WG 的协调（其中嵌入式 UI 表面呈现自己的文件选择器），
+  以及与安全 WG 的协调（主机端验证要求）。
+- **文档**：涵盖文件输入声明的规范部分，以及为当前使用临时 base64 指令的服务器提供的迁移指南。
 
-### Out of Scope
+### 范围外
 
-- Server-to-client file delivery, which is already covered by Resources and `BlobResourceContents`.
-- Changes to the transport layer or session model.
+- 服务器到客户端的文件传递，这已被资源和 `BlobResourceContents` 覆盖。
+- 对传输层或会话模型的更改。
 
-The WG may evaluate approaches such as streaming, chunked transfer, or presigned upload URLs as part
-of its design work; whether those land in the initial SEP or a follow-up is a WG decision rather
-than a charter constraint.
+WG 可以评估流式传输、分块传输或预签名上传 URL 等方法作为其设计工作的一部分；
+这些方法是在初始 SEP 还是后续 SEP 中落地是 WG 的决定，而非章程约束。
 
-### Related Groups
+### 相关小组
 
-- **MCP Apps WG** — embedded app UIs may surface their own file pickers; the descriptor format
-  should be reusable in that context.
-- **Security WG** — host-side validation requirements for user-supplied file content (the SEP
-  references [OWASP ASVS V5](https://owasp.org/www-project-application-security-verification-standard/)
-  for general upload hygiene).
-- **Tool Annotations IG** — file input descriptors are a form of input-parameter metadata and should
-  remain consistent with the broader annotation taxonomy.
+- **MCP Apps WG** — 嵌入式应用 UI 可能呈现自己的文件选择器；描述符格式应在此上下文中可重用。
+- **安全 WG** — 用户提供的文件内容的主机端验证要求（SEP 引用 [OWASP ASVS V5](https://owasp.org/www-project-application-security-verification-standard/) 作为一般上传卫生标准）。
+- **工具注释 IG** — 文件输入描述符是一种输入参数元数据形式，应与更广泛的注释分类保持一致。
 
-## Leadership
+## 领导层
 
-| Role | Name           | Organization | GitHub                                   | Term    |
-| ---- | -------------- | ------------ | ---------------------------------------- | ------- |
-| Lead | Den Delimarsky | Anthropic    | [@localden](https://github.com/localden) | Initial |
+| 角色   | 姓名           | 组织      | GitHub                                   | 任期 |
+| ------ | -------------- | --------- | ---------------------------------------- | ---- |
+| 负责人 | Den Delimarsky | Anthropic | [@localden](https://github.com/localden) | 初始 |
 
-Sponsored by Den Delimarsky ([@localden](https://github.com/localden)) and Nick Cooper
-([@nickcoai](https://github.com/nickcoai)).
+由 Den Delimarsky ([@localden](https://github.com/localden)) 和 Nick Cooper ([@nickcoai](https://github.com/nickcoai)) 赞助。
 
-## Authority & Decision Rights
+## 权限与决策权
 
-| Decision Type                       | Authority Level                                        |
-| ----------------------------------- | ------------------------------------------------------ |
-| Meeting logistics & scheduling      | WG Leads (autonomous)                                  |
-| Proposal prioritization within WG   | WG Leads (autonomous)                                  |
-| SEP triage & closure (in scope)     | WG Leads (autonomous, with documented rationale)       |
-| Technical design within scope       | WG consensus                                           |
-| Spec changes (additive)             | WG consensus → Core Maintainer approval                |
-| Spec changes (breaking/fundamental) | WG consensus → Core Maintainer approval + wider review |
-| Scope expansion                     | Core Maintainer approval required                      |
-| WG Member approval                  | WG Member sponsors                                     |
+| 决策类型                  | 权限级别                                |
+| ------------------------- | --------------------------------------- |
+| 会议后勤与安排            | WG 负责人（自主）                       |
+| WG 内提案优先级           | WG 负责人（自主）                       |
+| SEP 分类与关闭（范围内）  | WG 负责人（自主，附记录理由）           |
+| 范围内技术设计            | WG 共识                                 |
+| 规范变更（新增）          | WG 共识 → 核心维护者批准                |
+| 规范变更（破坏性/根本性） | WG 共识 → 核心维护者批准 + 更广泛的评审 |
+| 范围扩展                  | 需要核心维护者批准                      |
+| WG 成员批准               | WG 成员赞助者                           |
 
-## Membership
+## 成员
 
-| Name           | Organization | GitHub                                   | Discord | Level     |
-| -------------- | ------------ | ---------------------------------------- | ------- | --------- |
-| Den Delimarsky | Anthropic    | [@localden](https://github.com/localden) |         | Lead      |
-| Nick Cooper    | OpenAI       | [@nickcoai](https://github.com/nickcoai) |         | WG Member |
-| Olivier Chafik | Anthropic    | [@ochafik](https://github.com/ochafik)   |         | WG Member |
+| 姓名           | 组织      | GitHub                                   | Discord | 级别    |
+| -------------- | --------- | ---------------------------------------- | ------- | ------- |
+| Den Delimarsky | Anthropic | [@localden](https://github.com/localden) |         | 负责人  |
+| Nick Cooper    | OpenAI    | [@nickcoai](https://github.com/nickcoai) |         | WG 成员 |
+| Olivier Chafik | Anthropic | [@ochafik](https://github.com/ochafik)   |         | WG 成员 |
 
-## Operations
+## 运营
 
-| Meeting         | Frequency | Duration | Purpose                               |
-| --------------- | --------- | -------- | ------------------------------------- |
-| Working Session | Biweekly  | 30 min   | Technical discussion, proposal review |
+| 会议     | 频率       | 时长    | 目的               |
+| -------- | ---------- | ------- | ------------------ |
+| 工作会议 | 每两周一次 | 30 分钟 | 技术讨论、提案评审 |
 
-Discord: `#file-uploads-wg`
+Discord：`#file-uploads-wg`
 
-## Deliverables & Success Metrics
+## 交付物与成功指标
 
-### Active Work Items
+### 活跃工作项
 
-| Item                                                                                                        | Status | Target Date | Champion                               |
-| ----------------------------------------------------------------------------------------------------------- | ------ | ----------- | -------------------------------------- |
-| [SEP-2356: Declarative file inputs](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2356) | Draft  | End May     | [@ochafik](https://github.com/ochafik) |
-| TypeScript SDK reference implementation                                                                     | —      | End May     | [@ochafik](https://github.com/ochafik) |
-| Reference implementation in a second Tier-1 SDK                                                             | —      | End June    | TBD                                    |
+| 项目                                                                                               | 状态 | 目标日期 | 负责人                                 |
+| -------------------------------------------------------------------------------------------------- | ---- | -------- | -------------------------------------- |
+| [SEP-2356：声明性文件输入](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2356) | 草稿 | 5 月底   | [@ochafik](https://github.com/ochafik) |
+| TypeScript SDK 参考实现                                                                            | —    | 5 月底   | [@ochafik](https://github.com/ochafik) |
+| 第二个第 1 层 SDK 中的参考实现                                                                     | —    | 6 月底   | 待定                                   |
 
-### Success Criteria
+### 成功标准
 
-- An accepted SEP defining the file input descriptor and wire encoding.
-- Reference implementations in at least two Tier-1 SDKs.
-- At least one production host rendering a native file picker from the descriptor.
-- Conformance test coverage for the new schema keyword.
+- 已接受的 SEP，定义文件输入描述符和线路编码。
+- 至少在两个第 1 层 SDK 中的参考实现。
+- 至少一个生产主机从描述符呈现原生文件选择器。
+- 新模式关键字的一致性测试覆盖。
 
-## Changelog
+## 变更日志
 
-| Date       | Change          |
-| ---------- | --------------- |
-| 2026-04-23 | Initial charter |
+| 日期       | 更改     |
+| ---------- | -------- |
+| 2026-04-23 | 初始章程 |

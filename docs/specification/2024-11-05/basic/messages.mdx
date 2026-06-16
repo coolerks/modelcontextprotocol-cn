@@ -1,16 +1,16 @@
 ---
-title: Messages
+title: 消息
 type: docs
 weight: 20
 ---
 
-All messages in MCP **MUST** follow the
-[JSON-RPC 2.0](https://www.jsonrpc.org/specification) specification. The protocol defines
-three types of messages:
+MCP 中的所有消息**MUST**遵循
+[JSON-RPC 2.0](https://www.jsonrpc.org/specification) 规范。协议定义了
+三种类型的消息：
 
-## Requests
+## 请求（Requests）
 
-Requests are sent from the client to the server or vice versa.
+请求可以从 client 发送到 server，反之亦然。
 
 ```typescript
 {
@@ -28,9 +28,9 @@ Requests are sent from the client to the server or vice versa.
 - The request ID **MUST NOT** have been previously used by the requestor within the same
   session.
 
-## Responses
+## 响应（Responses）
 
-Responses are sent in reply to requests.
+响应作为对请求的回复而发送。
 
 ```typescript
 {
@@ -51,10 +51,9 @@ Responses are sent in reply to requests.
 - Either a `result` or an `error` **MUST** be set. A response **MUST NOT** set both.
 - Error codes **MUST** be integers.
 
-## Notifications
+## 通知（Notifications）
 
-Notifications are sent from the client to the server or vice versa. They do not expect a
-response.
+通知可以从 client 发送到 server，反之亦然。它们不期望收到响应。
 
 ```typescript
 {

@@ -1,90 +1,86 @@
 # Model Context Protocol (MCP)
 
-This repository contains the MCP specification, documentation, and blog.
+本仓库包含 MCP 规范、文档和博客。
 
-## Documentation Structure
+## 文档结构
 
-- `docs/` - Mintlify site (`npm run serve:docs`)
-  - `docs/docs/` - guides and tutorials
-  - `docs/specification/` - MCP specification (more formal, versioned)
-- `blog/` - Hugo blog (`npm run serve:blog`)
+- `docs/` - Mintlify 站点（`npm run serve:docs`）
+  - `docs/docs/` - 指南和教程
+  - `docs/specification/` - MCP 规范（更正式，版本化）
+- `blog/` - Hugo 博客（`npm run serve:blog`）
 
-### Documentation Guidelines
+### 文档指南
 
-- When creating flowcharts, and graphs to visualize aspect of the protocol, use mermaid diagrams where
-  possible.
-- When writing tables, ensure column headers and columns are aligned with whitespace.
-- Before pushing or creating PR's ensure that `npm run prep` is free of warnings and errors.
+- 在创建流程图和图表以可视化协议时，尽可能使用 mermaid 图表。
+- 在编写表格时，确保列标题和列与空白对齐。
+- 在推送或创建 PR 之前，确保 `npm run prep` 没有警告和错误。
 
-## Specification Versioning
+## 规范版本管理
 
-Specifications use **date-based versioning** (YYYY-MM-DD), not semantic versioning:
+规范使用**基于日期的版本管理**（YYYY-MM-DD），而非语义化版本：
 
-- `schema/[YYYY-MM-DD]/` and `docs/specification/[YYYY-MM-DD]/` - released versions
-- `schema/draft/` and `docs/specification/draft/` - in-progress work
+- `schema/[YYYY-MM-DD]/` 和 `docs/specification/[YYYY-MM-DD]/` - 已发布版本
+- `schema/draft/` 和 `docs/specification/draft/` - 进行中的工作
 
-## Schema Generation
+## Schema 生成
 
-TypeScript files are the **source of truth** for the protocol schema:
+TypeScript 文件是协议 schema 的**唯一事实来源**：
 
-- Edit: `schema/[version]/schema.ts`
-- Generate JSON + docs: `npm run generate:schema`
-- This creates both `schema/[version]/schema.json` and the Schema Reference document in `docs/specification/[version]/schema.mdx`
+- 编辑：`schema/[version]/schema.ts`
+- 生成 JSON + 文档：`npm run generate:schema`
+- 这将创建 `schema/[version]/schema.json` 和 `docs/specification/[version]/schema.mdx` 中的 Schema 参考文档
 
-Always regenerate after editing schema files.
+编辑 schema 文件后始终重新生成。
 
-## Schema Examples
+## Schema 示例
 
-JSON examples live in `schema/[version]/examples/[TypeName]/`:
+JSON 示例位于 `schema/[version]/examples/[TypeName]/`：
 
-- Directory name = schema type (e.g., `Tool/`, `Resource/`)
-- Files validate against their directory's type: `Tool/example-name.json` → Tool schema
-- Referenced in `schema.ts` via `@includeCode` JSDoc tags
+- 目录名 = schema 类型（例如 `Tool/`、`Resource/`）
+- 文件根据其目录类型进行验证：`Tool/example-name.json` → Tool schema
+- 通过 `@includeCode` JSDoc 标签在 `schema.ts` 中引用
 
-## Agent Skills
+## 代理技能
 
-When adding a new skill, also add a directory symlink at `docs/.mintlify/skills/<name>` pointing to `../../../plugins/<plugin-name>/skills/<name>` so Mintlify's `.well-known/agent-skills/` and MCP server auto-scan exposes it.
+添加新技能时，还需在 `docs/.mintlify/skills/<name>` 处创建一个指向 `../../../plugins/<plugin-name>/skills/<name>` 的目录符号链接，以便 Mintlify 的 `.well-known/agent-skills/` 和 MCP server 自动扫描能够发现它。
 
-## Useful Commands
+## 常用命令
 
 ```bash
-# Dev servers
-npm run serve:docs       # Local Mintlify docs server
-npm run serve:blog       # Local Hugo blog server
+# 开发服务器
+npm run serve:docs       # 本地 Mintlify 文档服务器
+npm run serve:blog       # 本地 Hugo 博客服务器
 
-# Generation (run after editing source files)
-npm run generate         # Generate all (schema + SEPs)
-npm run generate:schema  # Generate JSON schemas + MDX from TypeScript
-npm run generate:seps    # Generate SEP documents
+# 生成（编辑源文件后运行）
+npm run generate         # 生成全部（schema + SEP）
+npm run generate:schema  # 从 TypeScript 生成 JSON schema + MDX
+npm run generate:seps    # 生成 SEP 文档
 
-# Formatting
-npm run format           # Format all (docs + schema)
-npm run format:docs      # Format markdown/MDX files
-npm run format:schema    # Format schema TypeScript files
+# 格式化
+npm run format           # 格式化全部（文档 + schema）
+npm run format:docs      # 格式化 Markdown/MDX 文件
+npm run format:schema    # 格式化 schema TypeScript 文件
 
-# Checks
-npm run check            # Run all checks
-npm run check:schema     # Check schema (TS, JSON, examples, MDX)
-npm run check:docs       # Check docs (format, comments, links)
-npm run check:seps       # Check SEP documents
+# 检查
+npm run check            # 运行所有检查
+npm run check:schema     # 检查 schema（TS、JSON、示例、MDX）
+npm run check:docs       # 检查文档（格式、评论、链接）
+npm run check:seps       # 检查 SEP 文档
 
-# Workflow
-npm run prep             # Full prep before committing (check, generate, format)
+# 工作流
+npm run prep             # 提交前的完整准备（检查、生成、格式化）
 ```
 
-## Issue Creation
+## 创建 Issue
 
-Blank issues are disabled. `gh issue create` and the API bypass the template
-chooser, so when filing via CLI or API you **must** use one of the forms in
-`.github/ISSUE_TEMPLATE/` and fill in its required fields.
+禁止空白 Issue。`gh issue create` 和 API 会绕过模板选择器，因此通过 CLI 或 API 提交时，你**必须**使用 `.github/ISSUE_TEMPLATE/` 中的某个表单并填写其必填字段。
 
-Before filing, check `.github/ISSUE_TEMPLATE/config.yml` — some categories
-are redirected out of this repo entirely:
+在提交前，检查 `.github/ISSUE_TEMPLATE/config.yml` — 某些类别会完全重定向到此仓库之外：
 
-- **SEPs** are pull requests adding a file to `seps/`, not issues
-- **SDK bugs** belong in the individual SDK repository
-- **Claude MCP behavior** belongs in `anthropics/claude-ai-mcp`
+- **SEP** 是向 `seps/` 添加文件的拉取请求，而不是 Issue
+- **SDK 错误** 属于各个 SDK 仓库
+- **Claude MCP 行为** 属于 `anthropics/claude-ai-mcp`
 
-## Commit Guidelines
+## 提交指南
 
-- Do not include model names or details (e.g., "Claude", "Opus") in commit messages
+- 不要在提交信息中包含模型名称或细节（例如 "Claude"、"Opus"）

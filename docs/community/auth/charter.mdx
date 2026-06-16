@@ -1,86 +1,86 @@
 ---
-title: Authorization Charter
-description: Charter for the MCP Authorization Interest Group.
+title: 授权章程
+description: MCP 授权兴趣小组的章程。
 ---
 
-## Group Type
+## 小组类型
 
-**Interest Group**
+**兴趣小组**
 
-## Mission Statement
+## 使命宣言
 
-The Authorization Interest Group provides a venue for MCP implementers, identity-provider vendors, and security practitioners to surface real-world authorization challenges encountered when deploying MCP clients and servers. The group gathers use cases, documents gaps in the current OAuth 2.1–based authorization specification, and incubates validated problems until they are scoped well enough to propose a focused Working Group via the standard [group-creation process](/community/working-interest-groups#creating-a-working-group) to drive the corresponding [SEPs](/community/sep-guidelines).
+授权兴趣小组为 MCP 实现者、身份提供商厂商和安全从业者提供了一个场所，以揭示在部署 MCP 客户端和服务器时遇到的现实世界授权挑战。该小组收集用例，记录当前基于 OAuth 2.1 的授权规范中的差距，并孵化经过验证的问题，直到它们的范围足够清晰，可以通过标准的[小组创建流程](/community/working-interest-groups#creating-a-working-group)提议一个专注的工作组，以推动相应的[SEP](/community/sep-guidelines)。
 
-## Scope
+## 范围
 
-### In Scope
+### 范围内
 
-- **Deployment experience reports**: how implementers have integrated the current authorization spec (OAuth 2.1, [RFC 9728](https://www.rfc-editor.org/rfc/rfc9728) Protected Resource Metadata, [RFC 7591](https://www.rfc-editor.org/rfc/rfc7591) Dynamic Client Registration, Client ID Metadata Documents) with real authorization servers, and where it falls short
-- **Enterprise identity integration**: requirements and friction points when connecting MCP servers to enterprise IdPs (Okta, Entra ID, Ping, Keycloak, etc.), including SSO, tenant isolation, and admin consent flows
-- **Delegated and agentic access**: use cases for on-behalf-of token exchange, downstream resource access, audience restriction, and consent when an MCP client acts through chains of agents or tools
-- **Scope and permission granularity**: whether and how MCP servers should advertise fine-grained scopes (per-tool, per-resource) and how clients should request and present them
-- **Credentials for non-HTTP transports**: patterns for stdio, WebSocket, and future transports where the HTTP authorization spec does not directly apply
-- **Client identity and registration**: operator experience with Dynamic Client Registration, Client ID Metadata Documents, software statements, and pre-registered clients
-- **Threat modelling input**: cataloguing authorization-related attack surfaces (token confusion, confused-deputy, audience mismatch, redirect handling) to inform Security Best Practices documentation
-- **Proposing Working Groups**: once a problem is validated and scoped, the IG submits a Working Group creation proposal via the standard `#wg-ig-group-creation` process; approval remains with community moderators and core maintainers
-- **Problem statements and requirements**: use-case catalogues and recommendations published to GitHub Discussions for consumption by SEP authors and Working Groups
+- **部署经验报告**：实现者如何将当前授权规范（OAuth 2.1、[RFC 9728](https://www.rfc-editor.org/rfc/rfc9728) 受保护资源元数据、[RFC 7591](https://www.rfc-editor.org/rfc/rfc7591) 动态客户端注册、客户端 ID 元数据文档）与真实授权服务器集成，以及不足之处
+- **企业身份集成**：将 MCP 服务器连接到企业 IdP（Okta、Entra ID、Ping、Keycloak 等）时的要求和摩擦点，包括 SSO、租户隔离和管理员同意流程
+- **委托和代理访问**：当 MCP 客户端通过代理或工具链操作时的代币交换、下游资源访问、受众限制和同意的用例
+- **范围和权限粒度**：MCP 服务器是否以及如何公布细粒度范围（按工具、按资源），以及客户端应如何请求和展示它们
+- **非 HTTP 传输的凭据**：适用于 stdio、WebSocket 和未来传输的模式，其中 HTTP 授权规范不直接适用
+- **客户端身份和注册**：动态客户端注册、客户端 ID 元数据文档、软件声明和预注册客户端的操作经验
+- **威胁建模输入**：编录与授权相关的攻击面（代币混淆、混淆代理、受众不匹配、重定向处理），以告知安全最佳实践文档
+- **提议工作组**：一旦问题得到验证和范围界定，IG 通过标准的 `#wg-ig-group-creation` 流程提交工作组创建提案；批准权仍由社区版主和核心维护者掌握
+- **问题陈述和需求**：发布到 GitHub Discussions 的用例目录和建议，供 SEP 作者和工作组使用
 
-### Out of Scope
+### 范围外
 
-- **Authentication of end users to MCP clients**: how a host application authenticates its own users is a host concern, not a protocol concern
-- **Transport security (TLS, mTLS, certificate handling)**: belongs to the Transports WG
-- **Server identity, provenance, and trust signalling**: belongs to the Server Card / Registry efforts
-- **End-user product configuration walk-throughs**: the IG discusses patterns, not step-by-step setup for individual IdP products. Vendor-reported constraints on what an authorization server can or cannot implement _are_ in scope as deployment experience
-- **Competitively sensitive or non-public business information**, per the [MCP Antitrust Policy](/community/antitrust)
+- **最终用户对 MCP 客户端的身份验证**：主机应用程序如何验证自己的用户是主机关注的问题，而非协议关注的问题
+- **传输安全（TLS、mTLS、证书处理）**：属于传输工作组
+- **服务器身份、来源和信任信号**：属于服务器卡/注册中心相关工作
+- **最终用户产品配置指南**：IG 讨论模式，而非单个 IdP 产品的逐步设置。供应商报告的关于授权服务器能或不能实现的约束*属于*范围内的部署经验
+- **竞争敏感或非公开的商业信息**，根据 [MCP 反垄断政策](/community/antitrust)
 
-### Related Groups
+### 相关小组
 
-- **Transports WG**: authorization is currently specified at the HTTP transport level; changes to transports affect where credentials are carried
-- **Agents WG**: delegated/on-behalf-of access and consent for multi-agent chains overlap heavily with agentic use cases
-- **[Server Card WG](/community/server-card/charter) / [Registry](/community/registry/charter)**: client and server identity, discovery metadata, and trust establishment intersect with how authorization servers and resource servers are located and verified
-- **SDK Maintainers**: SDKs ship the auth client implementations; IG findings should inform cross-SDK auth ergonomics
+- **传输工作组**：授权当前在 HTTP 传输级别指定；对传输的更改会影响凭据的承载位置
+- **代理工作组**：多代理链的委托/代表访问和同意与代理用例高度重叠
+- **[服务器卡工作组](/community/server-card/charter) / [注册中心](/community/registry/charter)**：客户端和服务器身份、发现元数据和信任建立与授权服务器和资源服务器的定位和验证相交织
+- **SDK 维护者**：SDK 提供授权客户端实现；IG 的发现应为跨 SDK 授权人体工程学提供信息
 
-## Leadership
+## 领导层
 
-| Role        | Name          | Organization | GitHub                                     | Term    |
-| ----------- | ------------- | ------------ | ------------------------------------------ | ------- |
-| Facilitator | Aaron Parecki | Okta         | [@aaronpk](https://github.com/aaronpk)     | Initial |
-| Facilitator | Darin McAdams | Amazon       | [@D-McAdams](https://github.com/D-McAdams) | Initial |
-| Facilitator | Paul Carleton | Anthropic    | [@pcarleton](https://github.com/pcarleton) | Initial |
+| 角色   | 姓名          | 组织      | GitHub                                     | 任期 |
+| ------ | ------------- | --------- | ------------------------------------------ | ---- |
+| 协调人 | Aaron Parecki | Okta      | [@aaronpk](https://github.com/aaronpk)     | 初始 |
+| 协调人 | Darin McAdams | Amazon    | [@D-McAdams](https://github.com/D-McAdams) | 初始 |
+| 协调人 | Paul Carleton | Anthropic | [@pcarleton](https://github.com/pcarleton) | 初始 |
 
-## Membership
+## 成员
 
-Open to anyone; no formal membership or approval step is required to join the channel, attend calls, or contribute.
+对任何人开放；无需正式的成员身份或批准步骤即可加入频道、参加会议或做出贡献。
 
-Join the `#auth-ig` channel on the [MCP Contributors Discord](/community/communication#discord) or open a thread in the Authorization category of [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions). If your topic clearly matches one of the Working Groups in the table below, you can post directly in that WG's channel. Calls are open and attendance is optional — async participation via Discord and GitHub is equally valued.
+加入 [MCP 贡献者 Discord](/community/communication#discord) 上的 `#auth-ig` 频道，或在 [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions) 的授权类别中开设话题。如果你的主题明确匹配下表中某个工作组的范围，你可以直接在该 WG 的频道中发帖。会议是开放的，出席是可选的——通过 Discord 和 GitHub 的异步参与同样受到重视。
 
-## Operations
+## 运营
 
-| Meeting         | Frequency     | Duration | Purpose                                                                      |
-| --------------- | ------------- | -------- | ---------------------------------------------------------------------------- |
-| Discussion Call | Every 2 weeks | 45 min   | Use-case sharing, problem triage, WG proposal decisions, implementer reports |
+| 会议   | 频率       | 时长    | 目的                                           |
+| ------ | ---------- | ------- | ---------------------------------------------- |
+| 讨论会 | 每两周一次 | 45 分钟 | 用例分享、问题分类、工作组提案决策、实现者报告 |
 
-Discord: [#auth-ig](https://discord.com/channels/1358869848138059966/1360835991749001368)
+Discord：[#auth-ig](https://discord.com/channels/1358869848138059966/1360835991749001368)
 
-### Working Group Incubation
+### 工作组孵化
 
-A topic graduates to a Working Group proposal when it has a written problem statement in GitHub Discussions and rough consensus on a bi-weekly call (recorded in published notes). A facilitator then files the standard WG creation template in `#wg-ig-group-creation`, citing that discussion. The IG's role ends at the proposal; approval remains with community moderators and core maintainers.
+当一个话题在 GitHub Discussions 中有书面的问题陈述，并在双周电话会议上达成粗略共识（记录在已发布的笔记中）时，该话题升级为工作组提案。然后协调人在 `#wg-ig-group-creation` 中提交标准的工作组创建模板，引用该讨论。IG 的角色在提案时结束；批准权仍由社区版主和核心维护者掌握。
 
-## Deliverables & Success Metrics
+## 交付物与成功指标
 
-The IG incubates problems until they are well-scoped, then proposes focused Working Groups to drive specific SEPs. Each spawned WG maintains its own charter; this list is a directory, not a substitute. The IG stewards [modelcontextprotocol/ext-auth](https://github.com/modelcontextprotocol/ext-auth), where individual WGs land authorization extension specifications via PR.
+IG 孵化问题，直到它们有明确的范围，然后提议专注的工作组来推动特定的 SEP。每个派生出的 WG 维护自己的章程；此列表是一个目录，而非替代品。IG 管理 [modelcontextprotocol/ext-auth](https://github.com/modelcontextprotocol/ext-auth)，各个 WG 通过 PR 在其中落地授权扩展规范。
 
-| Working Group              | Discord                        | Focus                                                                                                                                                                               | Status    | Charter |
-| -------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- |
-| Client Registration        | `#auth-wg-client-registration` | Dynamic Client Registration, Client ID Metadata Documents, software statements, and pre-registered client workflows                                                                 | Completed | —       |
-| Mix-up Protection          | `#auth-wg-mixup-protection`    | Mitigating OAuth authorization-server mix-up and token-audience confusion attacks                                                                                                   | Completed | —       |
-| Profiles                   | `#auth-wg-profiles`            | Extension specifications for additional grant types and token-binding mechanisms (Client Credentials, Enterprise-Managed Authorization, DPoP, Workload Identity Federation)         | Completed | —       |
-| Tool Scopes                | `#auth-wg-tool-scopes`         | Per-tool OAuth scope advertisement, step-up authorization / scope challenge, and client-side scope accumulation — mechanics within the OAuth scope-string model                     | Active    | Pending |
-| Fine-Grained Authorization | `#auth-wg-fine-grained-authz`  | Authorization granularity beyond scope strings — Rich Authorization Requests ([RFC 9396](https://www.rfc-editor.org/rfc/rfc9396)), remediation hints, and multi-credential handling | Active    | Pending |
-| Improve DevX               | `#auth-wg-improve-devx`        | Best-practices guidance and tutorials for building secure MCP clients and servers, beyond the normative spec                                                                        | Completed | —       |
+| 工作组         | Discord                        | 关注点                                                                                                            | 状态   | 章程 |
+| -------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------ | ---- |
+| 客户端注册     | `#auth-wg-client-registration` | 动态客户端注册、客户端 ID 元数据文档、软件声明和预注册客户端工作流程                                              | 已完成 | —    |
+| 混合保护       | `#auth-wg-mixup-protection`    | 缓解 OAuth 授权服务器混淆和代币受众混淆攻击                                                                       | 已完成 | —    |
+| 配置文件       | `#auth-wg-profiles`            | 额外授权类型和代币绑定机制的扩展规范（客户端凭据、企业托管授权、DPoP、工作负载身份联合）                          | 已完成 | —    |
+| 工具范围       | `#auth-wg-tool-scopes`         | 按工具的 OAuth 范围公布、逐步授权/范围挑战和客户端范围累积——OAuth 范围字符串模型内的机制                          | 活跃中 | 待定 |
+| 细粒度授权     | `#auth-wg-fine-grained-authz`  | 超越范围字符串的授权粒度——丰富授权请求 ([RFC 9396](https://www.rfc-editor.org/rfc/rfc9396))、修复提示和多凭据处理 | 活跃中 | 待定 |
+| 改善开发者体验 | `#auth-wg-improve-devx`        | 构建安全 MCP 客户端和服务器的最佳实践指南和教程，超越规范性规范                                                   | 已完成 | —    |
 
-## Changelog
+## 变更日志
 
-| Date       | Change          |
-| ---------- | --------------- |
-| 2026-06-02 | Initial charter |
+| 日期       | 更改     |
+| ---------- | -------- |
+| 2026-06-02 | 初始章程 |

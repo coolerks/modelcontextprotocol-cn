@@ -1,21 +1,21 @@
 ---
-title: The Model Context Protocol Blog
+title: Model Context Protocol 博客
 date: "2025-07-02T11:46:28+01:00"
 draft: false
-description: The official Model Context Protocol blog — updates, tutorials, and insights from maintainers and contributors.
+description: 官方 Model Context Protocol 博客 — 来自维护者和贡献者的更新、教程和见解。
 tags:
-  - announcement
+  - 公告
 ---
 
-Welcome to the official Model Context Protocol (MCP) blog! This is where we'll share the latest updates, tutorials, best practices, and insights about MCP.
+欢迎来到官方 Model Context Protocol (MCP) 博客！我们将在这里分享关于 MCP 的最新更新、教程、最佳实践和见解。
 
-## About MCP
+## 关于 MCP
 
-The Model Context Protocol is an open standard that enables seamless integration between AI assistants and external data sources and tools. It provides a universal way for AI models to interact with local services, APIs, and data stores.
+Model Context Protocol 是一个开放标准，实现了 AI 助手与外部数据源和工具之间的无缝集成。它为 AI 模型与本地服务、API 和数据存储进行交互提供了一种通用方式。
 
-## Get Involved
+## 参与其中
 
-We're excited to build this ecosystem together with you. Here's how you can participate:
+我们很高兴与您一起共建这个生态系统。以下是参与方式：
 
-- Check out the [MCP specification](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/main/docs/specification)
-- Join the discussion on [GitHub](https://github.com/modelcontextprotocol)
+- 查看 [MCP 规范](https://github.com/modelcontextprotocol/modelcontextprotocol/tree/main/docs/specification)
+- 在 [GitHub](https://github.com/modelcontextprotocol) 上加入讨论

@@ -1,13 +1,12 @@
 ---
-title: Transports
+title: 传输（Transports）
 ---
 
 <div id="enable-section-numbers" />
 
-MCP uses JSON-RPC to encode messages. JSON-RPC messages **MUST** be UTF-8 encoded.
+MCP 使用 JSON-RPC 对消息进行编码。JSON-RPC 消息 **MUST** 使用 UTF-8 编码。
 
-The protocol currently defines two standard transport mechanisms for client-server
-communication:
+该协议目前定义了两种用于客户端-服务器通信的标准传输机制：
 
 1. [stdio](#stdio), communication over standard in and standard out
 2. [Streamable HTTP](#streamable-http)

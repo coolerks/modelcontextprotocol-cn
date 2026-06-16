@@ -1,41 +1,32 @@
 ---
-title: Tools
+title: 工具（Tools）
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) allows servers to expose tools that can be invoked by
-language models. Tools enable models to interact with external systems, such as querying
-databases, calling APIs, or performing computations. Each tool is uniquely identified by
-a name and includes metadata describing its schema.
+Model Context Protocol (MCP) 允许服务器暴露可由语言模型调用的工具。工具使模型能够与外部系统交互，例如查询数据库、调用 API 或执行计算。每个工具通过名称唯一标识，并包含描述其模式的元数据。
 
-## User Interaction Model
+## 用户交互模型
 
-Tools in MCP are designed to be **model-controlled**, meaning that the language model can
-discover and invoke tools automatically based on its contextual understanding and the
-user's prompts.
+MCP 中的工具被设计为**模型控制**的，这意味着语言模型可以根据其上下文理解和用户提示自动发现和调用工具。
 
-However, implementations are free to expose tools through any interface pattern that
-suits their needs&mdash;the protocol itself does not mandate any specific user
-interaction model.
+然而，实现可以自由地通过任何适合其需求的界面模式来暴露工具——协议本身并不强制规定任何特定的用户交互模型。
 
 <Warning>
 
-For trust & safety and security, there **SHOULD** always
-be a human in the loop with the ability to deny tool invocations.
+为了信任与安全，**SHOULD** 始终确保有人类参与循环，并能够拒绝工具调用。
 
-Applications **SHOULD**:
+应用程序 **SHOULD**：
 
-- Provide UI that makes clear which tools are being exposed to the AI model
-- Insert clear visual indicators when tools are invoked
-- Present confirmation prompts to the user for operations, to ensure a human is in the
-  loop
+- 提供清晰的 UI，说明哪些工具正在暴露给 AI 模型
+- 在调用工具时插入清晰的视觉指示器
+- 向用户显示操作确认提示，以确保人类参与循环
 
 </Warning>
 
-## Capabilities
+## 能力
 
-Servers that support tools **MUST** declare the `tools` capability:
+支持工具的服务器 **MUST** 声明 `tools` 能力：
 
 ```json
 {
@@ -47,17 +38,15 @@ Servers that support tools **MUST** declare the `tools` capability:
 }
 ```
 
-`listChanged` indicates whether the server will emit notifications when the list of
-available tools changes.
+`listChanged` 指示服务器是否会在可用工具列表变化时发出通知。
 
-## Protocol Messages
+## 协议消息
 
-### Listing Tools
+### 列出工具
 
-To discover available tools, clients send a `tools/list` request. This operation supports
-[pagination](/specification/2025-11-25/server/utilities/pagination).
+要发现可用工具，客户端发送 `tools/list` 请求。此操作支持[分页](/specification/2025-11-25/server/utilities/pagination)。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -70,7 +59,7 @@ To discover available tools, clients send a `tools/list` request. This operation
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -80,14 +69,14 @@ To discover available tools, clients send a `tools/list` request. This operation
     "tools": [
       {
         "name": "get_weather",
-        "title": "Weather Information Provider",
-        "description": "Get current weather information for a location",
+        "title": "天气信息提供者",
+        "description": "获取某个位置的当前天气信息",
         "inputSchema": {
           "type": "object",
           "properties": {
             "location": {
               "type": "string",
-              "description": "City name or zip code"
+              "description": "城市名称或邮政编码"
             }
           },
           "required": ["location"]
@@ -109,11 +98,11 @@ To discover available tools, clients send a `tools/list` request. This operation
 }
 ```
 
-### Calling Tools
+### 调用工具
 
-To invoke a tool, clients send a `tools/call` request:
+要调用工具，客户端发送 `tools/call` 请求：
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -129,7 +118,7 @@ To invoke a tool, clients send a `tools/call` request:
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -139,7 +128,7 @@ To invoke a tool, clients send a `tools/call` request:
     "content": [
       {
         "type": "text",
-        "text": "Current weather in New York:\nTemperature: 72°F\nConditions: Partly cloudy"
+        "text": "纽约当前天气：\n温度：72°F\n状况：局部多云"
       }
     ],
     "isError": false
@@ -147,10 +136,9 @@ To invoke a tool, clients send a `tools/call` request:
 }
 ```
 
-### List Changed Notification
+### 列表变更通知
 
-When the list of available tools changes, servers that declared the `listChanged`
-capability **SHOULD** send a notification:
+当可用工具列表发生变化时，声明了 `listChanged` 能力的服务器 **SHOULD** 发送通知：
 
 ```json
 {
@@ -159,45 +147,45 @@ capability **SHOULD** send a notification:
 }
 ```
 
-## Message Flow
+## 消息流
 
 ```mermaid
 sequenceDiagram
     participant LLM
-    participant Client
-    participant Server
+    participant 客户端
+    participant 服务器
 
-    Note over Client,Server: Discovery
-    Client->>Server: tools/list
-    Server-->>Client: List of tools
+    Note over 客户端,服务器: 发现
+    客户端->>服务器: tools/list
+    服务器-->>客户端: 工具列表
 
-    Note over Client,LLM: Tool Selection
-    LLM->>Client: Select tool to use
+    Note over 客户端,LLM: 工具选择
+    LLM->>客户端: 选择要使用的工具
 
-    Note over Client,Server: Invocation
-    Client->>Server: tools/call
-    Server-->>Client: Tool result
-    Client->>LLM: Process result
+    Note over 客户端,服务器: 调用
+    客户端->>服务器: tools/call
+    服务器-->>客户端: 工具结果
+    客户端->>LLM: 处理结果
 
-    Note over Client,Server: Updates
-    Server--)Client: tools/list_changed
-    Client->>Server: tools/list
-    Server-->>Client: Updated tools
+    Note over 客户端,服务器: 更新
+    服务器--)客户端: tools/list_changed
+    客户端->>服务器: tools/list
+    服务器-->>客户端: 更新后的工具
 ```
 
-## Data Types
+## 数据类型
 
-### Tool
+### 工具
 
-A tool definition includes:
+一个工具定义包含：
 
-- `name`: Unique identifier for the tool
-- `title`: Optional human-readable name of the tool for display purposes.
-- `description`: Human-readable description of functionality
-- `icons`: Optional array of icons for display in user interfaces
-- `inputSchema`: JSON Schema defining expected parameters
-  - Follows the [JSON Schema usage guidelines](/specification/2025-11-25/basic#json-schema-usage)
-  - Defaults to 2020-12 if no `$schema` field is present
+- `name`：工具的唯一标识符
+- `title`：可选的用于显示目的的人类可读工具名称
+- `description`：功能的人类可读描述
+- `icons`：可选的用于用户界面显示的图标数组
+- `inputSchema`：定义预期参数的 JSON Schema
+  - 遵循 [JSON Schema 使用指南](/specification/2025-11-25/basic#json-schema-usage)
+  - 如果没有 `$schema` 字段，默认为 2020-12
   - **MUST** be a valid JSON Schema object (not `null`)
   - For tools with no parameters, use one of these valid approaches:
     - `{ "type": "object", "additionalProperties": false }` - **Recommended**: explicitly accepts only empty objects

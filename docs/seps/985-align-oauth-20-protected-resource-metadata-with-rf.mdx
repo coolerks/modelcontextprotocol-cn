@@ -1,7 +1,7 @@
 ---
-title: "SEP-985: Align OAuth 2.0 Protected Resource Metadata with RFC 9728"
-sidebarTitle: "SEP-985: Align OAuth 2.0 Protected Resource Meta…"
-description: "Align OAuth 2.0 Protected Resource Metadata with RFC 9728"
+title: "SEP-985: 使 OAuth 2.0 保护资源元数据与 RFC 9728 对齐"
+sidebarTitle: "SEP-985: 使 OAuth 2.0 保护资源元数据与 RFC 9728 对齐"
+description: "使 OAuth 2.0 保护资源元数据与 RFC 9728 对齐"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ description: "Align OAuth 2.0 Protected Resource Metadata with RFC 9728"
 
 ## Abstract
 
-This proposal brings the MCP spec's handling of OAuth 2.0 Protected Resource Metadata in line with [RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728#name-obtaining-protected-resourc).
+该提案使 MCP 规范对 OAuth 2.0 保护资源元数据的处理与 [RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728#name-obtaining-protected-resourc) 保持一致。
 
 Currently, the MCP spec requires the use of the HTTP WWW-Authenticate header when returning a 401 Unauthorized to indicate the location of the protected resource metadata. However, [RFC 9728, Section 5](https://datatracker.ietf.org/doc/html/rfc9728#section-5) states:
 

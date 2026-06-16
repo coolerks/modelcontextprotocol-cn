@@ -1,50 +1,40 @@
 ---
-title: Sampling
+title: 采样（Sampling）
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to request LLM
-sampling ("completions" or "generations") from language models via clients. This flow
-allows clients to maintain control over model access, selection, and permissions while
-enabling servers to leverage AI capabilities&mdash;with no server API keys necessary.
-Servers can request text, audio, or image-based interactions and optionally include
-context from MCP servers in their prompts.
+Model Context Protocol (MCP) 提供了一种标准化的方式，让服务器通过客户端向语言模型请求 LLM 采样（"补全"或"生成"）。此流程允许客户端保持对模型访问、选择和权限的控制，同时使服务器能够利用 AI 能力——无需服务器 API 密钥。服务器可以请求基于文本、音频或图像的交互，并可选择在其提示中包含来自 MCP 服务器的上下文。
 
-## User Interaction Model
+## 用户交互模型
 
-Sampling in MCP allows servers to implement agentic behaviors, by enabling LLM calls to
-occur _nested_ inside other MCP server features.
+MCP 中的采样通过允许 LLM 调用在*嵌套*在其他 MCP 服务器特性内部发生，使服务器能够实现代理行为。
 
-Implementations are free to expose sampling through any interface pattern that suits
-their needs&mdash;the protocol itself does not mandate any specific user interaction
-model.
+实现可以自由地通过任何适合其需求的界面模式来暴露采样——协议本身并不强制规定任何特定的用户交互模型。
 
 <Warning>
 
-For trust & safety and security, there **SHOULD** always
-be a human in the loop with the ability to deny sampling requests.
+为了信任与安全，**SHOULD** 始终确保有人类参与循环，并能够拒绝采样请求。
 
-Applications **SHOULD**:
+应用程序 **SHOULD**：
 
-- Provide UI that makes it easy and intuitive to review sampling requests
-- Allow users to view and edit prompts before sending
-- Present generated responses for review before delivery
+- 提供易于直观审查采样请求的 UI
+- 允许用户在发送前查看和编辑提示
+- 在交付前展示生成的响应以供审查
 
 </Warning>
 
-## Tools in Sampling
+## 采样中的工具使用
 
-Servers can request that the client's LLM use tools during sampling by providing a `tools` array and optional `toolChoice` configuration in their sampling requests. This enables servers to implement agentic behaviors where the LLM can call tools, receive results, and continue the conversation - all within a single sampling request flow.
+服务器可以通过在其采样请求中提供 `tools` 数组和可选的 `toolChoice` 配置，请求客户端的 LLM 在采样期间使用工具。这使得服务器能够实现代理行为，让 LLM 可以调用工具、接收结果并继续对话——所有这些都在单个采样请求流程内完成。
 
-Clients **MUST** declare support for tool use via the `sampling.tools` capability to receive tool-enabled sampling requests. Servers **MUST NOT** send tool-enabled sampling requests to Clients that have not declared support for tool use via the `sampling.tools` capability.
+客户端 **MUST** 通过 `sampling.tools` 能力声明对工具使用的支持，才能接收启用工具的采样请求。服务器 **MUST NOT** 向未通过 `sampling.tools` 能力声明支持工具使用的客户端发送启用工具的采样请求。
 
-## Capabilities
+## 能力
 
-Clients that support sampling **MUST** declare the `sampling` capability during
-[initialization](/specification/2025-11-25/basic/lifecycle#initialization):
+支持采样的客户端 **MUST** 在[初始化](/specification/2025-11-25/basic/lifecycle#initialization)期间声明 `sampling` 能力：
 
-**Basic sampling:**
+**基本采样：**
 
 ```json
 {
@@ -54,7 +44,7 @@ Clients that support sampling **MUST** declare the `sampling` capability during
 }
 ```
 
-**With tool use support:**
+**支持工具使用：**
 
 ```json
 {
@@ -66,7 +56,7 @@ Clients that support sampling **MUST** declare the `sampling` capability during
 }
 ```
 
-**With context inclusion support (soft-deprecated):**
+**支持上下文包含（软弃用）：**
 
 ```json
 {
@@ -79,20 +69,19 @@ Clients that support sampling **MUST** declare the `sampling` capability during
 ```
 
 <Note>
-  The `includeContext` parameter values `"thisServer"` and `"allServers"` are
-  soft-deprecated. Servers **SHOULD** avoid using these values (e.g. can just
-  omit `includeContext` since it defaults to `"none"`), and **SHOULD NOT** use
-  them unless the client declares `sampling.context` capability. These values
-  may be removed in future spec releases.
+  `includeContext` 参数值 `"thisServer"` 和 `"allServers"` 已被软弃用。服务器
+  **SHOULD** 避免使用这些值（例如，可以直接省略 `includeContext`，因为其默认为
+  `"none"`），并且 **SHOULD NOT** 使用它们，除非客户端声明了 `sampling.context`
+  能力。这些值可能会在未来的规范版本中移除。
 </Note>
 
-## Protocol Messages
+## 协议消息
 
-### Creating Messages
+### 创建消息
 
-To request a language model generation, servers send a `sampling/createMessage` request:
+要请求语言模型生成，服务器发送 `sampling/createMessage` 请求：
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -105,7 +94,7 @@ To request a language model generation, servers send a `sampling/createMessage` 
         "role": "user",
         "content": {
           "type": "text",
-          "text": "What is the capital of France?"
+          "text": "法国的首都是什么？"
         }
       }
     ],
@@ -118,13 +107,13 @@ To request a language model generation, servers send a `sampling/createMessage` 
       "intelligencePriority": 0.8,
       "speedPriority": 0.5
     },
-    "systemPrompt": "You are a helpful assistant.",
+    "systemPrompt": "你是一个有用的助手。",
     "maxTokens": 100
   }
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -134,7 +123,7 @@ To request a language model generation, servers send a `sampling/createMessage` 
     "role": "assistant",
     "content": {
       "type": "text",
-      "text": "The capital of France is Paris."
+      "text": "法国的首都是巴黎。"
     },
     "model": "claude-3-sonnet-20240307",
     "stopReason": "endTurn"
@@ -142,53 +131,53 @@ To request a language model generation, servers send a `sampling/createMessage` 
 }
 ```
 
-### Sampling with Tools
+### 使用工具进行采样
 
-The following diagram illustrates the complete flow of sampling with tools, including the multi-turn tool loop:
+下图说明了使用工具进行采样的完整流程，包括多轮工具循环：
 
 ```mermaid
 sequenceDiagram
-    participant Server
-    participant Client
-    participant User
+    participant 服务器
+    participant 客户端
+    participant 用户
     participant LLM
 
-    Note over Server,Client: Initial request with tools
-    Server->>Client: sampling/createMessage<br/>(messages + tools)
+    Note over 服务器,客户端: 初始请求带工具
+    服务器->>客户端: sampling/createMessage<br/>(messages + tools)
 
-    Note over Client,User: Human-in-the-loop review
-    Client->>User: Present request for approval
-    User-->>Client: Approve/modify
+    Note over 客户端,用户: 人类参与审查
+    客户端->>用户: 展示请求以供批准
+    用户-->>客户端: 批准/修改
 
-    Client->>LLM: Forward request with tools
-    LLM-->>Client: Response with tool_use<br/>(stopReason: "toolUse")
+    客户端->>LLM: 带工具的转发请求
+    LLM-->>客户端: 带 tool_use 的响应<br/>(stopReason: "toolUse")
 
-    Client->>User: Present tool calls for review
-    User-->>Client: Approve tool calls
-    Client-->>Server: Return tool_use response
+    客户端->>用户: 展示工具调用以供审查
+    用户-->>客户端: 批准工具调用
+    客户端-->>服务器: 返回 tool_use 响应
 
-    Note over Server: Execute tool(s)
-    Server->>Server: Run get_weather("Paris")<br/>Run get_weather("London")
+    Note over 服务器: 执行工具
+    服务器->>服务器: 运行 get_weather("Paris")<br/>运行 get_weather("London")
 
-    Note over Server,Client: Continue with tool results
-    Server->>Client: sampling/createMessage<br/>(history + tool_results + tools)
+    Note over 服务器,客户端: 继续处理工具结果
+    服务器->>客户端: sampling/createMessage<br/>(历史 + tool_results + tools)
 
-    Client->>User: Present continuation
-    User-->>Client: Approve
+    客户端->>用户: 展示后续
+    用户-->>客户端: 批准
 
-    Client->>LLM: Forward with tool results
-    LLM-->>Client: Final text response<br/>(stopReason: "endTurn")
+    客户端->>LLM: 带工具结果转发
+    LLM-->>客户端: 最终文本响应<br/>(stopReason: "endTurn")
 
-    Client->>User: Present response
-    User-->>Client: Approve
-    Client-->>Server: Return final response
+    客户端->>用户: 展示响应
+    用户-->>客户端: 批准
+    客户端-->>服务器: 返回最终响应
 
-    Note over Server: Server processes result<br/>(may continue conversation...)
+    Note over 服务器: 服务器处理结果<br/>(可以继续对话...)
 ```
 
-To request LLM generation with tool use capabilities, servers include `tools` and optionally `toolChoice` in the request:
+要请求具有工具使用能力的 LLM 生成，服务器在请求中包含 `tools` 和可选的 `toolChoice`：
 
-**Request (Server -> Client):**
+**请求（服务器 -> 客户端）：**
 
 ```json
 {

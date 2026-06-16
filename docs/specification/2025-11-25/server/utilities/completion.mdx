@@ -1,29 +1,22 @@
 ---
-title: Completion
+title: 补全
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to offer
-autocompletion suggestions for the arguments of prompts and resource templates. When
-users are filling in argument values for a specific prompt (identified by name) or
-resource template (identified by URI), servers can provide contextual suggestions.
+Model Context Protocol (MCP) 提供了一种标准化的方式，让服务器为提示和资源模板的参数提供自动补全建议。当用户为特定提示（通过名称标识）或资源模板（通过 URI 标识）填写参数值时，服务器可以提供上下文相关的建议。
 
-## User Interaction Model
+## 用户交互模型
 
-Completion in MCP is designed to support interactive user experiences similar to IDE code
-completion.
+MCP 中的补全功能旨在支持类似于 IDE 代码补全的交互式用户体验。
 
-For example, applications may show completion suggestions in a dropdown or popup menu as
-users type, with the ability to filter and select from available options.
+例如，应用程序可以在用户输入时在下拉或弹出菜单中显示补全建议，并提供过滤和从可用选项中选择的功能。
 
-However, implementations are free to expose completion through any interface pattern that
-suits their needs&mdash;the protocol itself does not mandate any specific user
-interaction model.
+然而，实现可以自由地通过任何适合其需求的界面模式来暴露补全功能——协议本身并不强制规定任何特定的用户交互模型。
 
-## Capabilities
+## 能力
 
-Servers that support completions **MUST** declare the `completions` capability:
+支持补全的服务器 **MUST** 声明 `completions` 能力：
 
 ```json
 {
@@ -33,14 +26,13 @@ Servers that support completions **MUST** declare the `completions` capability:
 }
 ```
 
-## Protocol Messages
+## 协议消息
 
-### Requesting Completions
+### 请求补全
 
-To get completion suggestions, clients send a `completion/complete` request specifying
-what is being completed through a reference type:
+要获取补全建议，客户端发送 `completion/complete` 请求，通过引用类型指定要补全的内容：
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -60,7 +52,7 @@ what is being completed through a reference type:
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -76,9 +68,9 @@ what is being completed through a reference type:
 }
 ```
 
-For prompts or URI templates with multiple arguments, clients should include previous completions in the `context.arguments` object to provide context for subsequent requests.
+对于具有多个参数的提示或 URI 模板，客户端应在 `context.arguments` 对象中包含先前的补全结果，以便为后续请求提供上下文。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -103,7 +95,7 @@ For prompts or URI templates with multiple arguments, clients should include pre
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -119,84 +111,84 @@ For prompts or URI templates with multiple arguments, clients should include pre
 }
 ```
 
-### Reference Types
+### 引用类型
 
-The protocol supports two types of completion references:
+该协议支持两种补全引用类型：
 
-| Type           | Description                 | Example                                             |
-| -------------- | --------------------------- | --------------------------------------------------- |
-| `ref/prompt`   | References a prompt by name | `{"type": "ref/prompt", "name": "code_review"}`     |
-| `ref/resource` | References a resource URI   | `{"type": "ref/resource", "uri": "file:///{path}"}` |
+| 类型           | 描述             | 示例                                                |
+| -------------- | ---------------- | --------------------------------------------------- |
+| `ref/prompt`   | 通过名称引用提示 | `{"type": "ref/prompt", "name": "code_review"}`     |
+| `ref/resource` | 引用资源 URI     | `{"type": "ref/resource", "uri": "file:///{path}"}` |
 
-### Completion Results
+### 补全结果
 
-Servers return an array of completion values ranked by relevance, with:
+服务器返回按相关性排序的补全值数组，包含：
 
-- Maximum 100 items per response
-- Optional total number of available matches
-- Boolean indicating if additional results exist
+- 每个响应最多 100 项
+- 可选的可用匹配总数
+- 指示是否存在额外结果的布尔值
 
-## Message Flow
+## 消息流
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Server
+    participant 客户端
+    participant 服务器
 
-    Note over Client: User types argument
-    Client->>Server: completion/complete
-    Server-->>Client: Completion suggestions
+    Note over 客户端: 用户输入参数
+    客户端->>服务器: completion/complete
+    服务器-->>客户端: 补全建议
 
-    Note over Client: User continues typing
-    Client->>Server: completion/complete
-    Server-->>Client: Refined suggestions
+    Note over 客户端: 用户继续输入
+    客户端->>服务器: completion/complete
+    服务器-->>客户端: 细化建议
 ```
 
-## Data Types
+## 数据类型
 
 ### CompleteRequest
 
-- `ref`: A `PromptReference` or `ResourceReference`
-- `argument`: Object containing:
-  - `name`: Argument name
-  - `value`: Current value
-- `context`: Object containing:
-  - `arguments`: A mapping of already-resolved argument names to their values.
+- `ref`：`PromptReference` 或 `ResourceReference`
+- `argument`：包含以下内容的对象：
+  - `name`：参数名称
+  - `value`：当前值
+- `context`：包含以下内容的对象：
+  - `arguments`：已解析的参数名称到其值的映射。
 
 ### CompleteResult
 
-- `completion`: Object containing:
-  - `values`: Array of suggestions (max 100)
-  - `total`: Optional total matches
-  - `hasMore`: Additional results flag
+- `completion`：包含以下内容的对象：
+  - `values`：建议数组（最多 100 个）
+  - `total`：可选的匹配总数
+  - `hasMore`：额外结果标志
 
-## Error Handling
+## 错误处理
 
-Servers **SHOULD** return standard JSON-RPC errors for common failure cases:
+服务器 **SHOULD** 对常见失败情况返回标准的 JSON-RPC 错误：
 
-- Method not found: `-32601` (Capability not supported)
-- Invalid prompt name: `-32602` (Invalid params)
-- Missing required arguments: `-32602` (Invalid params)
-- Internal errors: `-32603` (Internal error)
+- Method not found：`-32601`（能力不受支持）
+- 无效的提示名称：`-32602`（Invalid params）
+- 缺少必需参数：`-32602`（Invalid params）
+- 内部错误：`-32603`（Internal error）
 
-## Implementation Considerations
+## 实现考量
 
-1. Servers **SHOULD**:
-   - Return suggestions sorted by relevance
-   - Implement fuzzy matching where appropriate
-   - Rate limit completion requests
-   - Validate all inputs
+1. 服务器 **SHOULD**：
+   - 按相关性排序返回建议
+   - 在适当的情况下实现模糊匹配
+   - 对补全请求进行速率限制
+   - 验证所有输入
 
-2. Clients **SHOULD**:
-   - Debounce rapid completion requests
-   - Cache completion results where appropriate
-   - Handle missing or partial results gracefully
+2. 客户端 **SHOULD**：
+   - 对快速的补全请求进行防抖处理
+   - 在适当的情况下缓存补全结果
+   - 优雅地处理缺失或部分结果
 
-## Security
+## 安全
 
-Implementations **MUST**:
+实现 **MUST**：
 
-- Validate all completion inputs
-- Implement appropriate rate limiting
+- 验证所有补全输入
+- 实施适当的速率限制
 - Control access to sensitive suggestions
 - Prevent completion-based information disclosure

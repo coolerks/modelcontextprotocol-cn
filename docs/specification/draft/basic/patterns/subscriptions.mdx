@@ -1,19 +1,18 @@
 ---
-title: Subscriptions
+title: 订阅
 ---
 
 <div id="enable-section-numbers" />
 
-`subscriptions/listen` opens a long-lived notification stream from the server to the
-client. Unlike one-off requests, the stream stays open and delivers notifications until
-the client cancels it. It replaces the former `resources/subscribe` RPC and the HTTP GET
-endpoint.
+`subscriptions/listen` 打开一个从服务器到客户端的长期存在的通知流。
+与一次性请求不同，流保持开放并传递通知，直到客户端取消它。
+它取代了之前的 `resources/subscribe` RPC 和 HTTP GET 端点。
 
-## Opening a Stream
+## 打开流
 
-The client sends a `subscriptions/listen` request with a `notifications` filter
-specifying which event types it wants to receive. The server **MUST NOT** send
-notification types the client has not explicitly requested.
+客户端发送带有 `notifications` 过滤器的 `subscriptions/listen` 请求，
+指定它希望接收哪些事件类型。服务器 **MUST NOT** 发送
+客户端未明确请求的通知类型。
 
 ```json
 {
@@ -37,24 +36,22 @@ notification types the client has not explicitly requested.
 }
 ```
 
-### Notification Filter
+### 通知过滤器
 
-| Field                   | Type       | Description                                                       |
-| ----------------------- | ---------- | ----------------------------------------------------------------- |
-| `toolsListChanged`      | `boolean`  | Receive `notifications/tools/list_changed` when tools change      |
-| `promptsListChanged`    | `boolean`  | Receive `notifications/prompts/list_changed` when prompts change  |
-| `resourcesListChanged`  | `boolean`  | Receive `notifications/resources/list_changed` when list changes  |
-| `resourceSubscriptions` | `string[]` | Receive `notifications/resources/updated` for these resource URIs |
+| 字段                    | 类型       | 描述                                                    |
+| ----------------------- | ---------- | ------------------------------------------------------- |
+| `toolsListChanged`      | `boolean`  | 工具变更时接收 `notifications/tools/list_changed`       |
+| `promptsListChanged`    | `boolean`  | 提示变更时接收 `notifications/prompts/list_changed`     |
+| `resourcesListChanged`  | `boolean`  | 列表变更时接收 `notifications/resources/list_changed`   |
+| `resourceSubscriptions` | `string[]` | 针对这些资源 URI 接收 `notifications/resources/updated` |
 
-All fields are optional. Omitting a field is equivalent to not subscribing to that
-notification type.
+所有字段都是可选的。省略某个字段相当于不订阅该通知类型。
 
-## Acknowledgment
+## 确认
 
-The server **MUST** send `notifications/subscriptions/acknowledged` as the first
-message on the stream. The `notifications` field in the acknowledgment reflects the
-subset the server agreed to honor — notification types the server does not support are
-omitted.
+服务器 **MUST** 发送 `notifications/subscriptions/acknowledged` 作为流上的第一条消息。
+确认中的 `notifications` 字段反映服务器同意处理的子集 —
+服务器不支持的通知类型被省略。
 
 ```json
 {
@@ -72,16 +69,13 @@ omitted.
 }
 ```
 
-The client **SHOULD** check the acknowledged filter against what it requested and handle
-any unsupported types gracefully.
+客户端 **SHOULD** 检查已确认的过滤器与它请求的内容，并优雅处理任何不支持的类型。
 
-## Receiving Notifications
+## 接收通知
 
-All notifications delivered on the stream carry
-`io.modelcontextprotocol/subscriptionId` in `_meta`, matching the ID of the
-`subscriptions/listen` request that opened the stream. On stdio, where all messages
-share a single channel, clients **MUST** use this field to correlate notifications
-with their originating subscription.
+在流上传递的所有通知在 `_meta` 中都带有
+`io.modelcontextprotocol/subscriptionId`，匹配打开该流的 `subscriptions/listen` 请求的 ID。
+在 stdio 上，所有消息共享单个通道，客户端 **MUST** 使用此字段将通知与其原始订阅关联。
 
 ```json
 {
@@ -96,31 +90,24 @@ with their originating subscription.
 }
 ```
 
-## Multiple Concurrent Subscriptions
+## 多个并发订阅
 
-A client **MAY** have multiple active subscriptions concurrently — for example,
-one listening for tools-list changes and another for resource updates. Each
-subscription is identified by the JSON-RPC request ID of its
-`subscriptions/listen` request, and every notification on the stream carries
-that ID in `io.modelcontextprotocol/subscriptionId` so clients can demultiplex
-them.
+客户端 **MAY** 同时有多个活跃订阅 — 例如，
+一个监听工具列表变更，另一个监听资源更新。
+每个订阅由其 `subscriptions/listen` 请求的 JSON-RPC 请求 ID 标识，
+流上的每个通知在 `io.modelcontextprotocol/subscriptionId` 中携带该 ID，
+以便客户端可以解复用它们。
 
-## Cancellation
+## 取消
 
-A subscription ends when:
+订阅在以下情况结束：
 
-- The **client** cancels it — close the SSE stream (HTTP) or send
-  `notifications/cancelled` referencing the `subscriptions/listen` request ID (stdio).
-- The **server** tears it down (e.g., during shutdown) — it **MUST** close the SSE
-  stream (HTTP) or send `notifications/cancelled` referencing the
-  `subscriptions/listen` request ID (stdio).
-- The underlying transport closes (HTTP timeout, TCP disconnect, stdio process
-  exit).
+- **客户端**取消它 — 关闭 SSE 流（HTTP）或发送引用 `subscriptions/listen` 请求 ID 的 `notifications/cancelled`（stdio）。
+- **服务器**拆除它（例如，在关闭期间）— 它 **MUST** 关闭 SSE 流（HTTP）或发送引用 `subscriptions/listen` 请求 ID 的 `notifications/cancelled`（stdio）。
+- 底层传输关闭（HTTP 超时、TCP 断开、stdio 进程退出）。
 
-On **stdio**, if the connection is terminated and then re-established, the
-client **MUST** re-send `subscriptions/listen` to re-establish its
-subscriptions — the server holds no subscription state across reconnections.
+在 **stdio** 上，如果连接被终止然后重新建立，客户端 **MUST** 重新发送 `subscriptions/listen` 以重新建立其订阅 — 服务器在重新连接期间不保持任何订阅状态。
 
-See [Cancellation][cancellation] for the full rules.
+有关完整规则，请参见[取消][cancellation]。
 
 [cancellation]: /specification/draft/basic/patterns/cancellation

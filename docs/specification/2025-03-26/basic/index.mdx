@@ -1,33 +1,28 @@
 ---
-title: Overview
+title: 概述
 ---
 
-The Model Context Protocol consists of several key components that work together:
+Model Context Protocol 由几个协同工作的关键组件组成：
 
-- **Base Protocol**: Core JSON-RPC message types
-- **Lifecycle Management**: Connection initialization, capability negotiation, and
-  session control
-- **Server Features**: Resources, prompts, and tools exposed by servers
-- **Client Features**: Sampling and root directory lists provided by clients
-- **Utilities**: Cross-cutting concerns like logging and argument completion
+- **基础协议**：核心 JSON-RPC 消息类型
+- **生命周期管理**：连接初始化、能力协商和会话控制
+- **服务器特性**：服务器暴露的资源、提示和工具
+- **客户端特性**：客户端提供的采样和根目录列表
+- **实用工具**：日志记录和参数补全等横切关注点
 
-All implementations **MUST** support the base protocol and lifecycle management
-components. Other components **MAY** be implemented based on the specific needs of the
-application.
+所有实现 **MUST** 支持基础协议和生命周期管理组件。其他组件 **MAY** 根据应用程序的特定需求来实现。
 
-These protocol layers establish clear separation of concerns while enabling rich
-interactions between clients and servers. The modular design allows implementations to
-support exactly the features they need.
+这些协议层建立了清晰的关注点分离，同时实现了客户端和服务器之间的丰富交互。模块化设计允许实现精确支持它们所需的特性。
 
-## Messages
+## 消息
 
-All messages between MCP clients and servers **MUST** follow the
-[JSON-RPC 2.0](https://www.jsonrpc.org/specification) specification. The protocol defines
-these types of messages:
+MCP 客户端和服务器之间的所有消息 **MUST** 遵循
+[JSON-RPC 2.0](https://www.jsonrpc.org/specification) 规范。该协议定义了
+以下类型的消息：
 
-### Requests
+### 请求（Requests）
 
-Requests are sent from the client to the server or vice versa, to initiate an operation.
+请求从客户端发送到服务器，或反之，用于发起一个操作。
 
 ```typescript
 {
@@ -40,14 +35,13 @@ Requests are sent from the client to the server or vice versa, to initiate an op
 }
 ```
 
-- Requests **MUST** include a string or integer ID.
-- Unlike base JSON-RPC, the ID **MUST NOT** be `null`.
-- The request ID **MUST NOT** have been previously used by the requestor within the same
-  session.
+- 请求 **MUST** 包含一个字符串或整数 ID。
+- 与基础 JSON-RPC 不同，ID **MUST NOT** 为 `null`。
+- 请求 ID **MUST NOT** 在同一个会话中被请求方以前使用过。
 
-### Responses
+### 响应（Responses）
 
-Responses are sent in reply to requests, containing the result or error of the operation.
+响应作为请求的回复发送，包含操作的结果或错误。
 
 ```typescript
 {
@@ -64,18 +58,15 @@ Responses are sent in reply to requests, containing the result or error of the o
 }
 ```
 
-- Responses **MUST** include the same ID as the request they correspond to.
-- **Responses** are further sub-categorized as either **successful results** or
-  **errors**. Either a `result` or an `error` **MUST** be set. A response **MUST NOT**
-  set both.
-- Results **MAY** follow any JSON object structure, while errors **MUST** include an
-  error code and message at minimum.
-- Error codes **MUST** be integers.
+- 响应 **MUST** 包含与其对应的请求相同的 ID。
+- **响应** 进一步分为 **成功结果** 或 **错误**。必须设置 `result` 或 `error` 其中之一。响应 **MUST NOT** 同时设置两者。
+- 结果 **MAY** 遵循任何 JSON 对象结构，而错误 **MUST** 至少包含错误码和消息。
+- 错误码 **MUST** 为整数。
 
-### Notifications
+### 通知（Notifications）
 
-Notifications are sent from the client to the server or vice versa, as a one-way message.
-The receiver **MUST NOT** send a response.
+通知从客户端发送到服务器，或反之，作为单向消息。
+接收方 **MUST NOT** 发送响应。
 
 ```typescript
 {
@@ -87,37 +78,35 @@ The receiver **MUST NOT** send a response.
 }
 ```
 
-- Notifications **MUST NOT** include an ID.
+- 通知 **MUST NOT** 包含 ID。
 
-### Batching
+### 批处理（Batching）
 
-JSON-RPC also defines a means to
-[batch multiple requests and notifications](https://www.jsonrpc.org/specification#batch),
-by sending them in an array. MCP implementations **MAY** support sending JSON-RPC
-batches, but **MUST** support receiving JSON-RPC batches.
+JSON-RPC 还定义了一种
+[批量发送多个请求和通知](https://www.jsonrpc.org/specification#batch) 的方式，
+通过将它们放在一个数组中发送。MCP 实现 **MAY** 支持发送 JSON-RPC
+批处理，但 **MUST** 支持接收 JSON-RPC 批处理。
 
-## Auth
+## 授权
 
-MCP provides an [Authorization](/specification/2025-03-26/basic/authorization) framework for use with HTTP.
-Implementations using an HTTP-based transport **SHOULD** conform to this specification,
-whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
-and instead retrieve credentials from the environment.
+MCP 提供了一个与 HTTP 一起使用的[授权](/specification/2025-03-26/basic/authorization)框架。
+使用基于 HTTP 的传输的实现 **SHOULD** 遵循此规范，
+而使用 STDIO 传输的实现 **SHOULD NOT** 遵循此规范，
+应从环境中获取凭据。
 
-Additionally, clients and servers **MAY** negotiate their own custom authentication and
-authorization strategies.
+此外，客户端和服务器 **MAY** 协商它们自己的自定义身份验证和
+授权策略。
 
-For further discussions and contributions to the evolution of MCP’s auth mechanisms, join
-us in
+有关进一步讨论和对 MCP 授权机制演进的贡献，请加入我们的
 [GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions)
-to help shape the future of the protocol!
+一起塑造协议的未来！
 
-## Schema
+## 模式
 
-The full specification of the protocol is defined as a
-[TypeScript schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/2025-03-26/schema.ts).
-This is the source of truth for all protocol messages and structures.
+协议的完整规范定义为
+[TypeScript 模式](https://github.com/modelcontextprotocol/specification/blob/main/schema/2025-03-26/schema.ts)。
+这是所有协议消息和结构的权威来源。
 
-There is also a
-[JSON Schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/2025-03-26/schema.json),
-which is automatically generated from the TypeScript source of truth, for use with
-various automated tooling.
+还有一个
+[JSON Schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/2025-03-26/schema.json)，
+它是从 TypeScript 权威来源自动生成的，可用于各种自动化工具。

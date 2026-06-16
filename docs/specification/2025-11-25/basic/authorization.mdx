@@ -1,120 +1,86 @@
 ---
-title: Authorization
+title: 授权
 ---
 
 <div id="enable-section-numbers" />
 
-## Introduction
+## 引言
 
-### Purpose and Scope
+### 目的与范围
 
-The Model Context Protocol provides authorization capabilities at the transport level,
-enabling MCP clients to make requests to restricted MCP servers on behalf of resource
-owners. This specification defines the authorization flow for HTTP-based transports.
+Model Context Protocol 在传输层提供授权能力，使 MCP 客户端能够代表资源所有者向受限的 MCP 服务器发出请求。本规范定义了基于 HTTP 的传输的授权流程。
 
-### Protocol Requirements
+### 协议要求
 
-Authorization is **OPTIONAL** for MCP implementations. When supported:
+授权对于 MCP 实现是 **OPTIONAL**。当支持时：
 
-- Implementations using an HTTP-based transport **SHOULD** conform to this specification.
-- Implementations using an STDIO transport **SHOULD NOT** follow this specification, and
-  instead retrieve credentials from the environment.
-- Implementations using alternative transports **MUST** follow established security best
-  practices for their protocol.
+- 使用基于 HTTP 的传输的实现 **SHOULD** 遵循此规范。
+- 使用 STDIO 传输的实现 **SHOULD NOT** 遵循此规范，而应从环境中获取凭据。
+- 使用替代传输的实现 **MUST** 遵循其协议既定的安全最佳实践。
 
-### Standards Compliance
+### 标准合规性
 
-This authorization mechanism is based on established specifications listed below, but
-implements a selected subset of their features to ensure security and interoperability
-while maintaining simplicity:
+此授权机制基于下面列出的既定规范，但实现了其功能的一个选定子集，以确保安全性和互操作性，同时保持简洁性：
 
 - OAuth 2.1 IETF DRAFT ([draft-ietf-oauth-v2-1-13](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13))
-- OAuth 2.0 Authorization Server Metadata
-  ([RFC8414](https://datatracker.ietf.org/doc/html/rfc8414))
-- OAuth 2.0 Dynamic Client Registration Protocol
-  ([RFC7591](https://datatracker.ietf.org/doc/html/rfc7591))
+- OAuth 2.0 Authorization Server Metadata ([RFC8414](https://datatracker.ietf.org/doc/html/rfc8414))
+- OAuth 2.0 Dynamic Client Registration Protocol ([RFC7591](https://datatracker.ietf.org/doc/html/rfc7591))
 - OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728))
 - OAuth Client ID Metadata Documents ([draft-ietf-oauth-client-id-metadata-document-00](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00))
 
-## Roles
+## 角色
 
-A protected _MCP server_ acts as an [OAuth 2.1 resource server](https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-13.html#name-roles),
-capable of accepting and responding to protected resource requests using access tokens.
+一个受保护的 _MCP 服务器_ 充当 [OAuth 2.1 资源服务器](https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-13.html#name-roles)，能够使用访问令牌接受和响应受保护资源请求。
 
-An _MCP client_ acts as an [OAuth 2.1 client](https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-13.html#name-roles),
-making protected resource requests on behalf of a resource owner.
+一个 _MCP 客户端_ 充当 [OAuth 2.1 客户端](https://www.ietf.org/archive/id/draft-ietf-oauth-v2-1-13.html#name-roles)，代表资源所有者发出受保护资源请求。
 
-The _authorization server_ is responsible for interacting with the user (if necessary) and issuing access tokens for use at the MCP server.
-The implementation details of the authorization server are beyond the scope of this specification. It may be hosted with the
-resource server or a separate entity. The [Authorization Server Discovery section](#authorization-server-discovery)
-specifies how an MCP server indicates the location of its corresponding authorization server to a client.
+_授权服务器_ 负责与用户交互（如有必要）并颁发用于 MCP 服务器的访问令牌。授权服务器的实现细节超出了本规范的范围。它可以与资源服务器托管在一起，也可以是独立的实体。[授权服务器发现部分](#authorization-server-discovery) 规定了 MCP 服务器如何向客户端指示其对应授权服务器的位置。
 
-## Overview
+## 概述
 
-1. Authorization servers **MUST** implement OAuth 2.1 with appropriate security
-   measures for both confidential and public clients.
+1. 授权服务器 **MUST** 实施 OAuth 2.1，并为机密客户端和公共客户端采取适当的安全措施。
 
-2. Authorization servers and MCP clients **SHOULD** support OAuth Client ID Metadata Documents
-   ([draft-ietf-oauth-client-id-metadata-document-00](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00)).
+2. 授权服务器和 MCP 客户端 **SHOULD** 支持 OAuth 客户端 ID 元数据文档 ([draft-ietf-oauth-client-id-metadata-document-00](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00))。
 
-3. Authorization servers and MCP clients **MAY** support the OAuth 2.0 Dynamic Client Registration
-   Protocol ([RFC7591](https://datatracker.ietf.org/doc/html/rfc7591)).
+3. 授权服务器和 MCP 客户端 **MAY** 支持 OAuth 2.0 动态客户端注册协议 ([RFC7591](https://datatracker.ietf.org/doc/html/rfc7591))。
 
-4. MCP servers **MUST** implement OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)).
-   MCP clients **MUST** use OAuth 2.0 Protected Resource Metadata for authorization server discovery.
+4. MCP 服务器 **MUST** 实现 OAuth 2.0 受保护资源元数据 ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728))。MCP 客户端 **MUST** 使用 OAuth 2.0 受保护资源元数据进行授权服务器发现。
 
-5. MCP authorization servers **MUST** provide at least one of the following discovery mechanisms:
-   - OAuth 2.0 Authorization Server Metadata ([RFC8414](https://datatracker.ietf.org/doc/html/rfc8414))
+5. MCP 授权服务器 **MUST** 提供至少以下一种发现机制：
+   - OAuth 2.0 授权服务器元数据 ([RFC8414](https://datatracker.ietf.org/doc/html/rfc8414))
    - [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
-   MCP clients **MUST** support both discovery mechanisms to obtain the information required to interact with the authorization server.
+   MCP 客户端 **MUST** 支持两种发现机制，以获取与授权服务器交互所需的信息。
 
-## Authorization Server Discovery
+## 授权服务器发现
 
-This section describes the mechanisms by which MCP servers advertise their associated
-authorization servers to MCP clients, as well as the discovery process through which MCP
-clients can determine authorization server endpoints and supported capabilities.
+本节描述 MCP 服务器向 MCP 客户端通告其关联授权服务器的机制，以及 MCP 客户端确定授权服务器端点和支持能力的发现过程。
 
-### Authorization Server Location
+### 授权服务器位置
 
-MCP servers **MUST** implement the OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728))
-specification to indicate the locations of authorization servers. The Protected Resource Metadata document returned by the MCP server **MUST** include
-the `authorization_servers` field containing at least one authorization server.
+MCP 服务器 **MUST** 实现 OAuth 2.0 受保护资源元数据 ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)) 规范，以指示授权服务器的位置。MCP 服务器返回的受保护资源元数据文档 **MUST** 包含 `authorization_servers` 字段，其中至少包含一个授权服务器。
 
-The specific use of `authorization_servers` is beyond the scope of this specification; implementers should consult
-OAuth 2.0 Protected Resource Metadata ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)) for
-guidance on implementation details.
+`authorization_servers` 的具体使用超出了本规范的范围；实现者应参考 OAuth 2.0 受保护资源元数据 ([RFC9728](https://datatracker.ietf.org/doc/html/rfc9728)) 获取实现细节的指导。
 
-Implementors should note that Protected Resource Metadata documents can define multiple authorization servers. The responsibility for selecting which authorization server to use lies with the MCP client, following the guidelines specified in
-[RFC9728 Section 7.6 "Authorization Servers"](https://datatracker.ietf.org/doc/html/rfc9728#name-authorization-servers).
+实现者应注意，受保护资源元数据文档可以定义多个授权服务器。选择使用哪个授权服务器的责任在于 MCP 客户端，遵循 [RFC9728 第 7.6 节 "Authorization Servers"](https://datatracker.ietf.org/doc/html/rfc9728#name-authorization-servers) 中指定的指南。
 
-### Protected Resource Metadata Discovery Requirements
+### 受保护资源元数据发现要求
 
-MCP servers **MUST** implement one of the following discovery mechanisms to provide authorization server location information to MCP clients:
+MCP 服务器 **MUST** 实现以下一种发现机制，以向 MCP 客户端提供授权服务器位置信息：
 
-1. **WWW-Authenticate Header**: Include the resource metadata URL in the `WWW-Authenticate` HTTP header under `resource_metadata` when returning `401 Unauthorized` responses, as described in [RFC9728 Section 5.1](https://datatracker.ietf.org/doc/html/rfc9728#name-www-authenticate-response).
+1. **WWW-Authenticate 头部**：在返回 `401 Unauthorized` 响应时，将资源元数据 URL 包含在 `WWW-Authenticate` HTTP 头部的 `resource_metadata` 下，如 [RFC9728 第 5.1 节](https://datatracker.ietf.org/doc/html/rfc9728#name-www-authenticate-response) 所述。
 
-2. **Well-Known URI**: Serve metadata at a well-known URI as specified in [RFC9728](https://datatracker.ietf.org/doc/html/rfc9728). This can be either:
-   - At the path of the server's MCP endpoint: `https://example.com/public/mcp` could host metadata at `https://example.com/.well-known/oauth-protected-resource/public/mcp`
-   - At the root: `https://example.com/.well-known/oauth-protected-resource`
+2. **Well-Known URI**：按照 [RFC9728](https://datatracker.ietf.org/doc/html/rfc9728) 的指定，在 well-known URI 上提供元数据。可以是：
+   - 在服务器 MCP 端点的路径上：`https://example.com/public/mcp` 可以在 `https://example.com/.well-known/oauth-protected-resource/public/mcp` 托管元数据
+   - 在根路径：`https://example.com/.well-known/oauth-protected-resource`
 
-MCP clients **MUST** support both discovery mechanisms and use the resource metadata URL from the parsed `WWW-Authenticate` headers when present; otherwise, they **MUST** fall back to constructing and requesting the well-known URIs in the order listed above.
+MCP 客户端 **MUST** 支持两种发现机制，并在存在时使用从解析的 `WWW-Authenticate` 头部中获取的资源元数据 URL；否则，它们 **MUST** 回退到按上述顺序构造和请求 well-known URI。
 
-MCP servers **SHOULD** include a `scope` parameter in the `WWW-Authenticate` header as defined in
-[RFC 6750 Section 3](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
-to indicate the scopes required for accessing the resource. This provides clients with immediate
-guidance on the appropriate scopes to request during authorization,
-following the principle of least privilege and preventing clients from requesting excessive permissions.
+MCP 服务器 **SHOULD** 在 `WWW-Authenticate` 头部中包含 `scope` 参数，如 [RFC 6750 第 3 节](https://datatracker.ietf.org/doc/html/rfc6750#section-3) 所定义，以指示访问资源所需的范围。这为客户提供了在授权期间应请求的适当范围的即时指导，遵循最小权限原则并防止客户端请求过多的权限。
 
-The scopes included in the `WWW-Authenticate` challenge **MAY** match `scopes_supported`, be a subset
-or superset of it, or an alternative collection that is neither a strict subset nor
-superset. Clients **MUST NOT** assume any particular set relationship between the challenged
-scope set and `scopes_supported`. Clients **MUST** treat the scopes provided in the
-challenge as authoritative for satisfying the current request. Servers **SHOULD** strive for
-consistency in how they construct scope sets but they are not required to surface every dynamically
-issued scope through `scopes_supported`.
+`WWW-Authenticate` 挑战中包含的范围 **MAY** 与 `scopes_supported` 匹配，是其子集或超集，或者是既不是严格子集也不是超集的替代集合。客户端 **MUST NOT** 假定挑战范围集与 `scopes_supported` 之间存在任何特定的集合关系。客户端 **MUST** 将挑战中提供的范围视为满足当前请求的权威依据。服务器 **SHOULD** 在构建范围集时力求一致性，但它们不需要通过 `scopes_supported` 公开每个动态颁发的范围。
 
-Example 401 response with scope guidance:
+带有范围指导的 401 响应示例：
 
 ```http
 HTTP/1.1 401 Unauthorized
@@ -122,82 +88,82 @@ WWW-Authenticate: Bearer resource_metadata="https://mcp.example.com/.well-known/
                          scope="files:read"
 ```
 
-MCP clients **MUST** be able to parse `WWW-Authenticate` headers and respond appropriately to `HTTP 401 Unauthorized` responses from the MCP server.
+MCP 客户端 **MUST** 能够解析 `WWW-Authenticate` 头部，并适当响应来自 MCP 服务器的 `HTTP 401 Unauthorized` 响应。
 
-If the `scope` parameter is absent, clients **SHOULD** apply the fallback behavior defined in the [Scope Selection Strategy](#scope-selection-strategy) section.
+如果 `scope` 参数不存在，客户端 **SHOULD** 应用 [范围选择策略](#scope-selection-strategy) 部分中定义的回退行为。
 
-### Authorization Server Metadata Discovery
+### 授权服务器元数据发现
 
-To handle different issuer URL formats and ensure interoperability with both OAuth 2.0 Authorization Server Metadata and OpenID Connect Discovery 1.0 specifications, MCP clients **MUST** attempt multiple well-known endpoints when discovering authorization server metadata.
+为了处理不同的签发者 URL 格式并确保与 OAuth 2.0 授权服务器元数据和 OpenID Connect Discovery 1.0 规范的互操作性，MCP 客户端 **MUST** 在发现授权服务器元数据时尝试多个 well-known 端点。
 
-The discovery approach is based on [RFC8414 Section 3.1 "Authorization Server Metadata Request"](https://datatracker.ietf.org/doc/html/rfc8414#section-3.1) for OAuth 2.0 Authorization Server Metadata discovery and [RFC8414 Section 5 "Compatibility Notes"](https://datatracker.ietf.org/doc/html/rfc8414#section-5) for OpenID Connect Discovery 1.0 interoperability.
+发现方法基于 [RFC8414 第 3.1 节 "Authorization Server Metadata Request"](https://datatracker.ietf.org/doc/html/rfc8414#section-3.1) 用于 OAuth 2.0 授权服务器元数据发现，以及 [RFC8414 第 5 节 "Compatibility Notes"](https://datatracker.ietf.org/doc/html/rfc8414#section-5) 用于 OpenID Connect Discovery 1.0 互操作性。
 
-For issuer URLs with path components (e.g., `https://auth.example.com/tenant1`), clients **MUST** try endpoints in the following priority order:
+对于带有路径组件的签发者 URL（例如 `https://auth.example.com/tenant1`），客户端 **MUST** 按以下优先级顺序尝试端点：
 
-1. OAuth 2.0 Authorization Server Metadata with path insertion: `https://auth.example.com/.well-known/oauth-authorization-server/tenant1`
-2. OpenID Connect Discovery 1.0 with path insertion: `https://auth.example.com/.well-known/openid-configuration/tenant1`
-3. OpenID Connect Discovery 1.0 path appending: `https://auth.example.com/tenant1/.well-known/openid-configuration`
+1. OAuth 2.0 授权服务器元数据（路径插入）：`https://auth.example.com/.well-known/oauth-authorization-server/tenant1`
+2. OpenID Connect Discovery 1.0（路径插入）：`https://auth.example.com/.well-known/openid-configuration/tenant1`
+3. OpenID Connect Discovery 1.0（路径追加）：`https://auth.example.com/tenant1/.well-known/openid-configuration`
 
-For issuer URLs without path components (e.g., `https://auth.example.com`), clients **MUST** try:
+对于没有路径组件的签发者 URL（例如 `https://auth.example.com`），客户端 **MUST** 尝试：
 
-1. OAuth 2.0 Authorization Server Metadata: `https://auth.example.com/.well-known/oauth-authorization-server`
-2. OpenID Connect Discovery 1.0: `https://auth.example.com/.well-known/openid-configuration`
+1. OAuth 2.0 授权服务器元数据：`https://auth.example.com/.well-known/oauth-authorization-server`
+2. OpenID Connect Discovery 1.0：`https://auth.example.com/.well-known/openid-configuration`
 
-### Authorization Server Discovery Sequence Diagram
+### 授权服务器发现序列图
 
-The following diagram outlines an example flow:
+下图概述了一个示例流程：
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant M as MCP Server (Resource Server)
-    participant A as Authorization Server
+    participant C as 客户端
+    participant M as MCP 服务器（资源服务器）
+    participant A as 授权服务器
 
-    Note over C: Attempt unauthenticated MCP request
-    C->>M: MCP request without token
-    M-->>C: HTTP 401 Unauthorized (may include WWW-Authenticate header)
+    Note over C: 尝试未经身份验证的 MCP 请求
+    C->>M: 无令牌的 MCP 请求
+    M-->>C: HTTP 401 Unauthorized（可能包含 WWW-Authenticate 头部）
 
-    alt Header includes resource_metadata
-        Note over C: Extract resource_metadata URL from header
+    alt 头部包含 resource_metadata
+        Note over C: 从头部提取 resource_metadata URL
         C->>M: GET resource_metadata URI
-        M-->>C: Resource metadata with authorization server URL
-    else No resource_metadata in header
-        Note over C: Fallback to well-known URI probing
-        Note over M: _Not applicable if the MCP server is at the root_
+        M-->>C: 带有授权服务器 URL 的资源元数据
+    else 头部中无 resource_metadata
+        Note over C: 回退到 well-known URI 探测
+        Note over M: _如果 MCP 服务器在根路径则不适用_
         C->>M: GET /.well-known/oauth-protected-resource/mcp
-        alt Sub-path metadata found
-            M-->>C: Resource metadata with authorization server URL
-        else Sub-path not found
+        alt 找到子路径元数据
+            M-->>C: 带有授权服务器 URL 的资源元数据
+        else 未找到子路径
             C->>M: GET /.well-known/oauth-protected-resource
-            alt Root metadata found
-                M-->>C: Resource metadata with authorization server URL
-            else Root metadata not found
-                Note over C: Abort or use pre-configured values
+            alt 找到根元数据
+                M-->>C: 带有授权服务器 URL 的资源元数据
+            else 未找到根元数据
+                Note over C: 中止或使用预配置的值
             end
         end
     end
 
-    Note over C: Validate RS metadata,<br />build AS metadata URL
+    Note over C: 验证 RS 元数据，<br />构建 AS 元数据 URL
 
-    C->>A: GET Authorization server metadata endpoint
-    Note over C,A: Try OAuth 2.0 and OpenID Connect<br/>discovery endpoints in priority order
-    A-->>C: Authorization server metadata
+    C->>A: GET 授权服务器元数据端点
+    Note over C,A: 按优先级顺序尝试 OAuth 2.0 和<br/>OpenID Connect 发现端点
+    A-->>C: 授权服务器元数据
 
-    Note over C,A: OAuth 2.1 authorization flow happens here
+    Note over C,A: 此处进行 OAuth 2.1 授权流程
 
-    C->>A: Token request
-    A-->>C: Access token
+    C->>A: 令牌请求
+    A-->>C: 访问令牌
 
-    C->>M: MCP request with access token
-    M-->>C: MCP response
-    Note over C,M: MCP communication continues with valid token
+    C->>M: 带有访问令牌的 MCP 请求
+    M-->>C: MCP 响应
+    Note over C,M: MCP 通信使用有效令牌继续
 ```
 
-## Client Registration Approaches
+## 客户端注册方法
 
-MCP supports three client registration mechanisms. Choose based on your scenario:
+MCP 支持三种客户端注册机制。根据您的场景进行选择：
 
-- **Client ID Metadata Documents**: When client and server have no prior relationship (most common)
+- **客户端 ID 元数据文档**：当客户端和服务器没有事先关系时（最常见）
 - **Pre-registration**: When client and server have an existing relationship
 - **Dynamic Client Registration**: For backwards compatibility or specific requirements
 

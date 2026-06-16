@@ -1,55 +1,43 @@
 ---
-title: Elicitation
+title: 引导
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to request additional
-information from users through the client during interactions. This flow allows clients to
-maintain control over user interactions and data sharing while enabling servers to gather
-necessary information dynamically.
+Model Context Protocol (MCP) 提供了标准化的方式让服务器在交互期间通过客户端向用户请求额外信息。此流程允许客户端保持对用户交互和数据共享的控制，同时使服务器能够动态收集必要的信息。
 
-Elicitation supports two modes:
+引导支持两种模式：
 
-- **Form mode**: Servers can request structured data from users with optional JSON schemas to validate responses
-- **URL mode**: Servers can direct users to external URLs for sensitive interactions that must _not_ pass through the MCP client
+- **表单模式**：服务器可以使用可选的 JSON schema 向用户请求结构化数据以验证响应
+- **URL 模式**：服务器可以将用户引导到外部 URL，用于一定不能通过 MCP 客户端的敏感交互
 
-## User Interaction Model
+## 用户交互模型
 
-Elicitation in MCP allows servers to implement interactive workflows by enabling user input
-requests to occur _nested_ inside other MCP server features.
+MCP 中的引导允许服务器通过使用户输入请求*嵌套*在其他 MCP 服务器特性内部发生，从而实现交互式工作流。
 
-Implementations are free to expose elicitation through any interface pattern that suits
-their needs&mdash;the protocol itself does not mandate any specific user interaction
-model.
+实现可以自由地通过适合其需求的任何界面模式来暴露引导 — 协议本身不强制任何特定的用户交互模型。
 
 <Warning>
 
-For trust & safety and security:
+为了信任、安全和保护：
 
-- Servers **MUST NOT** use form mode elicitation to request sensitive information such as
-  passwords, API keys, access tokens, or payment credentials
-- Servers **MUST** use [URL mode](#url-mode-elicitation-requests) for interactions involving
-  such sensitive information
+- 服务器 **MUST NOT** 使用表单模式引导来请求敏感信息，如密码、API 密钥、访问令牌或支付凭证
+- 服务器 **MUST** 对涉及此类敏感信息的交互使用 [URL 模式](#url-mode-elicitation-requests)
 
-"Sensitive information" in this context refers to secrets and credentials that grant access or
-authorize transactions. General contact or profile information (such as a name, email address,
-or username) is not categorically prohibited; whether to request such data via form mode is at
-the discretion of the server and subject to the user's ability to review and decline.
+在此上下文中，"敏感信息"指授予访问权限或授权交易的秘密和凭证。一般的联系信息或个人信息（如姓名、电子邮件地址或用户名）未被明确禁止；是否通过表单模式请求此类数据由服务器自行决定，并受用户审查和拒绝能力的约束。
 
-MCP clients **MUST**:
+MCP 客户端 **MUST**：
 
-- Provide UI that makes it clear which server is requesting information
-- Respect user privacy and provide clear decline and cancel options
-- For form mode, allow users to review and modify their responses before sending
-- For URL mode, clearly display the target domain/host and gather user consent before navigation to the target URL
+- 提供 UI 明确显示哪个服务器正在请求信息
+- 尊重用户隐私并提供明确的拒绝和取消选项
+- 对于表单模式，允许用户在发送前审查和修改其响应
+- 对于 URL 模式，在导航到目标 URL 之前清晰显示目标域/主机并收集用户同意
 
 </Warning>
 
-## Capabilities
+## 能力
 
-Clients that support elicitation **MUST** declare the `elicitation` capability in
-`_meta.io.modelcontextprotocol/clientCapabilities` on each request:
+支持引导的客户端 **MUST** 在每个请求的 `_meta.io.modelcontextprotocol/clientCapabilities` 中声明 `elicitation` 能力：
 
 ```json
 {
@@ -76,26 +64,25 @@ Clients declaring the `elicitation` capability **MUST** support at least one mod
 
 Servers **MUST NOT** send elicitation requests with modes that are not supported by the client.
 
-## Protocol Messages
+## 协议消息
 
-### Elicitation Requests
+### 引导请求
 
-Servers **MAY** request information from a user during the processing of a client request, by sending an [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult)
-containing an `elicitation/create` request.
+服务器 **MAY** 在处理客户端请求期间，通过发送包含 `elicitation/create` 请求的 [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult) 向用户请求信息。
 
-All elicitation requests **MUST** include the following parameters:
+所有引导请求 **MUST** 包含以下参数：
 
-| Name      | Type   | Options       | Description                                                                            |
-| --------- | ------ | ------------- | -------------------------------------------------------------------------------------- |
-| `mode`    | string | `form`, `url` | The mode of the elicitation. Optional for form mode (defaults to `"form"` if omitted). |
-| `message` | string |               | A human-readable message explaining why the interaction is needed.                     |
+| 名称      | 类型   | 选项          | 描述                                                    |
+| --------- | ------ | ------------- | ------------------------------------------------------- |
+| `mode`    | string | `form`, `url` | 引导的模式。对于表单模式可选（省略时默认为 `"form"`）。 |
+| `message` | string |               | 解释为何需要交互的人类可读消息。                        |
 
-The `mode` parameter specifies the type of elicitation:
+`mode` 参数指定引导的类型：
 
-- `"form"`: In-band structured data collection with optional schema validation. Data is exposed to the client.
-- `"url"`: Out-of-band interaction via URL navigation. Data (other than the URL itself) is **not** exposed to the client.
+- `"form"`：带内结构化数据收集，可选的 schema 验证。数据暴露给客户端。
+- `"url"`：通过 URL 导航的带外交互。数据（除了 URL 本身）**不**暴露给客户端。
 
-For backwards compatibility, servers **MAY** omit the `mode` field for form mode elicitation requests. Clients **MUST** treat requests without a `mode` field as form mode.
+为了向后兼容，服务器 **MAY** 为表单模式引导请求省略 `mode` 字段。客户端 **MUST** 将没有 `mode` 字段的请求视为表单模式。
 
 ### Form Mode Elicitation Requests
 
@@ -320,33 +307,31 @@ Note that complex nested structures, arrays of objects (beyond enums), and other
 }
 ```
 
-### URL Mode Elicitation Requests
+### URL 模式引导请求
 
 <Note>
 
-**New feature:** URL mode elicitation is introduced in the `2025-11-25` version of the MCP specification. Its design and implementation may change in future protocol revisions.
+**新特性：** URL 模式引导是在 MCP 规范 `2025-11-25` 版本中引入的。其设计和实现可能在未来的协议修订版中发生变化。
 
 </Note>
 
-URL mode elicitation enables servers to direct users to external URLs for out-of-band interactions that must not pass through the MCP client. This is essential for auth flows, payment processing, and other sensitive or secure operations.
+URL 模式引导使服务器能够将用户引导到外部 URL，用于不能通过 MCP 客户端的带外交互。这对于身份验证流程、支付处理和其他敏感或安全操作至关重要。
 
-URL mode elicitation requests **MUST** specify `mode: "url"`, a `message`, and include these additional parameters:
+URL 模式引导请求 **MUST** 指定 `mode: "url"`、`message`，并包含以下额外参数：
 
-| Name            | Type   | Description                               |
-| --------------- | ------ | ----------------------------------------- |
-| `url`           | string | The URL that the user should navigate to. |
-| `elicitationId` | string | A unique identifier for the elicitation.  |
+| 名称            | 类型   | 描述                 |
+| --------------- | ------ | -------------------- |
+| `url`           | string | 用户应导航到的 URL。 |
+| `elicitationId` | string | 引导的唯一标识符。   |
 
-The `url` parameter **MUST** contain a valid URL.
+`url` 参数 **MUST** 包含一个有效的 URL。
 
 <Note>
-  **Important**: URL mode elicitation is *not* for authorizing the MCP client's
-  access to the MCP server (that's handled by [MCP
-  authorization](../basic/authorization)). Instead, it's used when the MCP
-  server needs to obtain sensitive information or third-party authorization on
-  behalf of the user. The MCP client's bearer token remains unchanged. The
-  client's only responsibility is to provide the user with context about the
-  elicitation URL the server wants them to open.
+  **重要**：URL 模式引导*不是*用于授权 MCP 客户端访问 MCP 服务器（那由 [MCP
+  授权](../basic/authorization)处理）。相反，它用于 MCP
+  服务器需要代表用户获取敏感信息或第三方授权时。MCP 客户端的 bearer
+  令牌保持不变。客户端的唯一责任是向用户提供关于服务器希望他们打开的引导 URL
+  的上下文。
 </Note>
 
 #### Example: Request Sensitive Data
@@ -382,21 +367,20 @@ The response with `action: "accept"` indicates that the user has consented to th
 interaction. It does not mean that the interaction is complete. The interaction occurs out
 of band and the client is not aware of the outcome until and unless the server sends a notification indicating completion.
 
-### Completion Notifications for URL Mode Elicitation
+### URL 模式引导的完成通知
 
-Servers **MAY** send a `notifications/elicitation/complete` notification when an
-out-of-band interaction started by URL mode elicitation is completed. This allows clients to react programmatically if appropriate.
+当由 URL 模式引导启动的带外交互完成时，服务器 **MAY** 发送 `notifications/elicitation/complete` 通知。这允许客户端在适当时以编程方式做出反应。
 
-Servers sending notifications:
+发送通知的服务器：
 
-- **MUST** only send the notification to the client that initiated the elicitation request.
-- **MUST** include the `elicitationId` established in the original `elicitation/create` request.
+- **MUST** 仅向发起引导请求的客户端发送通知。
+- **MUST** 包含原始 `elicitation/create` 请求中建立的 `elicitationId`。
 
-Clients:
+客户端：
 
-- **MUST** ignore notifications referencing unknown or already-completed IDs.
-- **MAY** wait for this notification to automatically retry requests that received a [URLElicitationRequiredError](#error-handling), update the user interface, or otherwise continue an interaction.
-- **SHOULD** still provide manual controls that let the user retry or cancel the original request (or otherwise resume interacting with the client) if the notification never arrives.
+- **MUST** 忽略引用未知或已完成 ID 的通知。
+- **MAY** 等待此通知以自动重试收到 [URLElicitationRequiredError](#error-handling) 的请求、更新用户界面或以其他方式继续交互。
+- **SHOULD** 如果通知未到达，仍应提供手动控件，让用户重试或取消原始请求（或以其他方式恢复与客户端的交互）。
 
 #### Example
 

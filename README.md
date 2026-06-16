@@ -1,28 +1,27 @@
 # Model Context Protocol (MCP)
 
-_Just heard of MCP and not sure where to start? Check out our [documentation website](https://modelcontextprotocol.io)._
+_刚听说 MCP 不知道从哪里开始？请查看我们的[文档网站](https://modelcontextprotocol.io)。_
 
-This repo contains the:
+本仓库包含：
 
-- MCP specification
-- MCP protocol schema
-- Official MCP documentation
+- MCP 规范
+- MCP 协议 schema
+- 官方 MCP 文档
 
-The schema is [defined in TypeScript](schema/2025-11-25/schema.ts) first, but
-[made available as JSON Schema](schema/2025-11-25/schema.json) as well, for wider
-compatibility.
+Schema 首先[以 TypeScript 定义](schema/2025-11-25/schema.ts)，同时
+也[以 JSON Schema 形式提供](schema/2025-11-25/schema.json)，以获得更广泛的兼容性。
 
-The official MCP documentation is built using Mintlify and available at
-[modelcontextprotocol.io](https://modelcontextprotocol.io).
+官方 MCP 文档使用 Mintlify 构建，可在
+[modelcontextprotocol.io](https://modelcontextprotocol.io) 访问。
 
-## Authors
+## 作者
 
-The Model Context Protocol was created by David Soria Parra ([@dsp](https://github.com/dsp)) and Justin Spahr-Summers ([@jspahrsummers](https://github.com/jspahrsummers)).
+Model Context Protocol 由 David Soria Parra ([@dsp](https://github.com/dsp)) 和 Justin Spahr-Summers ([@jspahrsummers](https://github.com/jspahrsummers)) 创建。
 
-## Contributing
+## 贡献
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+请参阅 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
-## License
+## 许可证
 
-This project is licensed under the [MIT License](LICENSE).
+本项目采用 [MIT 许可证](LICENSE) 授权。

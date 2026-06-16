@@ -1,41 +1,32 @@
 ---
-title: Tools
+title: 工具
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) allows servers to expose tools that can be invoked by
-language models. Tools enable models to interact with external systems, such as querying
-databases, calling APIs, or performing computations. Each tool is uniquely identified by
-a name and includes metadata describing its schema.
+Model Context Protocol (MCP) 允许服务器暴露可由语言模型调用的工具。工具使模型能够与外部系统交互，例如查询数据库、调用 API 或执行计算。每个工具由名称唯一标识，并包含描述其 schema 的元数据。
 
-## User Interaction Model
+## 用户交互模型
 
-Tools in MCP are designed to be **model-controlled**, meaning that the language model can
-discover and invoke tools automatically based on its contextual understanding and the
-user's prompts.
+MCP 中的工具设计为**模型控制**，意味着语言模型可以根据其上下文理解和用户的提示自动发现和调用工具。
 
-However, implementations are free to expose tools through any interface pattern that
-suits their needs&mdash;the protocol itself does not mandate any specific user
-interaction model.
+然而，实现可以自由地通过适合其需求的任何界面模式来暴露工具 — 协议本身不强制任何特定的用户交互模型。
 
 <Warning>
 
-For trust & safety and security, there **SHOULD** always
-be a human in the loop with the ability to deny tool invocations.
+为了信任、安全和保护，**SHOULD** 始终在循环中有人类参与，具有拒绝工具调用的能力。
 
-Applications **SHOULD**:
+应用程序 **SHOULD**：
 
-- Provide UI that makes clear which tools are being exposed to the AI model
-- Insert clear visual indicators when tools are invoked
-- Present confirmation prompts to the user for operations, to ensure a human is in the
-  loop
+- 提供 UI 明确显示哪些工具暴露给 AI 模型
+- 在工具被调用时插入清晰的视觉指示
+- 向用户呈现操作确认提示，确保有人在循环中
 
 </Warning>
 
-## Capabilities
+## 能力
 
-Servers that support tools **MUST** declare the `tools` capability:
+支持工具的服务器 **MUST** 声明 `tools` 能力：
 
 ```json
 {
@@ -64,12 +55,11 @@ requests when the underlying set of tools has not changed). Deterministic orderi
 clients to reliably cache the tool list and improves LLM prompt cache hit rates when tools
 are included in model context.
 
-## Protocol Messages
+## 协议消息
 
-### Listing Tools
+### 列出工具
 
-To discover available tools, clients send a `tools/list` request. This operation supports
-[pagination](/specification/draft/server/utilities/pagination) and [caching](/specification/draft/server/utilities/caching).
+要发现可用的工具，客户端发送 `tools/list` 请求。此操作支持[分页](/specification/draft/server/utilities/pagination)和[缓存](/specification/draft/server/utilities/caching)。
 
 **Request:**
 
@@ -123,9 +113,9 @@ To discover available tools, clients send a `tools/list` request. This operation
 }
 ```
 
-### Calling Tools
+### 调用工具
 
-To invoke a tool, clients send a `tools/call` request:
+要调用工具，客户端发送 `tools/call` 请求：
 
 **Request:**
 
@@ -162,9 +152,9 @@ To invoke a tool, clients send a `tools/call` request:
 }
 ```
 
-### Input Required Tool Results
+### 需要输入的工具结果
 
-Servers **MAY** respond to `tools/call` with an [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult) to indicate that additional input is needed before the tool call can be completed. This follows the [multi round-trip requests](/specification/draft/basic/patterns/mrtr#multi-round-trip-requests) mechanism.
+服务器 **MAY** 以 [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult) 响应 `tools/call`，以指示在工具调用完成之前需要额外的输入。这遵循[多轮请求](/specification/draft/basic/patterns/mrtr#multi-round-trip-requests)机制。
 
 When retrying the request with input responses, clients include `inputResponses` and, if provided by the server, `requestState` in the request parameters:
 
@@ -224,12 +214,9 @@ When retrying the request with input responses, clients include `inputResponses`
 
 Note that the JSON-RPC `id` **MUST** be different between the initial request and the retry.
 
-### List Changed Notification
+### 列表变更通知
 
-When the list of available tools changes, servers that declared the `listChanged`
-capability **SHOULD** send a notification to clients that have opened a
-[`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions) stream with
-`toolsListChanged: true`:
+当可用工具列表发生变化时，声明了 `listChanged` 能力的服务器 **SHOULD** 向已打开带有 `toolsListChanged: true` 的 [`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions) 流的客户端发送通知：
 
 ```json
 {
@@ -268,43 +255,41 @@ sequenceDiagram
     end
 ```
 
-## Data Types
+## 数据类型
 
-### Tool
+### 工具
 
-A tool definition includes:
+工具定义包括：
 
-- `name`: Unique identifier for the tool
-- `title`: Optional human-readable name of the tool for display purposes.
-- `description`: Human-readable description of functionality
-- `icons`: Optional array of icons for display in user interfaces
-- `inputSchema`: JSON Schema defining expected parameters
-  - Follows the [JSON Schema usage guidelines](/specification/draft/basic#json-schema-usage)
-  - Defaults to 2020-12 if no `$schema` field is present
-  - **MUST** be a valid JSON Schema object (not `null`)
-  - For tools with no parameters, use one of these valid approaches:
-    - `{ "type": "object", "additionalProperties": false }` - **Recommended**: explicitly accepts only empty objects
-    - `{ "type": "object" }` - accepts any object (including with properties)
-  - Properties **MAY** include an [`x-mcp-header`](#x-mcp-header) annotation to expose
-    parameter values as HTTP headers
-- `outputSchema`: Optional JSON Schema defining expected output structure
-  - Follows the [JSON Schema usage guidelines](/specification/draft/basic#json-schema-usage)
-  - Defaults to 2020-12 if no `$schema` field is present
-- `annotations`: Optional properties describing tool behavior
+- `name`：工具的唯一标识符
+- `title`：用于显示目的的可选人类可读工具名称
+- `description`：功能的人类可读描述
+- `icons`：在用户界面中显示的可选图标数组
+- `inputSchema`：定义预期参数的 JSON Schema
+  - 遵循 [JSON Schema 使用指南](/specification/draft/basic#json-schema-usage)
+  - 如果没有 `$schema` 字段，默认为 2020-12
+  - **MUST** 是有效的 JSON Schema 对象（不是 `null`）
+  - 对于没有参数的工具，使用以下有效方法之一：
+    - `{ "type": "object", "additionalProperties": false }` - **推荐**：显式只接受空对象
+    - `{ "type": "object" }` - 接受任何对象（包括带属性的）
+  - 属性 **MAY** 包含 [`x-mcp-header`](#x-mcp-header) 注释以将参数值暴露为 HTTP 头部
+- `outputSchema`：定义预期输出结构的可选 JSON Schema
+  - 遵循 [JSON Schema 使用指南](/specification/draft/basic#json-schema-usage)
+  - 如果没有 `$schema` 字段，默认为 2020-12
+- `annotations`：描述工具行为的可选属性
 
 <Warning>
-  For trust & safety and security, clients **MUST** consider tool annotations to
-  be untrusted unless they come from trusted servers.
+  为了信任、安全和保护，客户端 **MUST**
+  将工具注释视为不可信的，除非它们来自受信任的服务器。
 </Warning>
 
-#### Tool Names
+#### 工具名称
 
-- Tool names **SHOULD** be between 1 and 128 characters in length (inclusive).
-- Tool names **SHOULD** be considered case-sensitive.
-- The following **SHOULD** be the only allowed characters: uppercase and lowercase ASCII letters (A-Z, a-z), digits
-  (0-9), underscore (\_), hyphen (-), and dot (.)
-- Tool names **SHOULD NOT** contain spaces, commas, or other special characters.
-- Tool names **SHOULD** be unique within a server.
+- 工具名称 **SHOULD** 长度在 1 到 128 个字符之间（含）。
+- 工具名称 **SHOULD** 被视为区分大小写。
+- 以下 **SHOULD** 是仅允许的字符：大写和小写 ASCII 字母 (A-Z, a-z)、数字 (0-9)、下划线 (\_)、连字符 (-) 和点 (.)
+- 工具名称 **SHOULD NOT** 包含空格、逗号或其他特殊字符。
+- 工具名称 **SHOULD** 在服务器内唯一。
 - Example valid tool names:
   - `getUser`
   - `DATA_EXPORT_v2`
@@ -324,9 +309,7 @@ servers and **SHOULD NOT** be relied upon for disambiguation.
 
 #### x-mcp-header
 
-The `x-mcp-header` extension property allows servers to designate specific tool
-parameters to be mirrored into HTTP headers when using the
-[Streamable HTTP transport](/specification/draft/basic/transports/streamable-http#custom-headers-from-tool-parameters).
+`x-mcp-header` 扩展属性允许服务器指定在使用 [Streamable HTTP 传输](/specification/draft/basic/transports/streamable-http#custom-headers-from-tool-parameters) 时将特定工具参数镜像到 HTTP 头部中。
 This enables network intermediaries (load balancers, proxies, WAFs) to route and process
 requests based on parameter values without parsing the request body.
 

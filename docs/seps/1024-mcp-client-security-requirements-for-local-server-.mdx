@@ -1,7 +1,7 @@
 ---
-title: "SEP-1024: MCP Client Security Requirements for Local Server Installation"
-sidebarTitle: "SEP-1024: MCP Client Security Requirements for Lo…"
-description: "MCP Client Security Requirements for Local Server Installation"
+title: "SEP-1024: MCP 客户端本地服务器安装安全要求"
+sidebarTitle: "SEP-1024: MCP 客户端本地服务器安装安全要求"
+description: "MCP 客户端本地服务器安装安全要求"
 ---
 
 <div className="flex items-center gap-2 mb-4">
@@ -28,9 +28,9 @@ description: "MCP Client Security Requirements for Local Server Installation"
 
 ## Abstract
 
-This SEP addresses critical security vulnerabilities in MCP client implementations that support one-click installation of local MCP servers. The current MCP specification lacks explicit security requirements for client-side installation flows, allowing malicious actors to execute arbitrary commands on user systems through crafted MCP server configurations distributed via links or social engineering.
+本 SEP 解决了支持一键安装本地 MCP 服务器的 MCP 客户端实现中的关键安全漏洞。当前的 MCP 规范缺乏对客户端安装流程的明确安全要求，使得恶意行为者能够通过链接或社会工程分发精心构造的 MCP 服务器配置，在用户系统上执行任意命令。
 
-This proposal establishes a best practice for MCP clients, requiring explicit user consent before executing any local server installation commands and complete command transparency.
+该提案为 MCP 客户端建立了最佳实践，要求在执行任何本地服务器安装命令之前获得明确的用户同意，并实现完整的命令透明度。
 
 ## Motivation
 

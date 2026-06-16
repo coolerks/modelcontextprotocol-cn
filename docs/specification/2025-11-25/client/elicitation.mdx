@@ -1,55 +1,43 @@
 ---
-title: Elicitation
+title: 征询（Elicitation）
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to request additional
-information from users through the client during interactions. This flow allows clients to
-maintain control over user interactions and data sharing while enabling servers to gather
-necessary information dynamically.
+Model Context Protocol (MCP) 提供了一种标准化的方式，让服务器在交互期间通过客户端向用户请求额外信息。此流程允许客户端保持对用户交互和数据共享的控制，同时使服务器能够动态收集必要的信息。
 
-Elicitation supports two modes:
+征询支持两种模式：
 
-- **Form mode**: Servers can request structured data from users with optional JSON schemas to validate responses
-- **URL mode**: Servers can direct users to external URLs for sensitive interactions that must _not_ pass through the MCP client
+- **表单模式**：服务器可以使用可选的 JSON schemas 向用户请求结构化数据以验证响应
+- **URL 模式**：服务器可以将用户引导到外部 URL，用于 _必须不_ 经过 MCP 客户端的敏感交互
 
-## User Interaction Model
+## 用户交互模型
 
-Elicitation in MCP allows servers to implement interactive workflows by enabling user input
-requests to occur _nested_ inside other MCP server features.
+MCP 中的征询通过允许用户输入请求在*嵌套*在其他 MCP 服务器特性内部发生，使服务器能够实现交互式工作流。
 
-Implementations are free to expose elicitation through any interface pattern that suits
-their needs&mdash;the protocol itself does not mandate any specific user interaction
-model.
+实现可以自由地通过任何适合其需求的界面模式来暴露征询——协议本身并不强制规定任何特定的用户交互模型。
 
 <Warning>
 
-For trust & safety and security:
+为了信任与安全：
 
-- Servers **MUST NOT** use form mode elicitation to request sensitive information such as
-  passwords, API keys, access tokens, or payment credentials
-- Servers **MUST** use [URL mode](#url-mode-elicitation-requests) for interactions involving
-  such sensitive information
+- 服务器 **MUST NOT** 使用表单模式征询来请求敏感信息，例如密码、API 密钥、访问令牌或支付凭证
+- 服务器 **MUST** 对涉及此类敏感信息的交互使用 [URL 模式](#url-mode-elicitation-requests)
 
-"Sensitive information" in this context refers to secrets and credentials that grant access or
-authorize transactions. General contact or profile information (such as a name, email address,
-or username) is not categorically prohibited; whether to request such data via form mode is at
-the discretion of the server and subject to the user's ability to review and decline.
+在此上下文中，"敏感信息"指授予访问权限或授权交易的机密和凭证。一般的联系人或个人信息（如姓名、电子邮件地址或用户名）并非绝对禁止；是否通过表单模式请求此类数据由服务器自行决定，并受用户审查和拒绝能力的约束。
 
-MCP clients **MUST**:
+MCP 客户端 **MUST**：
 
-- Provide UI that makes it clear which server is requesting information
-- Respect user privacy and provide clear decline and cancel options
-- For form mode, allow users to review and modify their responses before sending
-- For URL mode, clearly display the target domain/host and gather user consent before navigation to the target URL
+- 提供清晰的 UI，说明哪个服务器正在请求信息
+- 尊重用户隐私，并提供明确的拒绝和取消选项
+- 对于表单模式，允许用户在发送前审查和修改其响应
+- 对于 URL 模式，在导航到目标 URL 之前，清晰显示目标域/主机并收集用户同意
 
 </Warning>
 
-## Capabilities
+## 能力
 
-Clients that support elicitation **MUST** declare the `elicitation` capability during
-[initialization](../basic/lifecycle#initialization):
+支持征询的客户端 **MUST** 在[初始化](../basic/lifecycle#initialization)期间声明 `elicitation` 能力：
 
 ```json
 {
@@ -62,67 +50,65 @@ Clients that support elicitation **MUST** declare the `elicitation` capability d
 }
 ```
 
-For backwards compatibility, an empty capabilities object is equivalent to declaring support for `form` mode only:
+为了向后兼容性，空的能力对象等效于仅声明对 `form` 模式的支持：
 
 ```jsonc
 {
   "capabilities": {
-    "elicitation": {}, // Equivalent to { "form": {} }
+    "elicitation": {}, // 等同于 { "form": {} }
   },
 }
 ```
 
-Clients declaring the `elicitation` capability **MUST** support at least one mode (`form` or `url`).
+声明 `elicitation` 能力的客户端 **MUST** 支持至少一种模式（`form` 或 `url`）。
 
-Servers **MUST NOT** send elicitation requests with modes that are not supported by the client.
+服务器 **MUST NOT** 发送包含客户端不支持的模式类型的征询请求。
 
-## Protocol Messages
+## 协议消息
 
-### Elicitation Requests
+### 征询请求
 
-To request information from a user, servers send an `elicitation/create` request.
+要向用户请求信息，服务器发送 `elicitation/create` 请求。
 
-All elicitation requests **MUST** include the following parameters:
+所有征询请求 **MUST** 包含以下参数：
 
-| Name      | Type   | Options       | Description                                                                            |
-| --------- | ------ | ------------- | -------------------------------------------------------------------------------------- |
-| `mode`    | string | `form`, `url` | The mode of the elicitation. Optional for form mode (defaults to `"form"` if omitted). |
-| `message` | string |               | A human-readable message explaining why the interaction is needed.                     |
+| 名称      | 类型   | 选项          | 描述                                                    |
+| --------- | ------ | ------------- | ------------------------------------------------------- |
+| `mode`    | string | `form`, `url` | 征询的模式。对于表单模式可选（省略时默认为 `"form"`）。 |
+| `message` | string |               | 解释为何需要交互的人类可读消息。                        |
 
-The `mode` parameter specifies the type of elicitation:
+`mode` 参数指定征询的类型：
 
-- `"form"`: In-band structured data collection with optional schema validation. Data is exposed to the client.
-- `"url"`: Out-of-band interaction via URL navigation. Data (other than the URL itself) is **not** exposed to the client.
+- `"form"`：带内结构化数据收集，可进行 schema 验证。数据暴露给客户端。
+- `"url"`：通过 URL 导航进行带外交互。数据（除 URL 本身外）**不**暴露给客户端。
 
-For backwards compatibility, servers **MAY** omit the `mode` field for form mode elicitation requests. Clients **MUST** treat requests without a `mode` field as form mode.
+为了向后兼容性，服务器 **MAY** 在表单模式征询请求中省略 `mode` 字段。客户端 **MUST** 将没有 `mode` 字段的请求视为表单模式。
 
-### Form Mode Elicitation Requests
+### 表单模式征询请求
 
-Form mode elicitation allows servers to collect structured data directly through the MCP client.
+表单模式征询允许服务器直接通过 MCP 客户端收集结构化数据。
 
-Form mode elicitation requests **MUST** either specify `mode: "form"` or omit the `mode` field, and include these additional parameters:
+表单模式征询请求 **MUST** 要么指定 `mode: "form"`，要么省略 `mode` 字段，并包含以下额外参数：
 
-| Name              | Type   | Description                                                    |
-| ----------------- | ------ | -------------------------------------------------------------- |
-| `requestedSchema` | object | A JSON Schema defining the structure of the expected response. |
+| 名称              | 类型   | 描述                             |
+| ----------------- | ------ | -------------------------------- |
+| `requestedSchema` | object | 定义预期响应结构的 JSON Schema。 |
 
-#### Requested Schema
+#### 请求的 Schema
 
-The `requestedSchema` parameter allows servers to define the structure of the expected
-response using a restricted subset of JSON Schema.
+`requestedSchema` 参数允许服务器使用 JSON Schema 的受限子集来定义预期响应的结构。
 
-To simplify client user experience, form mode elicitation schemas are limited to flat objects
-with primitive properties only.
+为了简化客户端用户体验，表单模式征询 schemas 仅限于仅包含基本类型属性的扁平对象。
 
-The schema is restricted to these primitive types:
+Schema 限制为以下基本类型：
 
-1. **String Schema**
+1. **字符串 Schema**
 
    ```json
    {
      "type": "string",
-     "title": "Display Name",
-     "description": "Description text",
+     "title": "显示名称",
+     "description": "描述文本",
      "minLength": 3,
      "maxLength": 50,
      "pattern": "^[A-Za-z]+$",
@@ -131,69 +117,69 @@ The schema is restricted to these primitive types:
    }
    ```
 
-   Supported formats: `email`, `uri`, `date`, `date-time`
+   支持的格式：`email`、`uri`、`date`、`date-time`
 
-2. **Number Schema**
+2. **数字 Schema**
 
    ```json
    {
-     "type": "number", // or "integer"
-     "title": "Display Name",
-     "description": "Description text",
+     "type": "number", // 或 "integer"
+     "title": "显示名称",
+     "description": "描述文本",
      "minimum": 0,
      "maximum": 100,
      "default": 50
    }
    ```
 
-3. **Boolean Schema**
+3. **布尔 Schema**
 
    ```json
    {
      "type": "boolean",
-     "title": "Display Name",
-     "description": "Description text",
+     "title": "显示名称",
+     "description": "描述文本",
      "default": false
    }
    ```
 
-4. **Enum Schema**
+4. **枚举 Schema**
 
-   Single-select enum (without titles):
+   单选枚举（无标题）：
 
    ```json
    {
      "type": "string",
-     "title": "Color Selection",
-     "description": "Choose your favorite color",
-     "enum": ["Red", "Green", "Blue"],
-     "default": "Red"
+     "title": "颜色选择",
+     "description": "选择你最喜欢的颜色",
+     "enum": ["红", "绿", "蓝"],
+     "default": "红"
    }
    ```
 
-   Single-select enum (with titles):
+   单选枚举（有标题）：
 
    ```json
    {
      "type": "string",
-     "title": "Color Selection",
-     "description": "Choose your favorite color",
+     "title": "颜色选择",
+     "description": "选择你最喜欢的颜色",
      "oneOf": [
-       { "const": "#FF0000", "title": "Red" },
-       { "const": "#00FF00", "title": "Green" },
-       { "const": "#0000FF", "title": "Blue" }
+       { "const": "#FF0000", "title": "红色" },
+       { "const": "#00FF00", "title": "绿色" },
+       { "const": "#0000FF", "title": "蓝色" }
      ],
      "default": "#FF0000"
    }
    ```
 
-   Multi-select enum (without titles):
+   多选枚举（无标题）：
 
    ```json
    {
      "type": "array",
-     "title": "Color Selection",
-     "description": "Choose your favorite colors",
+     "title": "颜色选择",
+     "description": "选择你最喜欢的颜色",
      "minItems": 1,
      "maxItems": 2,
      "items": {

@@ -1,48 +1,48 @@
 ---
-title: Tasks
+title: 任务（Tasks）
 ---
 
 <div id="enable-section-numbers" />
 
 <Note>
 
-Tasks were introduced in version 2025-11-25 of the MCP specification and are currently considered **experimental**.
-The design and behavior of tasks may evolve in future protocol versions.
+任务是在 MCP 规范 2025-11-25 版本中引入的，目前被视为**实验性**功能。
+任务的设计和行为可能会在未来的协议版本中演变。
 
 </Note>
 
-The Model Context Protocol (MCP) allows requestors — which can be either clients or servers, depending on the direction of communication — to augment their requests with **tasks**. Tasks are durable state machines that carry information about the underlying execution state of the request they wrap, and are intended for requestor polling and deferred result retrieval. Each task is uniquely identifiable by a receiver-generated **task ID**.
+Model Context Protocol (MCP) 允许请求方（可以是客户端或服务器，取决于通信方向）使用**任务（tasks）**来增强其请求。任务是持久的状态机，携带有关其所包装请求的底层执行状态的信息，旨在供请求方轮询和延迟结果检索。每个任务由接收方生成的**任务 ID** 唯一标识。
 
-Tasks are useful for representing expensive computations and batch processing requests, and integrate seamlessly with external job APIs.
+任务对于表示昂贵的计算和批处理请求非常有用，并且可以与外部作业 API 无缝集成。
 
-## Definitions
+## 定义
 
-Tasks represent parties as either "requestors" or "receivers," defined as follows:
+任务将各方表示为"请求方"或"接收方"，定义如下：
 
-- **Requestor:** The sender of a task-augmented request. This can be the client or the server — either can create tasks.
-- **Receiver:** The receiver of a task-augmented request, and the entity executing the task. This can be the client or the server — either can receive and execute tasks.
+- **请求方（Requestor）**：任务增强型请求的发送者。可以是客户端或服务器——两者都可以创建任务。
+- **接收方（Receiver）**：任务增强型请求的接收者，以及执行任务的实体。可以是客户端或服务器——两者都可以接收和执行任务。
 
-## User Interaction Model
+## 用户交互模型
 
-Tasks are designed to be **requestor-driven** - requestors are responsible for augmenting requests with tasks and for polling for the results of those tasks; meanwhile, receivers tightly control which requests (if any) support task-based execution and manages the lifecycles of those tasks.
+任务被设计为**请求方驱动**的——请求方负责使用任务增强请求并轮询这些任务的结果；同时，接收方严格控制哪些请求（如果有）支持基于任务的执行并管理这些任务的生命周期。
 
-This requestor-driven approach ensures deterministic response handling and enables sophisticated patterns such as dispatching concurrent requests, which only the requestor has sufficient context to orchestrate.
+这种请求方驱动的方法确保了确定性的响应处理，并支持复杂的模式，如调度并发请求，只有请求方拥有足够的上下文来进行编排。
 
-Implementations are free to expose tasks through any interface pattern that suits their needs — the protocol itself does not mandate any specific user interaction model.
+实现可以自由地通过任何适合其需求的界面模式来暴露任务——协议本身并不强制规定任何特定的用户交互模型。
 
-## Capabilities
+## 能力
 
-Servers and clients that support task-augmented requests **MUST** declare a `tasks` capability during initialization. The `tasks` capability is structured by request category, with boolean properties indicating which specific request types support task augmentation.
+支持任务增强型请求的服务器和客户端 **MUST** 在初始化期间声明 `tasks` 能力。`tasks` 能力按请求类别结构化，使用布尔属性指示哪些特定请求类型支持任务增强。
 
-### Server Capabilities
+### 服务器能力
 
-Servers declare if they support tasks, and if so, which server-side requests can be augmented with tasks.
+服务器声明是否支持任务，如果支持，哪些服务器端请求可以增强为任务。
 
-| Capability                  | Description                                          |
-| --------------------------- | ---------------------------------------------------- |
-| `tasks.list`                | Server supports the `tasks/list` operation           |
-| `tasks.cancel`              | Server supports the `tasks/cancel` operation         |
-| `tasks.requests.tools.call` | Server supports task-augmented `tools/call` requests |
+| 能力                        | 描述                                   |
+| --------------------------- | -------------------------------------- |
+| `tasks.list`                | 服务器支持 `tasks/list` 操作           |
+| `tasks.cancel`              | 服务器支持 `tasks/cancel` 操作         |
+| `tasks.requests.tools.call` | 服务器支持任务增强的 `tools/call` 请求 |
 
 ```json
 {
@@ -60,16 +60,16 @@ Servers declare if they support tasks, and if so, which server-side requests can
 }
 ```
 
-### Client Capabilities
+### 客户端能力
 
-Clients declare if they support tasks, and if so, which client-side requests can be augmented with tasks.
+客户端声明是否支持任务，如果支持，哪些客户端端请求可以增强为任务。
 
-| Capability                              | Description                                                      |
-| --------------------------------------- | ---------------------------------------------------------------- |
-| `tasks.list`                            | Client supports the `tasks/list` operation                       |
-| `tasks.cancel`                          | Client supports the `tasks/cancel` operation                     |
-| `tasks.requests.sampling.createMessage` | Client supports task-augmented `sampling/createMessage` requests |
-| `tasks.requests.elicitation.create`     | Client supports task-augmented `elicitation/create` requests     |
+| 能力                                    | 描述                                               |
+| --------------------------------------- | -------------------------------------------------- |
+| `tasks.list`                            | 客户端支持 `tasks/list` 操作                       |
+| `tasks.cancel`                          | 客户端支持 `tasks/cancel` 操作                     |
+| `tasks.requests.sampling.createMessage` | 客户端支持任务增强的 `sampling/createMessage` 请求 |
+| `tasks.requests.elicitation.create`     | 客户端支持任务增强的 `elicitation/create` 请求     |
 
 ```json
 {
@@ -90,44 +90,44 @@ Clients declare if they support tasks, and if so, which client-side requests can
 }
 ```
 
-### Capability Negotiation
+### 能力协商
 
-During the initialization phase, both parties exchange their `tasks` capabilities to establish which operations support task-based execution. Requestors **SHOULD** only augment requests with a task if the corresponding capability has been declared by the receiver.
+在初始化阶段，双方交换其 `tasks` 能力，以确定哪些操作支持基于任务的执行。请求方 **SHOULD** 仅当接收方声明了相应能力时才使用任务增强请求。
 
-For example, if a server's capabilities include `tasks.requests.tools.call: {}`, then clients may augment `tools/call` requests with a task. If a client's capabilities include `tasks.requests.sampling.createMessage: {}`, then servers may augment `sampling/createMessage` requests with a task.
+例如，如果服务器的能力包括 `tasks.requests.tools.call: {}`，则客户端可以使用任务增强 `tools/call` 请求。如果客户端的能力包括 `tasks.requests.sampling.createMessage: {}`，则服务器可以使用任务增强 `sampling/createMessage` 请求。
 
-If `capabilities.tasks` is not defined, the peer **SHOULD NOT** attempt to create tasks during requests.
+如果未定义 `capabilities.tasks`，对端 **SHOULD NOT** 尝试在请求期间创建任务。
 
-The set of capabilities in `capabilities.tasks.requests` is exhaustive. If a request type is not present, it does not support task-augmentation.
+`capabilities.tasks.requests` 中的能力集是穷举的。如果某个请求类型不存在，则它不支持任务增强。
 
-`capabilities.tasks.list` controls if the `tasks/list` operation is supported by the party.
+`capabilities.tasks.list` 控制该方是否支持 `tasks/list` 操作。
 
-`capabilities.tasks.cancel` controls if the `tasks/cancel` operation is supported by the party.
+`capabilities.tasks.cancel` 控制该方是否支持 `tasks/cancel` 操作。
 
-### Tool-Level Negotiation
+### 工具级协商
 
-Tool calls are given special consideration for the purpose of task augmentation. In the result of `tools/list`, tools declare support for tasks via `execution.taskSupport`, which if present can have a value of `"required"`, `"optional"`, or `"forbidden"`.
+工具调用在任务增强方面受到特殊考虑。在 `tools/list` 的结果中，工具通过 `execution.taskSupport` 声明对任务的支持，如果存在，其值可以是 `"required"`、`"optional"` 或 `"forbidden"`。
 
-This is to be interpreted as a fine-grained layer in addition to capabilities, following these rules:
+这被解释为除能力之外的细粒度层，遵循以下规则：
 
-1. If a server's capabilities do not include `tasks.requests.tools.call`, then clients **MUST NOT** attempt to use task augmentation on that server's tools, regardless of the `execution.taskSupport` value.
-1. If a server's capabilities include `tasks.requests.tools.call`, then clients consider the value of `execution.taskSupport`, and handle it accordingly:
-   1. If `execution.taskSupport` is not present or `"forbidden"`, clients **MUST NOT** attempt to invoke the tool as a task. Servers **SHOULD** return a `-32601` (Method not found) error if a client attempts to do so. This is the default behavior.
-   1. If `execution.taskSupport` is `"optional"`, clients **MAY** invoke the tool as a task or as a normal request.
-   1. If `execution.taskSupport` is `"required"`, clients **MUST** invoke the tool as a task. Servers **MUST** return a `-32601` (Method not found) error if a client does not attempt to do so.
+1. 如果服务器的能力不包括 `tasks.requests.tools.call`，则客户端 **MUST NOT** 尝试在该服务器的工具上使用任务增强，无论 `execution.taskSupport` 的值如何。
+1. 如果服务器的能力包括 `tasks.requests.tools.call`，则客户端考虑 `execution.taskSupport` 的值，并相应处理：
+   1. 如果 `execution.taskSupport` 不存在或为 `"forbidden"`，客户端 **MUST NOT** 尝试将工具作为任务调用。如果客户端尝试这样做，服务器 **SHOULD** 返回 `-32601`（Method not found）错误。这是默认行为。
+   1. 如果 `execution.taskSupport` 是 `"optional"`，客户端 **MAY** 将工具作为任务或普通请求调用。
+   1. 如果 `execution.taskSupport` 是 `"required"`，客户端 **MUST** 将工具作为任务调用。如果客户端不这样做，服务器 **MUST** 返回 `-32601`（Method not found）错误。
 
-## Protocol Messages
+## 协议消息
 
-### Creating Tasks
+### 创建任务
 
-Task-augmented requests follow a two-phase response pattern that differs from normal requests:
+任务增强型请求遵循与普通请求不同的两阶段响应模式：
 
-- **Normal requests**: The server processes the request and returns the actual operation result directly.
-- **Task-augmented requests**: The server accepts the request and immediately returns a `CreateTaskResult` containing task data. The actual operation result becomes available later through `tasks/result` after the task completes.
+- **普通请求**：服务器处理请求并直接返回实际操作结果。
+- **任务增强型请求**：服务器接受请求并立即返回包含任务数据的 `CreateTaskResult`。实际操作结果在任务完成后通过 `tasks/result` 可用。
 
-To create a task, requestors send a request with the `task` field included in the request params. Requestors **MAY** include a `ttl` value indicating the desired task lifetime duration (in milliseconds) since its creation.
+要创建任务，请求方发送一个请求，在请求参数中包含 `task` 字段。请求方 **MAY** 包含一个 `ttl` 值，指示自创建以来所需的任务生命周期持续时间（以毫秒为单位）。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -146,7 +146,7 @@ To create a task, requestors send a request with the `task` field included in th
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -156,7 +156,7 @@ To create a task, requestors send a request with the `task` field included in th
     "task": {
       "taskId": "786512e2-9e0d-44bd-8f29-789f320fe840",
       "status": "working",
-      "statusMessage": "The operation is now in progress.",
+      "statusMessage": "操作正在进行中。",
       "createdAt": "2025-11-25T10:30:00Z",
       "lastUpdatedAt": "2025-11-25T10:40:00Z",
       "ttl": 60000,
@@ -166,35 +166,34 @@ To create a task, requestors send a request with the `task` field included in th
 }
 ```
 
-When a receiver accepts a task-augmented request, it returns a [`CreateTaskResult`](/specification/2025-11-25/schema#createtaskresult) containing task data. The response does not include the actual operation result. The actual result (e.g., tool result for `tools/call`) becomes available only through `tasks/result` after the task completes.
+当接收方接受任务增强型请求时，它返回一个包含任务数据的 [`CreateTaskResult`](/specification/2025-11-25/schema#createtaskresult)。响应不包括实际操作结果。实际结果（例如 `tools/call` 的工具结果）仅在任务完成后通过 `tasks/result` 可用。
 
 <Note>
 
-When a task is created in response to a `tools/call` request, host applications may wish to return control to the model while the task is executing. This allows the model to continue processing other requests or perform additional work while waiting for the task to complete.
+当响应 `tools/call` 请求而创建任务时，主机应用程序可能希望在任务执行期间将控制权返回给模型。这允许模型在等待任务完成时继续处理其他请求或执行额外工作。
 
-To support this pattern, servers can provide an optional `io.modelcontextprotocol/model-immediate-response` key in the `_meta` field of the `CreateTaskResult`. The value of this key should be a string intended to be passed as an immediate tool result to the model.
-If a server does not provide this field, the host application can fall back to its own predefined message.
+为了支持这种模式，服务器可以在 `CreateTaskResult` 的 `_meta` 字段中提供可选的 `io.modelcontextprotocol/model-immediate-response` 键。此键的值应是一个字符串，旨在作为即时工具结果传递给模型。
+如果服务器不提供此字段，主机应用程序可以回退到其自己的预定义消息。
 
-This guidance is non-binding and is provisional logic intended to account for the specific use case. This behavior may be formalized or modified as part of `CreateTaskResult` in future protocol versions.
+此指南不具有约束力，是旨在考虑特定用例的临时逻辑。此行为可能会在未来的协议版本中作为 `CreateTaskResult` 的一部分正式化或修改。
 
 </Note>
 
-### Getting Tasks
+### 获取任务
 
 <Note>
 
-In the Streamable HTTP (SSE) transport, clients **MAY** disconnect from an SSE stream opened by the server in response to a `tasks/get` request at any time.
+在 Streamable HTTP (SSE) 传输中，客户端 **MAY** 随时断开由服务器响应 `tasks/get` 请求而打开的 SSE 流。
 
-While this note is not prescriptive regarding the specific usage of SSE streams, all implementations **MUST** continue to comply with the existing [Streamable HTTP transport specification](../transports#sending-messages-to-the-server).
+虽然此说明对 SSE 流的具体使用没有规定性，但所有实现 **MUST** 继续遵守现有的 [Streamable HTTP 传输规范](../transports#sending-messages-to-the-server)。
 
 </Note>
 
-Requestors poll for task completion by sending [`tasks/get`](/specification/2025-11-25/schema#tasks%2Fget) requests.
-Requestors **SHOULD** respect the `pollInterval` provided in responses when determining polling frequency.
+请求方通过发送 [`tasks/get`](/specification/2025-11-25/schema#tasks%2Fget) 请求来轮询任务完成状态。请求方 **SHOULD** 在确定轮询频率时尊重响应中提供的 `pollInterval`。
 
-Requestors **SHOULD** continue polling until the task reaches a terminal status (`completed`, `failed`, or `cancelled`), or until encountering the [`input_required`](#input-required-status) status. Note that invoking `tasks/result` does not imply that the requestor needs to stop polling - requestors **SHOULD** continue polling the task status via `tasks/get` if they are not actively waiting for `tasks/result` to complete.
+请求方 **SHOULD** 继续轮询，直到任务达到终端状态（`completed`、`failed` 或 `cancelled`），或遇到 [`input_required`](#input-required-status) 状态。请注意，调用 `tasks/result` 并不意味着请求方需要停止轮询——如果请求方没有主动等待 `tasks/result` 完成，则 **SHOULD** 继续通过 `tasks/get` 轮询任务状态。
 
-**Request:**
+**请求：**
 
 ```json
 {

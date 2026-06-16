@@ -1,38 +1,38 @@
 ---
-title: Understanding Authorization in MCP
-description: Learn how to implement secure authorization for MCP servers using OAuth 2.1 to protect sensitive resources and operations
+title: 理解 MCP 中的授权
+description: 了解如何使用 OAuth 2.1 为 MCP server 实现安全授权，以保护敏感资源和操作
 ---
 
-Authorization in the Model Context Protocol (MCP) secures access to sensitive resources and operations exposed by MCP servers. If your MCP server handles user data or administrative actions, authorization ensures only permitted users can access its endpoints.
+Model Context Protocol (MCP) 中的授权保护对 MCP server 暴露的敏感资源和操作的安全访问。如果你的 MCP server 处理用户数据或管理操作，授权确保只有被允许的用户才能访问其端点。
 
-MCP uses standardized authorization flows to build trust between MCP clients and MCP servers. Its design doesn't focus on one specific authorization or identity system, but rather follows the conventions outlined for [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13). For detailed information, see the [Authorization specification](/specification/latest/basic/authorization).
+MCP 使用标准化的授权流程在 MCP clients 和 MCP servers 之间建立信任。其设计不关注特定的授权或身份系统，而是遵循 [OAuth 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13) 概述的约定。详细信息请参阅[授权规范](/specification/latest/basic/authorization)。
 
-## When Should You Use Authorization?
+## 何时应使用授权？
 
-While authorization for MCP servers is **optional**, it is strongly recommended when:
+虽然 MCP server 的授权是**可选的**，但在以下情况下强烈建议使用：
 
-- Your server accesses user-specific data (emails, documents, databases)
-- You need to audit who performed which actions
-- Your server grants access to its APIs that require user consent
-- You're building for enterprise environments with strict access controls
-- You want to implement rate limiting or usage tracking per user
+- 你的 server 访问用户特定数据（邮件、文档、数据库）
+- 你需要审计谁执行了哪些操作
+- 你的 server 授予对其 API 的访问权限，需要用户同意
+- 你正在为具有严格访问控制的企业环境构建
+- 你想要实现每用户的速率限制或使用跟踪
 
 <Tip>
-**Authorization for Local MCP Servers**
+**本地 MCP Server 的授权**
 
-For MCP servers using the [STDIO transport](/specification/latest/basic/transports#stdio), you can use environment-based credentials or credentials provided by third-party libraries embedded directly in the MCP server instead. Because a STDIO-built MCP server runs locally, it has access to a range of flexible options when it comes to acquiring user credentials that may or may not rely on in-browser authentication and authorization flows.
+对于使用 [STDIO 传输](/specification/latest/basic/transports#stdio)的 MCP server，你可以改用基于环境的凭证或由直接嵌入在 MCP server 中的第三方库提供的凭证。由于基于 STDIO 构建的 MCP server 在本地运行，它在获取用户凭证方面拥有多种灵活选项，这些选项可能依赖也可能不依赖浏览器内的认证和授权流程。
 
-OAuth flows, in turn, are designed for HTTP-based transports where the MCP server is remotely-hosted and the client uses OAuth to establish that a user is authorized to access said remote server.
+而 OAuth 流程是为基于 HTTP 的传输设计的，其中 MCP server 是远程托管的，client 使用 OAuth 来确认用户有权访问该远程 server。
 
 </Tip>
 
-## The Authorization Flow: Step by Step
+## 授权流程：分步进行
 
-Let's walk through what happens when a client wants to connect to your protected MCP server:
+让我们逐步了解 client 想要连接到你的受保护 MCP server 时会发生什么：
 
 <Steps>
-<Step title="Initial Handshake">
-When your MCP client first tries to connect, your server responds with a `401 Unauthorized` and tells the client where to find authorization information, captured in a [Protected Resource Metadata (PRM) document](https://datatracker.ietf.org/doc/html/rfc9728). The document is hosted by the MCP server, follows a predictable path pattern, and is provided to the client in the `resource_metadata` parameter within the `WWW-Authenticate` header.
+<Step title="初始握手">
+当你的 MCP client 首次尝试连接时，你的 server 会响应 `401 Unauthorized`，并告诉 client 在哪里可以找到授权信息，这些信息包含在[受保护资源元数据 (PRM) 文档](https://datatracker.ietf.org/doc/html/rfc9728)中。该文档由 MCP server 托管，遵循可预测的路径模式，并通过 `WWW-Authenticate` 头中的 `resource_metadata` 参数提供给 client。
 
 ```http
 HTTP/1.1 401 Unauthorized
@@ -40,12 +40,12 @@ WWW-Authenticate: Bearer realm="mcp",
   resource_metadata="https://your-server.com/.well-known/oauth-protected-resource"
 ```
 
-This tells the client that authorization is required for the MCP server and where to get the necessary information to kickstart the authorization flow.
+这告诉 client 访问 MCP server 需要授权，以及在哪里获取启动授权流程所需的信息。
 
 </Step>
 
-<Step title="Protected Resource Metadata Discovery">
-With the URI pointer to the PRM document, the client will fetch the metadata to learn about the authorization server, supported scopes, and other resource information. The data is typically encapsulated in a JSON blob, similar to the one below.
+<Step title="受保护资源元数据发现">
+拿到 PRM 文档的 URI 指针后，client 将获取元数据以了解授权服务器、支持的范围和其他资源信息。数据通常封装在 JSON 中，类似于下面的例子。
 
 ```json
 {
@@ -55,15 +55,14 @@ With the URI pointer to the PRM document, the client will fetch the metadata to 
 }
 ```
 
-You can see a more comprehensive example in [RFC 9728 Section 3.2](https://datatracker.ietf.org/doc/html/rfc9728#name-protected-resource-metadata-r).
+你可以在 [RFC 9728 第 3.2 节](https://datatracker.ietf.org/doc/html/rfc9728#name-protected-resource-metadata-r)中看到更全面的示例。
 
 </Step>
 
-<Step title="Authorization Server Discovery">
-Next, the client discovers what the authorization server can do by fetching its metadata. If the PRM document lists more than one authorization server, the client can decide which one to use.
+<Step title="授权服务器发现">
+接下来，client 通过获取授权服务器的元数据来发现其支持的功能。如果 PRM 文档列出了多个授权服务器，client 可以决定使用哪一个。
 
-With an authorization server selected, the client will then construct a standard metadata URI and issue a request to the [OpenID Connect (OIDC) Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) or [OAuth 2.0 Auth Server Metadata](https://datatracker.ietf.org/doc/html/rfc8414) endpoints (depending on authorization server support)
-and retrieve another set of metadata properties that will allow it to know the endpoints it needs to complete the authorization flow.
+选定授权服务器后，client 将构建一个标准元数据 URI，并向 [OpenID Connect (OIDC) 发现](https://openid.net/specs/openid-connect-discovery-1_0.html)或 [OAuth 2.0 授权服务器元数据](https://datatracker.ietf.org/doc/html/rfc8414)端点（取决于授权服务器支持情况）发出请求，并检索另一组元数据属性，从而知道完成授权流程所需的端点。
 
 ```json
 {
@@ -76,12 +75,12 @@ and retrieve another set of metadata properties that will allow it to know the e
 
 </Step>
 
-<Step title="Client Registration">
-With all the metadata out of the way, the client now needs to make sure that it's registered with the authorization server. This can be done in two ways.
+<Step title="Client 注册">
+元数据问题解决后，client 现在需要确保它已在授权服务器上注册。这可以通过两种方式完成。
 
-First, the client can be **pre-registered** with a given authorization server, in which case it can have embedded client registration information that it uses to complete the authorization flow.
+首先，client 可以在给定的授权服务器上**预注册**，在这种情况下，它可以拥有嵌入的 client 注册信息，用于完成授权流程。
 
-Alternatively, the client can use **Dynamic Client Registration** (DCR) to dynamically register itself with the authorization server. The latter scenario requires the authorization server to support DCR. If the authorization server does support DCR, the client will send a request to the `registration_endpoint` with its information:
+或者，client 可以使用**动态 Client 注册 (DCR)** 动态地在授权服务器上注册自己。后一种情况要求授权服务器支持 DCR。如果授权服务器确实支持 DCR，client 将向其信息发送到 `registration_endpoint`：
 
 ```json
 {
@@ -92,19 +91,19 @@ Alternatively, the client can use **Dynamic Client Registration** (DCR) to dynam
 }
 ```
 
-If the registration succeeds, the authorization server will return a JSON blob with client registration information.
+如果注册成功，授权服务器将返回一个包含 client 注册信息的 JSON 数据块。
 
 <Tip>
-**No DCR or Pre-Registration**
+**没有 DCR 或预注册**
 
-In case an MCP client connects to an MCP server that doesn't use an authorization server that supports DCR and the client is not pre-registered with said authorization server, it's the responsibility of the client developer to provide an affordance for the end-user to enter client information manually.
+如果 MCP client 连接到的 MCP server 使用的授权服务器不支持 DCR，并且 client 没有在该授权服务器上预注册，则由 client 开发者负责为最终用户提供手动输入 client 信息的途径。
 
 </Tip>
 
 </Step>
 
-<Step title="User Authorization">
-The client will now need to open a browser to the `/authorize` endpoint, where the user can log in and grant the required permissions. The authorization server will then redirect back to the client with an authorization code that the client exchanges for tokens:
+<Step title="用户授权">
+Client 现在需要打开浏览器访问 `/authorize` 端点，用户可以在其中登录并授予所需的权限。然后授权服务器将重定向回 client，并附带一个授权码，client 用该授权码交换令牌：
 
 ```json
 {
@@ -115,12 +114,12 @@ The client will now need to open a browser to the `/authorize` endpoint, where t
 }
 ```
 
-The access token is what the client will use to authenticate requests to the MCP server. This step follows standard [OAuth 2.1 authorization code with PKCE](https://oauth.net/2/grant-types/authorization-code/) conventions.
+访问令牌是 client 用于向 MCP server 认证请求的凭证。此步骤遵循标准 [OAuth 2.1 授权码 + PKCE](https://oauth.net/2/grant-types/authorization-code/) 约定。
 
 </Step>
 
-<Step title="Making Authenticated Requests">
-Finally, the client can make requests to your MCP server using the access token embedded in the `Authorization` header:
+<Step title="发起已认证请求">
+最后，client 可以使用嵌入在 `Authorization` 头中的访问令牌向你的 MCP server 发起请求：
 
 ```http
 GET /mcp HTTP/1.1
@@ -128,131 +127,131 @@ Host: your-server.com
 Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
 ```
 
-The MCP server will need to validate the token and process the request if the token is valid and has the required permissions.
+MCP server 需要验证令牌，如果令牌有效且具有所需权限，则处理请求。
 
 </Step>
 </Steps>
 
-## Implementation Example
+## 实现示例
 
-To get started with a practical implementation, we will use a [Keycloak](https://www.keycloak.org/) authorization server hosted in a Docker container. Keycloak is an open-source authorization server that can be easily deployed locally for testing and experimentation.
+为了开始实际实现，我们将使用 Docker 容器中托管的 [Keycloak](https://www.keycloak.org/) 授权服务器。Keycloak 是一个开源授权服务器，可以轻松部署在本地进行测试和实验。
 
-Make sure that you download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/). We will need it to deploy Keycloak on our development machine.
+请确保下载并安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。我们需要它来在我们的开发机器上部署 Keycloak。
 
-### Keycloak Setup
+### Keycloak 设置
 
-From your terminal application, run the following command to start the Keycloak container:
+从终端应用程序运行以下命令以启动 Keycloak 容器：
 
 ```bash
 docker run -p 127.0.0.1:8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak start-dev
 ```
 
-This command will pull the Keycloak container image locally and bootstrap the basic configuration. It will run on port `8080` and have an `admin` user with `admin` password.
+此命令将在本地拉取 Keycloak 容器镜像并引导基本配置。它将在端口 `8080` 上运行，并具有一个 `admin` 用户，密码为 `admin`。
 
 <Warning>
-**Not for Production**
+**不适用于生产环境**
 
-The configuration above may be suitable for testing and experimentation; however, you should never use it in production. Refer to the [Configuring Keycloak for production](https://www.keycloak.org/server/configuration-production) guide for additional details on how to deploy the authorization server for scenarios that require reliability, security, and high availability.
+上述配置可能适用于测试和实验；但是，切勿在生产环境中使用。请参阅[配置 Keycloak 以用于生产](https://www.keycloak.org/server/configuration-production)指南，了解如何在需要可靠性、安全性和高可用性的场景中部署授权服务器的更多详细信息。
 
 </Warning>
 
-You will be able to access the Keycloak authorization server from your browser at `http://localhost:8080`.
+你可以从浏览器访问 Keycloak 授权服务器，地址为 `http://localhost:8080`。
 
 <Frame>
   <img
     src="/images/tutorial-authorization/keycloak-browser.png"
-    alt="Keycloak admin dashboard authentication dialog."
+    alt="Keycloak 管理面板认证对话框。"
   />
 </Frame>
 
-When running with the default configuration, Keycloak will already support many of the capabilities that we need for MCP servers, including Dynamic Client Registration. You can check this by looking at the OIDC configuration, available at:
+使用默认配置运行时，Keycloak 已经支持 MCP server 所需的许多功能，包括动态 Client 注册。你可以通过查看 OIDC 配置来检查这一点，地址为：
 
 ```http
 http://localhost:8080/realms/master/.well-known/openid-configuration
 ```
 
-We will also need to set up Keycloak to support our scopes and allow our host (local machine) to dynamically register clients, as the default policies restrict anonymous dynamic client registration.
+我们还需要设置 Keycloak 以支持我们的范围，并允许我们的 host（本地机器）动态注册 clients，因为默认策略限制了匿名动态 client 注册。
 
-Go to **Client scopes** in the Keycloak dashboard and create a new `mcp:tools` scope. We will use this to access all of the tools on our MCP server.
+转到 Keycloak 仪表板中的 **Client scopes**，创建一个新的 `mcp:tools` 范围。我们将使用它来访问 MCP server 上的所有 tools。
 
 <Frame>
   <img
     src="/images/tutorial-authorization/keycloak-scopes.png"
-    alt="Configuring Keycloak scopes."
+    alt="配置 Keycloak 范围。"
   />
 </Frame>
 
-After creating the scope, make sure that you assign its type to **Default** and have flipped the **Include in token scope** switch, as this will be needed for token validation.
+创建范围后，确保将其类型分配为 **Default**，并打开 **Include in token scope** 开关，因为令牌验证需要此项。
 
-Let's now also set up an **audience** for our Keycloak-issued tokens. An audience is important to configure because it embeds the intended destination directly into the issued access token. This helps your MCP server to verify that the token it got was actually meant for it rather than some other API. This is key to help avoid token passthrough scenarios.
+现在让我们还为 Keycloak 颁发的令牌设置一个 **audience**。配置 audience 很重要，因为它将预期目的地直接嵌入到颁发的访问令牌中。这有助于你的 MCP server 验证收到的令牌实际上是针对它的，而不是针对其他 API。这是帮助避免令牌传递场景的关键。
 
-To do this, open your `mcp:tools` client scope and click on **Mappers**, followed by **Configure a new mapper**. Select **Audience**.
+为此，打开你的 `mcp:tools` client 范围，点击 **Mappers**，然后点击 **Configure a new mapper**。选择 **Audience**。
 
 <Frame>
   <img
     src="/images/tutorial-authorization/scope-add-audience.gif"
-    alt="Configuring an audience for a token in Keycloak."
+    alt="在 Keycloak 中配置令牌的 audience。"
   />
 </Frame>
 
-For **Name**, use `audience-config`. Add a value for **Included Custom Audience**, set to `http://localhost:3000`. This will be the URI of our test server.
+对于 **Name**，使用 `audience-config`。为 **Included Custom Audience** 添加一个值，设置为 `http://localhost:3000`。这将是我们的测试 server 的 URI。
 
 <Warning>
-**Not for Production**
+**不适用于生产环境**
 
-The audience configuration above is meant for testing. For production scenarios, additional set-up and configuration will be required to ensure that audiences are properly constrained for issued tokens. Specifically, the audience needs to be based on the resource parameter passed from the client, not a fixed value.
+以上 audience 配置仅用于测试。对于生产场景，需要额外的设置和配置，以确保为颁发的令牌正确限制 audiences。具体来说，audience 需要基于从 client 传递的资源参数，而不是固定值。
 
 </Warning>
 
-Now, navigate to **Clients**, then **Client registration**, and then **Trusted Hosts**. Disable the **Client URIs Must Match** setting and add the hosts from which you're testing. You can get your current host IP by running the `ifconfig` command on Linux or macOS, or `ipconfig` on Windows. You can see the IP address you need to add by looking at the keycloak logs for a line that looks like `Failed to verify remote host : 192.168.215.1`. Check that the IP address is associated with your host. This may be for a bridge network depending on your docker setup.
+现在，导航到 **Clients**，然后 **Client registration**，再然后 **Trusted Hosts**。禁用 **Client URIs Must Match** 设置，并添加你正在测试的主机。你可以通过在 Linux 或 macOS 上运行 `ifconfig` 命令，或在 Windows 上运行 `ipconfig` 命令来获取当前主机 IP。你可以通过查看 keycloak 日志中类似 `Failed to verify remote host : 192.168.215.1` 的行来了解需要添加的 IP 地址。检查该 IP 地址是否与你的主机关联。根据你的 docker 设置，这可能是桥接网络的地址。
 
 <Frame>
   <img
     src="/images/tutorial-authorization/keycloak-client.gif"
-    alt="Setting up client registration details in Keycloak."
+    alt="在 Keycloak 中设置 client 注册详细信息。"
   />
 </Frame>
 
 <Warning>
-**Getting the Host**
+**获取主机**
 
-If you are running Keycloak from a container, you will also be able to see the host IP from the Terminal in the container logs.
+如果你从容器运行 Keycloak，你也可以在终端中从容器日志中看到主机 IP。
 
 </Warning>
 
-Lastly, we need to register a new client that we can use with the **MCP server itself** to talk to Keycloak for things like [token introspection](https://oauth.net/2/token-introspection/). To do that:
+最后，我们需要注册一个新的 client，用于 **MCP server 本身** 与 Keycloak 通信，例如用于[令牌内省](https://oauth.net/2/token-introspection/)。为此：
 
-1. Go to **Clients**.
-1. Click **Create client**.
-1. Give your client a unique **Client ID** and click **Next**.
-1. Enable **Client authentication** and click **Next**.
-1. Click **Save**.
+1. 转到 **Clients**。
+2. 点击 **Create client**。
+3. 为你的 client 提供一个唯一的 **Client ID**，然后点击 **Next**。
+4. 启用 **Client authentication**，然后点击 **Next**。
+5. 点击 **Save**。
 
-Worth noting that token introspection is just _one of_ the available approaches to validate tokens. This can also be done with the help of standalone libraries, specific to each language and platform.
+值得注意的是，令牌内省只是验证令牌的可用方法*之一*。这也可以通过特定于每种语言和平台的独立库来完成。
 
-When you open the client details, go to **Credentials** and take note of the **Client Secret**.
+打开 client 详细信息后，转到 **Credentials** 并记下 **Client Secret**。
 
 <Frame>
   <img
     src="/images/tutorial-authorization/keycloak-client-auth.gif"
-    alt="Creating a new client in Keycloak."
+    alt="在 Keycloak 中创建新 client。"
   />
 </Frame>
 
 <Warning>
-**Handling Secrets**
+**处理机密**
 
-Never embed client credentials directly in your code. We recommend using environment variables or specialized solutions for secret storage.
+切勿将 client 凭证直接嵌入代码中。我们建议使用环境变量或专门的解决方案来存储机密。
 
 </Warning>
 
-With Keycloak configured, every time the authorization flow is triggered, your MCP server will receive a token like this:
+配置好 Keycloak 后，每次触发授权流程时，你的 MCP server 将收到如下令牌：
 
 ```text
 eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1TjcxMGw1WW5MWk13WGZ1VlJKWGtCS3ZZMzZzb3JnRG5scmlyZ2tlTHlzIn0.eyJleHAiOjE3NTU1NDA4MTcsImlhdCI6MTc1NTU0MDc1NywiYXV0aF90aW1lIjoxNzU1NTM4ODg4LCJqdGkiOiJvbnJ0YWM6YjM0MDgwZmYtODQwNC02ODY3LTgxYmUtMTIzMWI1MDU5M2E4IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9tYXN0ZXIiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJzdWIiOiIzM2VkNmM2Yi1jNmUwLTQ5MjgtYTE2MS1mMmY2OWM3YTAzYjkiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiI3OTc1YTViNi04YjU5LTRhODUtOWNiYS04ZmFlYmRhYjg5NzQiLCJzaWQiOiI4ZjdlYzI3Ni0zNThmLTRjY2MtYjMxMy1kYjA4MjkwZjM3NmYiLCJzY29wZSI6Im1jcDp0b29scyJ9.P5xCRtXORly0R0EXjyqRCUx-z3J4uAOWNAvYtLPXroykZuVCCJ-K1haiQSwbURqfsVOMbL7jiV-sD6miuPzI1tmKOkN_Yct0Vp-azvj7U5rEj7U6tvPfMkg2Uj_jrIX0KOskyU2pVvGZ-5BgqaSvwTEdsGu_V3_E0xDuSBq2uj_wmhqiyTFm5lJ1WkM3Hnxxx1_AAnTj7iOKMFZ4VCwMmk8hhSC7clnDauORc0sutxiJuYUZzxNiNPkmNeQtMCGqWdP1igcbWbrfnNXhJ6NswBOuRbh97_QraET3hl-CNmyS6C72Xc0aOwR_uJ7xVSBTD02OaQ1JA6kjCATz30kGYg
 ```
 
-Decoded, it will look like this:
+解码后，它将如下所示：
 
 ```json
 {
@@ -275,27 +274,27 @@ Decoded, it will look like this:
 ```
 
 <Warning>
-**Embedded Audience**
+**嵌入的 Audience**
 
-Notice the `aud` claim embedded in the token - it's currently set to be the URI of the test MCP server and it's inferred from the scope that we've previously configured. This will be important in our implementation to validate.
+注意令牌中嵌入的 `aud` 声明——它当前设置为测试 MCP server 的 URI，并从我们之前配置的范围推断得出。这在我们实现中进行验证时将非常重要。
 
 </Warning>
 
-### MCP Server Setup
+### MCP Server 设置
 
-We will now set up our MCP server to use the locally-running Keycloak authorization server. Depending on your programming language preference, you can use one of the supported [MCP SDKs](/docs/sdk).
+我们现在将设置 MCP server 以使用本地运行的 Keycloak 授权服务器。根据你的编程语言偏好，你可以使用支持的 [MCP SDK](/docs/sdk) 之一。
 
-For our testing purposes, we will create an extremely simple MCP server that exposes two tools - one for addition and another for multiplication. The server will require authorization to access these.
+为了测试目的，我们将创建一个极其简单的 MCP server，暴露两个 tools——一个用于加法，另一个用于乘法。Server 将需要授权才能访问这些 tools。
 
 <Tabs>
 <Tab title='TypeScript'>
 
-You can see the complete TypeScript project in the [sample repository](https://github.com/localden/min-ts-mcp-auth).
+你可以在[示例仓库](https://github.com/localden/min-ts-mcp-auth)中看到完整的 TypeScript 项目。
 
-Prior to running the code below, ensure that you have a `.env` file with the following content:
+在运行以下代码之前，确保你有一个包含以下内容的 `.env` 文件：
 
 ```env
-# Server host/port
+# Server 主机/端口
 HOST=localhost
 PORT=3000
 

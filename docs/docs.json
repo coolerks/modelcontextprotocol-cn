@@ -11,7 +11,7 @@
   "navbar": {
     "links": [
       {
-        "label": "Blog",
+        "label": "博客",
         "href": "https://blog.modelcontextprotocol.io"
       },
       {
@@ -23,16 +23,16 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "文档",
         "pages": [
           {
-            "group": "Get started",
+            "group": "开始使用",
             "pages": [
               "docs/getting-started/intro"
             ]
           },
           {
-            "group": "About MCP",
+            "group": "关于 MCP",
             "pages": [
               "docs/learn/architecture",
               "docs/learn/server-concepts",
@@ -41,14 +41,14 @@
             ]
           },
           {
-            "group": "Develop with MCP",
+            "group": "使用 MCP 开发",
             "pages": [
               "docs/develop/connect-local-servers",
               "docs/develop/connect-remote-servers",
               "docs/develop/build-with-agent-skills",
               "docs/develop/build-server",
               {
-                "group": "Clients",
+                "group": "客户端",
                 "pages": [
                   "docs/develop/build-client",
                   "docs/develop/clients/client-best-practices"
@@ -56,7 +56,7 @@
               },
               "docs/sdk",
               {
-                "group": "Security",
+                "group": "安全",
                 "pages": [
                   "docs/tutorials/security/authorization",
                   "docs/tutorials/security/security_best_practices"
@@ -65,14 +65,14 @@
             ]
           },
           {
-            "group": "Developer tools",
+            "group": "开发者工具",
             "pages": [
               "docs/tools/inspector",
               "docs/tools/debugging"
             ]
           },
           {
-            "group": "Examples",
+            "group": "示例",
             "pages": [
               "examples"
             ]
@@ -80,19 +80,19 @@
         ]
       },
       {
-        "tab": "Extensions",
+        "tab": "扩展",
         "pages": [
           "extensions/overview",
           "extensions/client-matrix",
           {
-            "group": "MCP Apps",
+            "group": "MCP 应用",
             "pages": [
               "extensions/apps/overview",
               "extensions/apps/build"
             ]
           },
           {
-            "group": "Authorization Extensions",
+            "group": "授权扩展",
             "pages": [
               "extensions/auth/overview",
               "extensions/auth/oauth-client-credentials",
@@ -100,7 +100,7 @@
             ]
           },
           {
-            "group": "Tasks",
+            "group": "任务",
             "pages": [
               "extensions/tasks/overview"
             ]
@@ -108,23 +108,23 @@
         ]
       },
       {
-        "tab": "Specification",
+        "tab": "规范",
         "versions": [
           {
-            "version": "Version 2025-11-25 (latest)",
+            "version": "版本 2025-11-25（最新）",
             "pages": [
               "specification/2025-11-25/index",
               "specification/2025-11-25/changelog",
               "specification/2025-11-25/architecture/index",
               {
-                "group": "Base Protocol",
+                "group": "基础协议",
                 "pages": [
                   "specification/2025-11-25/basic/index",
                   "specification/2025-11-25/basic/lifecycle",
                   "specification/2025-11-25/basic/transports",
                   "specification/2025-11-25/basic/authorization",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-11-25/basic/utilities/cancellation",
                       "specification/2025-11-25/basic/utilities/ping",
@@ -135,7 +135,7 @@
                 ]
               },
               {
-                "group": "Client Features",
+                "group": "客户端功能",
                 "pages": [
                   "specification/2025-11-25/client/roots",
                   "specification/2025-11-25/client/sampling",
@@ -143,14 +143,14 @@
                 ]
               },
               {
-                "group": "Server Features",
+                "group": "服务器功能",
                 "pages": [
                   "specification/2025-11-25/server/index",
                   "specification/2025-11-25/server/prompts",
                   "specification/2025-11-25/server/resources",
                   "specification/2025-11-25/server/tools",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-11-25/server/utilities/completion",
                       "specification/2025-11-25/server/utilities/logging",
@@ -163,20 +163,20 @@
             ]
           },
           {
-            "version": "Version 2025-06-18",
+            "version": "版本 2025-06-18",
             "pages": [
               "specification/2025-06-18/index",
               "specification/2025-06-18/changelog",
               "specification/2025-06-18/architecture/index",
               {
-                "group": "Base Protocol",
+                "group": "基础协议",
                 "pages": [
                   "specification/2025-06-18/basic/index",
                   "specification/2025-06-18/basic/lifecycle",
                   "specification/2025-06-18/basic/transports",
                   "specification/2025-06-18/basic/authorization",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-06-18/basic/utilities/cancellation",
                       "specification/2025-06-18/basic/utilities/ping",
@@ -186,7 +186,7 @@
                 ]
               },
               {
-                "group": "Client Features",
+                "group": "客户端功能",
                 "pages": [
                   "specification/2025-06-18/client/roots",
                   "specification/2025-06-18/client/sampling",
@@ -194,14 +194,14 @@
                 ]
               },
               {
-                "group": "Server Features",
+                "group": "服务器功能",
                 "pages": [
                   "specification/2025-06-18/server/index",
                   "specification/2025-06-18/server/prompts",
                   "specification/2025-06-18/server/resources",
                   "specification/2025-06-18/server/tools",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-06-18/server/utilities/completion",
                       "specification/2025-06-18/server/utilities/logging",
@@ -214,20 +214,20 @@
             ]
           },
           {
-            "version": "Version 2025-03-26",
+            "version": "版本 2025-03-26",
             "pages": [
               "specification/2025-03-26/index",
               "specification/2025-03-26/changelog",
               "specification/2025-03-26/architecture/index",
               {
-                "group": "Base Protocol",
+                "group": "基础协议",
                 "pages": [
                   "specification/2025-03-26/basic/index",
                   "specification/2025-03-26/basic/lifecycle",
                   "specification/2025-03-26/basic/transports",
                   "specification/2025-03-26/basic/authorization",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-03-26/basic/utilities/cancellation",
                       "specification/2025-03-26/basic/utilities/ping",
@@ -237,21 +237,21 @@
                 ]
               },
               {
-                "group": "Client Features",
+                "group": "客户端功能",
                 "pages": [
                   "specification/2025-03-26/client/roots",
                   "specification/2025-03-26/client/sampling"
                 ]
               },
               {
-                "group": "Server Features",
+                "group": "服务器功能",
                 "pages": [
                   "specification/2025-03-26/server/index",
                   "specification/2025-03-26/server/prompts",
                   "specification/2025-03-26/server/resources",
                   "specification/2025-03-26/server/tools",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2025-03-26/server/utilities/completion",
                       "specification/2025-03-26/server/utilities/logging",
@@ -263,19 +263,19 @@
             ]
           },
           {
-            "version": "Version 2024-11-05",
+            "version": "版本 2024-11-05",
             "pages": [
               "specification/2024-11-05/index",
               "specification/2024-11-05/architecture/index",
               {
-                "group": "Base Protocol",
+                "group": "基础协议",
                 "pages": [
                   "specification/2024-11-05/basic/index",
                   "specification/2024-11-05/basic/lifecycle",
                   "specification/2024-11-05/basic/messages",
                   "specification/2024-11-05/basic/transports",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2024-11-05/basic/utilities/cancellation",
                       "specification/2024-11-05/basic/utilities/ping",
@@ -285,21 +285,21 @@
                 ]
               },
               {
-                "group": "Client Features",
+                "group": "客户端功能",
                 "pages": [
                   "specification/2024-11-05/client/roots",
                   "specification/2024-11-05/client/sampling"
                 ]
               },
               {
-                "group": "Server Features",
+                "group": "服务器功能",
                 "pages": [
                   "specification/2024-11-05/server/index",
                   "specification/2024-11-05/server/prompts",
                   "specification/2024-11-05/server/resources",
                   "specification/2024-11-05/server/tools",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/2024-11-05/server/utilities/completion",
                       "specification/2024-11-05/server/utilities/logging",
@@ -311,19 +311,19 @@
             ]
           },
           {
-            "version": "Draft",
+            "version": "草案",
             "pages": [
               "specification/draft/index",
               "specification/draft/changelog",
               "specification/draft/deprecated",
               "specification/draft/architecture/index",
               {
-                "group": "Base Protocol",
+                "group": "基础协议",
                 "pages": [
                   "specification/draft/basic/index",
                   "specification/draft/basic/versioning",
                   {
-                    "group": "Message Patterns",
+                    "group": "消息模式",
                     "pages": [
                       "specification/draft/basic/patterns/index",
                       "specification/draft/basic/patterns/mrtr",
@@ -333,7 +333,7 @@
                     ]
                   },
                   {
-                    "group": "Transports",
+                    "group": "传输",
                     "pages": [
                       "specification/draft/basic/transports/index",
                       "specification/draft/basic/transports/stdio",
@@ -341,7 +341,7 @@
                     ]
                   },
                   {
-                    "group": "Authorization",
+                    "group": "授权",
                     "pages": [
                       "specification/draft/basic/authorization/index",
                       "specification/draft/basic/authorization/authorization-server-discovery",
@@ -352,7 +352,7 @@
                 ]
               },
               {
-                "group": "Client Features",
+                "group": "客户端功能",
                 "pages": [
                   "specification/draft/client/roots",
                   "specification/draft/client/sampling",
@@ -360,7 +360,7 @@
                 ]
               },
               {
-                "group": "Server Features",
+                "group": "服务器功能",
                 "pages": [
                   "specification/draft/server/index",
                   "specification/draft/server/discover",
@@ -368,7 +368,7 @@
                   "specification/draft/server/resources",
                   "specification/draft/server/tools",
                   {
-                    "group": "Utilities",
+                    "group": "工具",
                     "pages": [
                       "specification/draft/server/utilities/caching",
                       "specification/draft/server/utilities/completion",
@@ -384,13 +384,13 @@
         ]
       },
       {
-        "tab": "Registry",
+        "tab": "注册表",
         "pages": [
           "registry/about",
           "registry/quickstart",
           "registry/faq",
           {
-            "group": "Publishing",
+            "group": "发布",
             "pages": [
               "registry/package-types",
               "registry/remote-servers",
@@ -401,7 +401,7 @@
             ]
           },
           {
-            "group": "Consuming",
+            "group": "消费",
             "pages": [
               "registry/registry-aggregators"
             ]
@@ -410,11 +410,11 @@
         ]
       },
       {
-        "tab": "SEPs",
+        "tab": "SEP",
         "pages": [
           "seps/index",
           {
-            "group": "Final",
+            "group": "最终",
             "pages": [
               "seps/414-request-meta",
               "seps/932-model-context-protocol-governance",
@@ -462,10 +462,10 @@
         ]
       },
       {
-        "tab": "Community",
+        "tab": "社区",
         "pages": [
           {
-            "group": "Get Involved",
+            "group": "参与贡献",
             "pages": [
               "community/contributing",
               "community/communication",
@@ -474,14 +474,14 @@
             ]
           },
           {
-            "group": "Propose Changes",
+            "group": "提议变更",
             "pages": [
               "community/design-principles",
               "community/sep-guidelines"
             ]
           },
           {
-            "group": "Governance",
+            "group": "治理",
             "pages": [
               "community/governance",
               "community/contributor-ladder",
@@ -491,7 +491,7 @@
             ]
           },
           {
-            "group": "Working Group Charters",
+            "group": "工作组章程",
             "pages": [
               "community/file-uploads/charter",
               "community/inspector-v2/charter",
@@ -504,14 +504,14 @@
             ]
           },
           {
-            "group": "Interest Group Charters",
+            "group": "兴趣组章程",
             "pages": [
               "community/auth/charter",
               "community/tool-annotations/charter"
             ]
           },
           {
-            "group": "Roadmap",
+            "group": "路线图",
             "pages": [
               "development/roadmap"
             ]

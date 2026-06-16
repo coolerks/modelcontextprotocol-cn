@@ -1,89 +1,42 @@
 ---
-title: Overview
+title: 概述
 ---
 
 <div id="enable-section-numbers" />
 
-This page defines what a transport must provide to carry MCP messages, the
-standard transport bindings, and the requirements for defining new ones.
+本页定义了传输必须提供什么来承载 MCP 消息、标准传输绑定以及定义新传输的要求。
 
-Protocol semantics are identical on every transport. A transport is a
-**binding**: it defines how messages are framed and delivered, how request
-metadata is carried, and how cancellation and termination are signaled. It
-does not define what the messages mean: the
-[message patterns](/specification/draft/basic/patterns) are part of the core
-protocol and are the same on every binding. The binding pages specify the
-standard transports:
+协议语义在每个传输上都是相同的。传输是一个**绑定**：它定义了消息如何帧封装和传递、请求元数据如何携带、以及取消和终止如何发出信号。它不定消息的含义：[消息模式](/specification/draft/basic/patterns)是核心协议的一部分，在每个绑定上都是相同的。绑定页面指定了标准传输：
 
-1. [stdio](/specification/draft/basic/transports/stdio): newline-delimited
-   messages over the standard streams of a client-launched subprocess.
-2. [Streamable HTTP](/specification/draft/basic/transports/streamable-http):
-   each message is an HTTP POST to a single MCP endpoint; replies arrive as
-   a JSON object or a request-scoped SSE stream.
+1. [stdio](/specification/draft/basic/transports/stdio)：通过客户端启动的子进程的标准流进行换行符分隔的消息。
+2. [Streamable HTTP](/specification/draft/basic/transports/streamable-http)：每个消息都是对单个 MCP 端点的 HTTP POST；回复以 JSON 对象或请求作用域的 SSE 流形式到达。
 
-It is also possible for clients and servers to implement
-[custom transports](#custom-transports).
+客户端和服务器也可以实现[自定义传输](#custom-transports)。
 
-## Messages
+## 消息
 
-MCP uses JSON-RPC to encode messages. JSON-RPC messages **MUST** be UTF-8
-encoded.
+MCP 使用 JSON-RPC 对消息进行编码。JSON-RPC 消息 **MUST** 使用 UTF-8 编码。
 
-A binding **MUST** deliver client-sent _requests_ and _notifications_ to the
-server, and server-sent _responses_ and _notifications_ to the client. No
-other message direction exists: per the
-[message patterns](/specification/draft/basic/patterns), servers do not
-initiate JSON-RPC requests and clients do not send JSON-RPC responses.
+绑定 **MUST** 将客户端发送的*请求*和*通知*传递给服务器，并将服务器发送的*响应*和*通知*传递给客户端。没有其他消息方向存在：根据[消息模式](/specification/draft/basic/patterns)，服务器不发起 JSON-RPC 请求，客户端也不发送 JSON-RPC 响应。
 
-## Request Metadata
+## 请求元数据
 
-All protocol metadata travels in the message body: every request carries its
-protocol version, client identity, and client capabilities in
-[`_meta.io.modelcontextprotocol/*`](/specification/draft/basic/index#meta)
-fields.
+所有协议元数据都在消息体中传输：每个请求在其 [`_meta.io.modelcontextprotocol/*`](/specification/draft/basic/index#meta) 字段中携带协议版本、客户端标识和客户端能力。
 
-A binding **MAY** additionally mirror selected body fields into envelope
-metadata. The Streamable HTTP transport mirrors them into
-[HTTP headers](/specification/draft/basic/transports/streamable-http#request-metadata)
-so that intermediaries can route and inspect requests without parsing the
-body. The body remains the source of truth; bindings that mirror metadata
-define how mismatches are rejected.
+绑定 **MAY** 额外将选定的消息体字段镜像到信封元数据中。Streamable HTTP 传输将它们镜像到 [HTTP 头部](/specification/draft/basic/transports/streamable-http#request-metadata)中，以便中间件可以在不解析消息体的情况下路由和检查请求。消息体仍然是真实来源；镜像元数据的绑定定义了不匹配时的拒绝方式。
 
-## Cancellation
+## 取消
 
-Each binding defines how a client abandons an in-flight request: on stdio
-the client sends a `notifications/cancelled` notification; on Streamable
-HTTP it closes the request's response stream. The protocol-level rules are
-the same everywhere; see
-[Cancellation](/specification/draft/basic/patterns/cancellation).
+每个绑定定义了客户端如何放弃正在进行的请求：在 stdio 上，客户端发送 `notifications/cancelled` 通知；在 Streamable HTTP 上，它关闭请求的响应流。协议级别的规则在所有地方都是相同的；请参见[取消](/specification/draft/basic/patterns/cancellation)。
 
-## Custom Transports
+## 自定义传输
 
-Clients and servers **MAY** implement additional custom transport mechanisms
-to suit their specific needs. The protocol is transport-agnostic and can be
-implemented over any communication channel that supports bidirectional
-message exchange.
+客户端和服务器 **MAY** 实现额外的自定义传输机制以满足其特定需求。协议是传输无关的，可以在任何支持双向消息交换的通信通道上实现。
 
-Implementers who choose to support custom transports **MUST** preserve the
-JSON-RPC message format, the
-[message patterns](/specification/draft/basic/patterns), and the per-request
-metadata model. Custom transports **SHOULD** document their connection
-establishment, message framing, and cancellation patterns to aid
-interoperability.
+选择支持自定义传输的实现者 **MUST** 保留 JSON-RPC 消息格式、[消息模式](/specification/draft/basic/patterns)和按请求元数据模型。自定义传输 **SHOULD** 记录其连接建立、消息帧封装和取消模式，以促进互操作性。
 
-Custom transports that run over a reliable bidirectional byte stream (e.g.,
-Unix domain sockets or TCP) **SHOULD** reuse the
-[stdio framing](/specification/draft/basic/transports/stdio) rather than
-defining a new one: the stdio binding is just newline-delimited JSON-RPC
-over a byte stream, and only its process-lifecycle rules are specific to
-standard streams.
+在可靠的面向连接字节流（例如，Unix 域套接字或 TCP）上运行的自定义传输 **SHOULD** 重用 [stdio 帧封装](/specification/draft/basic/transports/stdio) 而不是定义新的：stdio 绑定只是在字节流上的换行符分隔的 JSON-RPC，只有其进程生命周期规则是标准流特有的。
 
-## Backward Compatibility
+## 向后兼容性
 
-Earlier protocol revisions established a connection-scoped session with an
-`initialize` handshake and allowed servers to initiate JSON-RPC requests.
-Clients and servers that interoperate with those revisions detect the
-counterpart's era and fall back as described in
-[Versioning: Backward Compatibility](/specification/draft/basic/versioning#backward-compatibility-with-initialization-based-versions),
-which includes a compatibility matrix for implementors. Each binding page
-describes its transport-specific detection mechanics.
+早期的协议修订版通过 `initialize` 握手建立连接范围的会话，并允许服务器发起 JSON-RPC 请求。与这些修订版互操作的客户端和服务器检测对方的时代并按照[版本控制：向后兼容性](/specification/draft/basic/versioning#backward-compatibility-with-initialization-based-versions)中的描述回退，其中包含一个供实现者参考的兼容性矩阵。每个绑定页面描述了其传输特定的检测机制。

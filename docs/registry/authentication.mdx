@@ -1,34 +1,34 @@
 ---
-title: How to Authenticate When Publishing to the Official MCP Registry
-sidebarTitle: Authentication
+title: 如何向官方 MCP 注册表进行身份验证
+sidebarTitle: 身份验证
 ---
 
 <Note>
-  The MCP Registry is currently in preview. Breaking changes or data resets may occur before general availability. If you encounter any issues, please report them on [GitHub](https://github.com/modelcontextprotocol/registry/issues).
+  MCP 注册表当前处于预览阶段。在正式发布之前可能发生破坏性变更或数据重置。如果您遇到任何问题，请在 [GitHub](https://github.com/modelcontextprotocol/registry/issues) 上报告。
 </Note>
 
-You must authenticate before publishing to the official MCP Registry. The MCP Registry supports different authentication methods. Which authentication method you choose determines the namespace of your server's name.
+在发布到官方 MCP 注册表之前，您必须进行身份验证。MCP 注册表支持不同的身份验证方法。您选择的身份验证方法决定了您服务器名称的命名空间。
 
-If you choose GitHub-based authentication, your server's name in `server.json` **MUST** be of the form `io.github.username/*` (or `io.github.orgname/*`). For example, `io.github.alice/weather-server`.
+如果您选择基于 GitHub 的身份验证，则 `server.json` 中的服务器名称**必须**采用 `io.github.username/*`（或 `io.github.orgname/*`）的形式。例如 `io.github.alice/weather-server`。
 
-If you choose domain-based authentication, your server's name in `server.json` **MUST** be of the form `com.example.*/*`, where `com.example` is the reverse-DNS form of your domain name. For example, `io.modelcontextprotocol/everything`.
+如果您选择基于域名的身份验证，则 `server.json` 中的服务器名称**必须**采用 `com.example.*/*` 的形式，其中 `com.example` 是您域名的反向 DNS 形式。例如 `io.modelcontextprotocol/everything`。
 
-| Authentication | Name Format                                     | Example Name                         |
-| -------------- | ----------------------------------------------- | ------------------------------------ |
-| GitHub-based   | `io.github.username/*` or `io.github.orgname/*` | `io.github.alice/weather-server`     |
-| domain-based   | `com.example.*/*`                               | `io.modelcontextprotocol/everything` |
+| 身份验证方式   | 名称格式                                         | 示例名称                               |
+| -------------- | ------------------------------------------------ | -------------------------------------- |
+| 基于 GitHub    | `io.github.username/*` 或 `io.github.orgname/*`  | `io.github.alice/weather-server`       |
+| 基于域名       | `com.example.*/*`                                | `io.modelcontextprotocol/everything`   |
 
-## GitHub Authentication
+## GitHub 身份验证
 
-GitHub authentication uses an OAuth flow initiated by the `mcp-publisher` CLI tool.
+GitHub 身份验证使用由 `mcp-publisher` CLI 工具发起的 OAuth 流程。
 
-To perform GitHub authentication, navigate to your server project directory and run:
+要执行 GitHub 身份验证，请导航到您的服务器项目目录并运行：
 
 ```bash
 mcp-publisher login github
 ```
 
-You should see output like:
+您应该看到如下输出：
 
 ```text Output
 Logging in with github...
@@ -40,16 +40,16 @@ To authenticate, please:
 Waiting for authorization...
 ```
 
-Visit the link, follow the prompts, and enter the authorization code that was printed in the terminal (e.g., `ABCD-1234` in the above output). Once complete, go back to the terminal, and you should see output like:
+访问链接，按照提示操作，并输入终端中打印的授权码（例如上述输出中的 `ABCD-1234`）。完成后，返回终端，您应该看到如下输出：
 
 ```text Output
 Successfully authenticated!
 ✓ Successfully logged in
 ```
 
-## DNS Authentication
+## DNS 身份验证
 
-DNS authentication is a domain-based authentication method that relies on a DNS TXT record.
+DNS 身份验证是一种基于域名的身份验证方法，依赖于 DNS TXT 记录。
 
 To perform DNS authentication using the `mcp-publisher` CLI tool, run the following commands in your server project directory to generate a TXT record based on a public/private key pair:
 
@@ -173,28 +173,28 @@ mcp-publisher login dns azure-key-vault --domain="${MY_DOMAIN}" --vault "${MY_KE
 
 </CodeGroup>
 
-## HTTP Authentication
+## HTTP 身份验证
 
-HTTP authentication is a domain-based authentication method that relies on a `/.well-known/mcp-registry-auth` file hosted on your domain. For example, `https://example.com/.well-known/mcp-registry-auth`.
+HTTP 身份验证是一种基于域名的身份验证方法，依赖于托管在您域名上的 `/.well-known/mcp-registry-auth` 文件。例如 `https://example.com/.well-known/mcp-registry-auth`。
 
-To perform HTTP authentication using the `mcp-publisher` CLI tool, run the following commands in your server project directory to generate an `mcp-registry-auth` file based on a public/private key pair:
+要使用 `mcp-publisher` CLI 工具执行 HTTP 身份验证，请在您的服务器项目目录中运行以下命令，以基于公钥/私钥对生成 `mcp-registry-auth` 文件：
 
 <CodeGroup>
 
 ```bash Ed25519
-# Generate public/private key pair using Ed25519
+# 使用 Ed25519 生成公钥/私钥对
 openssl genpkey -algorithm Ed25519 -out key.pem
 
-# Generate mcp-registry-auth file
+# 生成 mcp-registry-auth 文件
 PUBLIC_KEY="$(openssl pkey -in key.pem -pubout -outform DER | tail -c 32 | base64)"
 echo "v=MCPv1; k=ed25519; p=${PUBLIC_KEY}" > mcp-registry-auth
 ```
 
 ```bash ECDSA P-384
-# Generate public/private key pair using ECDSA P-384
+# 使用 ECDSA P-384 生成公钥/私钥对
 openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:secp384r1 -out key.pem
 
-# Generate mcp-registry-auth file
+# 生成 mcp-registry-auth 文件
 PUBLIC_KEY="$(openssl ec -in key.pem -text -noout -conv_form compressed | grep -A4 "pub:" | tail -n +2 | tr -d ' :\n' | xxd -r -p | base64)"
 echo "v=MCPv1; k=ecdsap384; p=${PUBLIC_KEY}" > mcp-registry-auth
 ```

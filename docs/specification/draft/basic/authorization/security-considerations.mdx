@@ -1,51 +1,47 @@
 ---
-title: Authorization Security Considerations
-sidebarTitle: Security Considerations
+title: 授权安全考虑
+sidebarTitle: 安全考虑
 ---
 
 <div id="enable-section-numbers" />
 
-This document outlines security requirements that implementers **MUST** consider when
-building MCP clients and servers.
+本文档概述了实现者在构建 MCP 客户端和服务器时 **MUST** 考虑的安全要求。
 
-Additionally, implementors **MUST** follow OAuth 2.1 security best practices as outlined in
-[OAuth 2.1 Section 7. "Security Considerations"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#name-security-considerations).
+此外，实现者 **MUST** 遵循 [OAuth 2.1 第 7 节 "安全考虑"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#name-security-considerations) 中概述的 OAuth 2.1 安全最佳实践。
 
-## Token Audience Binding and Validation
+## 令牌受众绑定和验证
 
-[RFC 8707](https://www.rfc-editor.org/rfc/rfc8707.html) Resource Indicators provide critical security benefits by binding tokens to their intended
-audiences **when the Authorization Server supports the capability**. To enable current and future adoption:
+[RFC 8707](https://www.rfc-editor.org/rfc/rfc8707.html) 资源指示符通过将令牌绑定到其预期的受众提供关键的安全优势，**当授权服务器支持该能力时**。为了支持当前和未来的采用：
 
-- MCP clients **MUST** include the `resource` parameter in authorization and token requests as specified in the [Resource Parameter Implementation](/specification/draft/basic/authorization#resource-parameter-implementation) section
-- MCP servers **MUST** validate that tokens presented to them were specifically issued for their use
+- MCP 客户端 **MUST** 在授权和令牌请求中包含 `resource` 参数，如[资源参数实现](/specification/draft/basic/authorization#resource-parameter-implementation)部分所述
+- MCP 服务器 **MUST** 验证呈现给它们的令牌是专门为它们的使用颁发的
 
 The [Security Best Practices document](/docs/tutorials/security/security_best_practices#token-passthrough)
 outlines why token audience validation is crucial and why token passthrough is explicitly forbidden.
 
-## Token Theft
+## 令牌窃取
 
-Attackers who obtain tokens stored by the client, or tokens cached or logged on the server can access protected resources with
-requests that appear legitimate to resource servers.
+获取客户端存储的令牌或服务器上缓存或记录的令牌的攻击者可以使用在资源服务器看来合法的请求访问受保护的资源。
 
-Clients and servers **MUST** implement secure token storage and follow OAuth best practices,
-as outlined in [OAuth 2.1, Section 7.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-7.1).
+客户端和服务器 **MUST** 实现安全的令牌存储并遵循 OAuth 最佳实践，
+如 [OAuth 2.1 第 7.1 节](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-7.1) 中所述。
 
-Authorization servers **SHOULD** issue short-lived access tokens to reduce the impact of leaked tokens.
-For public clients, authorization servers **MUST** rotate refresh tokens as described in [OAuth 2.1 Section 4.3.1 "Token Endpoint Extension"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-4.3.1).
+授权服务器 **SHOULD** 颁发短期的访问令牌以减少令牌泄露的影响。
+对于公共客户端，授权服务器 **MUST** 按照 [OAuth 2.1 第 4.3.1 节 "令牌端点扩展"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-4.3.1) 中的描述轮换刷新令牌。
 
-## Communication Security
+## 通信安全
 
-Implementations **MUST** follow [OAuth 2.1 Section 1.5 "Communication Security"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-1.5).
+实现 **MUST** 遵循 [OAuth 2.1 第 1.5 节 "通信安全"](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-1.5)。
 
-Specifically:
+具体来说：
 
-1. All authorization server endpoints **MUST** be served over HTTPS.
-1. All redirect URIs **MUST** be either `localhost` or use HTTPS.
+1. 所有授权服务器端点 **MUST** 通过 HTTPS 提供服务。
+2. 所有重定向 URI **MUST** 是 `localhost` 或使用 HTTPS。
 
-## Authorization Code Protection
+## 授权码保护
 
-An attacker who has gained access to an authorization code contained in an authorization response can try to redeem the authorization code for an access token or otherwise make use of the authorization code.
-(Further described in [OAuth 2.1 Section 7.5](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-7.5))
+获得授权响应中包含的授权码的攻击者可以尝试将授权码兑换为访问令牌或以其他方式利用该授权码。
+（在 [OAuth 2.1 第 7.5 节](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-7.5) 中进一步描述）
 
 To mitigate this, MCP clients **MUST** implement PKCE according to [OAuth 2.1 Section 7.5.2](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-13#section-7.5.2) and **MUST** verify PKCE support before proceeding with authorization.
 PKCE helps prevent authorization code interception and injection attacks by requiring clients to create a secret verifier-challenge pair, ensuring that only the original requestor can exchange an authorization code for tokens.
@@ -60,15 +56,15 @@ Since OAuth 2.1 and PKCE specifications do not define a mechanism for clients to
 
 Authorization servers providing OpenID Connect Discovery 1.0 **MUST** include `code_challenge_methods_supported` in their metadata to ensure MCP compatibility.
 
-## Mix-Up Attacks
+## 混合攻击
 
-An MCP client typically interacts with many authorization servers over its lifetime. An attacker that controls one of those authorization servers may attempt to have the client send it an authorization code or token issued by a different, honest authorization server (a mix-up attack, described in [RFC9207 Section 1](https://datatracker.ietf.org/doc/html/rfc9207#section-1)).
+MCP 客户端在其生命周期中通常与许多授权服务器交互。控制其中一个授权服务器的攻击者可能试图让客户端向其发送由另一个诚实的授权服务器颁发的授权码或令牌（混合攻击，在 [RFC9207 第 1 节](https://datatracker.ietf.org/doc/html/rfc9207#section-1) 中描述）。
 
 [Authorization Response Validation](/specification/draft/basic/authorization#authorization-response-validation) mitigates this by binding the response to the authorization server the client recorded before redirecting, so the authorization code cannot be redeemed at an unintended token endpoint. PKCE alone does not prevent this attack because the client transmits the `code_verifier` to the attacker's token endpoint. Resource indicators do not help when the attacker's authorization server is intercepting requests before they hit the honest authorization server. This mitigation depends on honest authorization servers emitting `iss`; it provides no protection against an honest server that does not.
 
-## Open Redirection
+## 开放重定向
 
-An attacker may craft malicious redirect URIs to direct users to phishing sites.
+攻击者可能构造恶意的重定向 URI 以将用户引导到钓鱼网站。
 
 MCP clients **MUST** have redirect URIs registered with the authorization server.
 
@@ -81,10 +77,9 @@ Authorization servers **MUST** take precautions to prevent redirecting user agen
 
 Authorization servers **SHOULD** only automatically redirect the user agent if it trusts the redirection URI. If the URI is not trusted, the authorization server MAY inform the user and rely on the user to make the correct decision.
 
-## Client ID Metadata Document Security
+## 客户端 ID 元数据文档安全
 
-When implementing [Client ID Metadata Documents](/specification/draft/basic/authorization/client-registration#client-id-metadata-documents), authorization servers **MUST** consider the security implications
-detailed in [OAuth Client ID Metadata Document, Section 6](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00#name-security-considerations).
+在实现[客户端 ID 元数据文档](/specification/draft/basic/authorization/client-registration#client-id-metadata-documents)时，授权服务器 **MUST** 考虑 [OAuth 客户端 ID 元数据文档第 6 节](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00#name-security-considerations) 中详述的安全影响。
 Key considerations include:
 
 ### Authorization Server Abuse Protection
@@ -124,18 +119,18 @@ Authorization servers **MAY** implement domain-based trust policies:
 
 Servers maintain full control over their access policies.
 
-## Confused Deputy Problem
+## confused deputy 问题
 
-Attackers can exploit MCP servers acting as intermediaries to third-party APIs, leading to [confused deputy vulnerabilities](/docs/tutorials/security/security_best_practices#confused-deputy-problem).
-By using stolen authorization codes, they can obtain access tokens without user consent.
+攻击者可以利用充当第三方 API 中介的 MCP 服务器，导致 [confused deputy 漏洞](/docs/tutorials/security/security_best_practices#confused-deputy-problem)。
+通过使用窃取的授权码，他们可以在未经用户同意的情况下获取访问令牌。
 
 MCP proxy servers using static client IDs **MUST** obtain user consent for each
 [dynamically registered client](/specification/draft/basic/authorization/client-registration#dynamic-client-registration)
 before forwarding to third-party authorization servers (which may require additional consent).
 
-## Access Token Privilege Restriction
+## 访问令牌权限限制
 
-An attacker can gain unauthorized access or otherwise compromise an MCP server if the server accepts tokens issued for other resources.
+如果服务器接受为其他资源颁发的令牌，攻击者可以获得未经授权的访问或以其他方式危害 MCP 服务器。
 
 This vulnerability has two critical dimensions:
 

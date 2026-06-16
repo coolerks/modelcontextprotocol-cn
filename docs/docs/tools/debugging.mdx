@@ -1,55 +1,33 @@
 ---
-title: Debugging
-description: A comprehensive guide to debugging Model Context Protocol (MCP) integrations
+title: 调试
+description: 调试 Model Context Protocol (MCP) 集成的综合指南
 ---
 
-Effective debugging is essential when developing MCP servers or integrating
-them with applications. This guide covers the debugging tools and approaches
-available in the MCP ecosystem.
+有效的调试在开发 MCP server 或将它们与应用程序集成时至关重要。本指南涵盖了 MCP 生态系统中可用的调试工具和方法。
 
-## Debugging tools overview
+## 调试工具概览
 
-MCP provides several tools for debugging at different levels:
+MCP 提供了多种不同级别的调试工具：
 
-1. **[MCP Inspector](/docs/tools/inspector)**: interactive, transport-agnostic
-   testing UI. Connect to stdio or Streamable HTTP servers, invoke
-   [tools](/specification/latest/server/tools),
-   [prompts](/specification/latest/server/prompts), and
-   [resources](/specification/latest/server/resources), and watch the
-   notification stream. This should be your first stop.
-2. **Server logging**: structured logs to stderr (stdio transport) or via
-   [`notifications/message`](/specification/latest/server/utilities/logging#log-message-notifications)
-   (all transports).
-3. **Client developer tools**: most MCP clients expose logs and connection
-   state. See [Debugging in Claude Desktop](#debugging-in-claude-desktop)
-   below for one example, or consult your client's documentation.
+1. **[MCP Inspector](/docs/tools/inspector)**：交互式、传输无关的测试 UI。连接到 stdio 或 Streamable HTTP servers，调用 [tools](/specification/latest/server/tools)、[prompts](/specification/latest/server/prompts) 和 [resources](/specification/latest/server/resources)，并观察通知流。这应该是你的首选。
+2. **Server 日志记录**：结构化日志输出到 stderr（stdio 传输）或通过 [`notifications/message`](/specification/latest/server/utilities/logging#log-message-notifications)（所有传输）。
+3. **Client 开发者工具**：大多数 MCP clients 暴露日志和连接状态。下面以[在 Claude Desktop 中调试](#debugging-in-claude-desktop)为例，或查阅你的 client 文档。
 
-## Implementing logging
+## 实现日志记录
 
-### Server-side logging
+### 服务器端日志记录
 
-When building a server that uses the local
-[stdio transport](/specification/latest/basic/transports#stdio), all messages
-logged to stderr (standard error) will be captured by the host application
-automatically.
+当构建使用本地 [stdio 传输](/specification/latest/basic/transports#stdio) 的 server 时，所有记录到 stderr（标准错误）的消息将自动被 host 应用程序捕获。
 
 <Warning>
 
-Local MCP servers should not log messages to stdout (standard out), as this
-will interfere with protocol operation.
+本地 MCP server 不应将消息记录到 stdout（标准输出），因为这会干扰协议操作。
 
 </Warning>
 
-For servers using the
-[Streamable HTTP transport](/specification/latest/basic/transports#streamable-http),
-stderr is not captured by the client. Use the log message notifications below,
-your own server-side log aggregation, or standard HTTP tooling (curl, browser
-DevTools Network panel) to inspect requests,
-[`Mcp-Session-Id` headers](/specification/latest/basic/transports#session-management),
-and SSE streams.
+对于使用 [Streamable HTTP 传输](/specification/latest/basic/transports#streamable-http)的 servers，client 不会捕获 stderr。请使用下面的日志消息通知、你自己的服务器端日志聚合或标准 HTTP 工具（curl、浏览器 DevTools 网络面板）来检查请求、[`Mcp-Session-Id` 头](/specification/latest/basic/transports#session-management)和 SSE 流。
 
-For all [transports](/specification/latest/basic/transports), you can also
-provide logging to the client by sending a log message notification:
+对于所有[传输](/specification/latest/basic/transports)，你还可以通过发送日志消息通知向 client 提供日志记录：
 
 <CodeGroup>
 
@@ -72,40 +50,29 @@ await server.sendLoggingMessage({
 
 </CodeGroup>
 
-MCP defines eight
-[RFC 5424 severity levels](/specification/latest/server/utilities/logging#log-levels)
-(`debug` through `emergency`). Clients can adjust the minimum level at runtime
-via the
-[`logging/setLevel`](/specification/latest/server/utilities/logging#setting-log-level)
-request.
+MCP 定义了八个 [RFC 5424 严重级别](/specification/latest/server/utilities/logging#log-levels)（`debug` 到 `emergency`）。Clients 可以在运行时通过 [`logging/setLevel`](/specification/latest/server/utilities/logging#setting-log-level) 请求调整最低级别。
 
-Important events to log:
+需要记录的重要事件：
 
-- Initialization steps
-- Resource access
-- Tool execution
-- Error conditions
-- Performance metrics
+- 初始化步骤
+- 资源访问
+- Tool 执行
+- 错误条件
+- 性能指标
 
-## Common issues
+## 常见问题
 
-The examples below use Claude Desktop's
-[`claude_desktop_config.json`](/docs/develop/connect-local-servers); the same
-principles apply to any stdio-based MCP client.
+以下示例使用 Claude Desktop 的 [`claude_desktop_config.json`](/docs/develop/connect-local-servers)；相同原则适用于任何基于 stdio 的 MCP client。
 
-### Working directory
+### 工作目录
 
-When an MCP client launches a stdio server:
+当 MCP client 启动 stdio server 时：
 
-- The working directory for servers launched via the client's config may be
-  undefined (like `/` on macOS) since the client could be started from
-  anywhere
-- Always use absolute paths in your configuration and `.env` files to ensure
-  reliable operation
-- For testing servers directly via command line, the working directory will be
-  where you run the command
+- 通过 client 配置启动的 servers 的工作目录可能未定义（如 macOS 上的 `/`），因为 client 可能从任何位置启动
+- 始终在配置和 `.env` 文件中使用绝对路径以确保可靠操作
+- 通过命令行直接测试 servers 时，工作目录将是你运行命令的位置
 
-For example in `claude_desktop_config.json`, use:
+例如，在 `claude_desktop_config.json` 中，使用：
 
 ```json
 {
@@ -122,15 +89,13 @@ For example in `claude_desktop_config.json`, use:
 }
 ```
 
-Instead of relative paths like `./data`
+而不是像 `./data` 这样的相对路径
 
-### Environment variables
+### 环境变量
 
-MCP servers launched over stdio inherit only a limited subset of environment
-variables automatically (the exact set is platform-dependent).
+通过 stdio 启动的 MCP server 只自动继承有限的环境变量子集（确切的集合取决于平台）。
 
-To override the default variables or provide your own, you can specify an
-`env` key in `claude_desktop_config.json`:
+要覆盖默认变量或提供你自己的变量，你可以在 `claude_desktop_config.json` 中指定 `env` 键：
 
 ```json
 {
@@ -145,65 +110,52 @@ To override the default variables or provide your own, you can specify an
 }
 ```
 
-### Server initialization
+### Server 初始化
 
-Common initialization problems:
+常见的初始化问题：
 
-1. **Path Issues**
-   - Incorrect server executable path
-   - Missing required files
-   - Permission problems
-   - Try using an absolute path for `command`
+1. **路径问题**
+   - Server 可执行文件路径不正确
+   - 缺少必需文件
+   - 权限问题
+   - 尝试为 `command` 使用绝对路径
 
-2. **Configuration Errors**
-   - Invalid JSON syntax
-   - Missing required fields
-   - Type mismatches
+2. **配置错误**
+   - JSON 语法无效
+   - 缺少必填字段
+   - 类型不匹配
 
-3. **Environment Problems**
-   - Missing environment variables
-   - Incorrect variable values
-   - Permission restrictions
+3. **环境问题**
+   - 缺少环境变量
+   - 变量值不正确
+   - 权限限制
 
-### Connection problems
+### 连接问题
 
-When servers fail to connect:
+当 servers 无法连接时：
 
-1. Check client logs
-2. Verify server process is running
-3. Test standalone with [Inspector](/docs/tools/inspector)
-4. Verify
-   [protocol compatibility](/specification/latest/basic/lifecycle#version-negotiation)
-5. Check
-   [capability negotiation](/specification/latest/basic/lifecycle#capability-negotiation):
-   error [`-32602`](/specification/latest/basic/lifecycle#error-handling) is
-   the standard JSON-RPC "Invalid params" code and is returned in many
-   contexts. One common cause is a server sending
-   [sampling](/specification/latest/client/sampling) or
-   [elicitation](/specification/latest/client/elicitation) requests to a
-   client that hasn't declared that capability. Inspect the
-   [`initialize` exchange](/specification/latest/basic/lifecycle#initialization)
-   to verify both sides declared what you expect
+1. 检查 client 日志
+2. 验证 server 进程正在运行
+3. 使用 [Inspector](/docs/tools/inspector) 独立测试
+4. 验证[协议兼容性](/specification/latest/basic/lifecycle#version-negotiation)
+5. 检查[能力协商](/specification/latest/basic/lifecycle#capability-negotiation)：错误 [`-32602`](/specification/latest/basic/lifecycle#error-handling) 是标准 JSON-RPC "无效参数"代码，在许多上下文中都会返回。一个常见原因是 server 向未声明该能力的 client 发送 [sampling](/specification/latest/client/sampling) 或 [elicitation](/specification/latest/client/elicitation) 请求。检查 [`initialize` 交换](/specification/latest/basic/lifecycle#initialization)以验证双方声明了你期望的内容
 
-## Debugging in Claude Desktop
+## 在 Claude Desktop 中调试
 
-Claude Desktop is one of many MCP clients. It is available on
-macOS and Windows.
+Claude Desktop 是众多 MCP clients 之一。适用于 macOS 和 Windows。
 
-### Checking server status
+### 检查 server 状态
 
-Click the "Add files, connectors, and more" plus icon in the chat input, then
-hover over the **Connectors** menu to see connected servers and available
-tools.
+点击聊天输入中的"添加文件、连接器等"加号图标，然后悬停在 **Connectors** 菜单上查看已连接的 servers 和可用 tools。
 
-<img src="/images/available-mcp-tools.png" alt="Available MCP tools" />
+<img src="/images/available-mcp-tools.png" alt="可用的 MCP tools" />
 
-### Viewing logs
+### 查看日志
 
-Log files are written to:
+日志文件写入到：
 
-- macOS: `~/Library/Logs/Claude`
-- Windows: `%APPDATA%\Claude\logs`
+- macOS：`~/Library/Logs/Claude`
+- Windows：`%APPDATA%\Claude\logs`
 
 <CodeGroup>
 
@@ -217,19 +169,18 @@ type "$env:AppData\Claude\logs\mcp*.log"
 
 </CodeGroup>
 
-The logs capture:
+日志捕获：
 
-- Server connection events
-- Configuration issues
-- Runtime errors
-- Message exchanges
+- Server 连接事件
+- 配置问题
+- 运行时错误
+- 消息交换
 
-### Using Chrome DevTools
+### 使用 Chrome DevTools
 
-Access Chrome's developer tools inside Claude Desktop to investigate
-client-side errors:
+在 Claude Desktop 内访问 Chrome 的开发者工具以调查客户端错误：
 
-1. Create a `developer_settings.json` file with `allowDevTools` set to true:
+1. 创建一个包含 `allowDevTools` 设置为 true 的 `developer_settings.json` 文件：
 
 <CodeGroup>
 
@@ -243,104 +194,101 @@ echo '{"allowDevTools": true}' > ~/Library/Application\ Support/Claude/developer
 
 </CodeGroup>
 
-2. Open DevTools: `Command-Option-I` (macOS) or `Ctrl+Alt+I` (Windows)
+2. 打开 DevTools：`Command-Option-I`（macOS）或 `Ctrl+Alt+I`（Windows）
 
-Note: You'll see two DevTools windows:
+注意：你会看到两个 DevTools 窗口：
 
-- Main content window
-- App title bar window
+- 主内容窗口
+- 应用标题栏窗口
 
-Use the Console panel to inspect client-side errors.
+使用 Console 面板检查客户端错误。
 
-Use the Network panel to inspect:
+使用 Network 面板检查：
 
-- Message payloads
-- Connection timing
+- 消息负载
+- 连接时序
 
-## Debugging workflow
+## 调试工作流
 
-### Development cycle
+### 开发周期
 
-1. Initial Development
-   - Use [Inspector](/docs/tools/inspector) for basic testing
-   - Implement core functionality
-   - Add logging points
+1. 初始开发
+   - 使用 [Inspector](/docs/tools/inspector) 进行基本测试
+   - 实现核心功能
+   - 添加日志记录点
 
-2. Integration Testing
-   - Test in your target MCP client
-   - Monitor logs
-   - Check error handling
+2. 集成测试
+   - 在你的目标 MCP client 中测试
+   - 监控日志
+   - 检查错误处理
 
-### Testing changes
+### 测试变更
 
-To test changes efficiently:
+要高效测试变更：
 
-- **Configuration changes**: Restart the MCP client
-- **Server code changes**: Restart the client (for Claude Desktop, fully quit
-  and reopen; closing the window is not enough)
-- **Quick iteration**: Use [Inspector](/docs/tools/inspector) during
-  development
+- **配置变更**：重启 MCP client
+- **Server 代码变更**：重启 client（对于 Claude Desktop，完全退出并重新打开；关闭窗口是不够的）
+- **快速迭代**：开发期间使用 [Inspector](/docs/tools/inspector)
 
-## Best practices
+## 最佳实践
 
-### Logging strategy
+### 日志记录策略
 
-1. **Structured Logging**
-   - Use consistent formats
-   - Include context
-   - Add timestamps
-   - Track request IDs
+1. **结构化日志**
+   - 使用一致的格式
+   - 包含上下文
+   - 添加时间戳
+   - 跟踪请求 ID
 
-2. **Error Handling**
-   - Log stack traces
-   - Include error context
-   - Track error patterns
-   - Monitor recovery
+2. **错误处理**
+   - 记录堆栈跟踪
+   - 包含错误上下文
+   - 跟踪错误模式
+   - 监控恢复
 
-3. **Performance Tracking**
+3. **性能跟踪**
    - Log operation timing
    - Monitor resource usage
    - Track message sizes
    - Measure latency
 
-### Security considerations
+### 安全考虑
 
-When debugging:
+调试时：
 
-1. **Sensitive Data**
-   - Sanitize logs
-   - Protect credentials
-   - Mask personal information
+1. **敏感数据**
+   - 清理日志
+   - 保护凭证
+   - 屏蔽个人信息
 
-2. **Access Control**
-   - Verify permissions
-   - Check authentication
-   - Monitor access patterns
+2. **访问控制**
+   - 验证权限
+   - 检查认证
+   - 监控访问模式
 
-For a full treatment of MCP attack vectors and mitigations, see
-[Security Best Practices](/docs/tutorials/security/security_best_practices).
+有关 MCP 攻击向量和缓解措施的全面讨论，请参阅[安全最佳实践](/docs/tutorials/security/security_best_practices)。
 
-## Getting help
+## 获取帮助
 
-When encountering issues:
+遇到问题时：
 
-1. **First Steps**
-   - Check server logs
-   - Test with [Inspector](/docs/tools/inspector)
-   - Review configuration
-   - Verify environment
+1. **第一步**
+   - 检查 server 日志
+   - 使用 [Inspector](/docs/tools/inspector) 测试
+   - 审查配置
+   - 验证环境
 
-2. **Support Channels**
+2. **支持渠道**
    - [GitHub issues](https://github.com/modelcontextprotocol/modelcontextprotocol/issues)
    - [GitHub discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions)
 
-3. **Providing Information**
-   - Log excerpts
-   - Configuration files
-   - Steps to reproduce
-   - Environment details
+3. **提供信息**
+   - 日志摘录
+   - 配置文件
+   - 重现步骤
+   - 环境详情
 
-## Next steps
+## 下一步
 
 <CardGroup cols={2}>
   <Card
@@ -348,20 +296,16 @@ When encountering issues:
     icon="magnifying-glass"
     href="/docs/tools/inspector"
   >
-    Learn to use the MCP Inspector
+    学习使用 MCP Inspector
+  </Card>
+  <Card title="构建 MCP server" icon="code" href="/docs/develop/build-server">
+    从零开始构建 server 的完整指南
   </Card>
   <Card
-    title="Build an MCP server"
-    icon="code"
-    href="/docs/develop/build-server"
-  >
-    Walk through building a server from scratch
-  </Card>
-  <Card
-    title="Connect local servers"
+    title="连接本地 servers"
     icon="plug"
     href="/docs/develop/connect-local-servers"
   >
-    Full claude_desktop_config.json reference and troubleshooting
+    完整的 claude_desktop_config.json 参考和故障排除
   </Card>
 </CardGroup>

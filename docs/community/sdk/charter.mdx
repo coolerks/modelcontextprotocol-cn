@@ -1,90 +1,90 @@
 ---
-title: SDK Working Group Charter
-description: Charter for the MCP SDK Working Group.
+title: SDK 工作组章程
+description: MCP SDK 工作组的章程。
 ---
 
-## Group Type
+## 小组类型
 
-**Working Group**
+**工作组**
 
-## Mission Statement
+## 使命宣言
 
-The SDK Working Group exists to keep the official MCP SDKs consistent, conformant, and current with the specification. It coordinates implementation of new protocol versions across languages, governs the [SDK Tiering System](/community/sdk-tiers), and establishes shared design patterns where sensible, so that developers get a coherent experience across SDKs while each remains idiomatic to its language.
+SDK 工作组旨在保持官方 MCP SDK 与规范的一致性、合规性和同步性。它协调新协议版本在多种语言中的实现，管理 [SDK 分层系统](/community/sdk-tiers)，并在合理的情况下建立共享设计模式，以便开发者在不同 SDK 之间获得一致的体验，同时每个 SDK 仍保持其语言的惯用风格。
 
-## Scope
+## 范围
 
-### In Scope
+### 范围内
 
-- **SDK Tiering**: Operating the [SDK Tiering System](/community/sdk-tiers), including reviewing tier advancement requests, applying relegation criteria, and maintaining the published tier assignments.
-- **Official SDK Roster**: Evaluating proposals to add new official SDKs or retire existing ones.
-- **Release Coordination**: Aligning Tier-1 SDK release plans with specification version dates so that protocol features land in SDKs on the timelines their tier requires.
-- **Cross-SDK Design Guidance**: Recommending common patterns for SDK API surface, versioning, deprecation, error handling, and extension packaging, so that SDKs remain recognisably similar across languages while staying idiomatic.
-- **Conformance Integration**: Working with the Conformance Testing project to ensure each official SDK runs the conformance suite and publishes results.
-- **Maintainer Coordination**: Providing a forum for per-language SDK maintainers to share implementation experience and surface specification ambiguities back to Core Maintainers.
+- **SDK 分层**：运营 [SDK 分层系统](/community/sdk-tiers)，包括评审层级晋升请求、应用降级标准，以及维护已发布的层级分配。
+- **官方 SDK 名单**：评估新增官方 SDK 或淘汰现有 SDK 的提案。
+- **发布协调**：使第 1 层 SDK 发布计划与规范版本日期对齐，以便协议功能在其层级要求的时间线上落地到 SDK。
+- **跨 SDK 设计指导**：推荐 SDK API 表面、版本控制、弃用、错误处理和扩展打包的通用模式，使 SDK 在多种语言中保持可识别的相似性，同时保持惯用风格。
+- **一致性集成**：与一致性测试项目合作，确保每个官方 SDK 运行一致性套件并发布结果。
+- **维护者协调**：提供一个论坛，供各语言 SDK 维护者分享实现经验，并将规范歧义反馈给核心维护者。
 
-### Out of Scope
+### 范围外
 
-- **Per-SDK day-to-day maintenance**: Issue triage, PR review, and releases for an individual SDK remain the responsibility of that SDK's maintainers as listed in [MAINTAINERS.md](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md).
-- **Specification authorship**: Protocol changes are proposed through the [SEP process](/community/sep-guidelines) and owned by the relevant working group or Core Maintainers. The SDK WG implements accepted SEPs; it does not own spec sections.
-- **Conformance test authoring**: The conformance test suite itself is owned by the [Conformance Testing](https://github.com/modelcontextprotocol/conformance) project.
-- **Third-party and community SDKs**: SDKs outside the [modelcontextprotocol](https://github.com/modelcontextprotocol) organization are not governed by this group.
+- **各 SDK 日常维护**：单个 SDK 的问题分类、PR 评审和发布仍由该 SDK 的维护者负责，如 [MAINTAINERS.md](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) 中所列。
+- **规范编写**：协议变更通过 [SEP 流程](/community/sep-guidelines) 提出，由相关工作组或核心维护者拥有。SDK WG 实现已接受的 SEP；它不拥有规范章节。
+- **一致性测试编写**：一致性测试套件本身由 [Conformance Testing](https://github.com/modelcontextprotocol/conformance) 项目拥有。
+- **第三方和社区 SDK**：[modelcontextprotocol](https://github.com/modelcontextprotocol) 组织之外的 SDK 不受本小组管理。
 
-### Related Groups
+### 相关小组
 
-- **Transports WG**: Transport implementations are a substantial part of every SDK. The SDK WG coordinates with the Transports WG on rollout sequencing when transport SEPs land.
-- **Conformance Testing**: Tier assignments depend on conformance scores. The SDK WG consumes conformance results and feeds back gaps in test coverage.
-- **All specification-producing WGs**: The SDK WG is a downstream consumer of accepted SEPs and coordinates reference-implementation timing with the originating group.
+- **传输工作组**：传输实现是每个 SDK 的重要组成部分。SDK WG 在传输 SEP 落地时与传输工作组协调发布顺序。
+- **一致性测试**：层级分配取决于一致性评分。SDK WG 使用一致性结果并反馈测试覆盖的差距。
+- **所有产生规范的工作组**：SDK WG 是已接受 SEP 的下游消费者，并与源工作组协调参考实现的时间安排。
 
-## Leadership
+## 领导层
 
-| Role | Name             | Organization | GitHub                                                 | Term    |
-| ---- | ---------------- | ------------ | ------------------------------------------------------ | ------- |
-| Lead | Felix Weinberger | Anthropic    | [@felixweinberger](https://github.com/felixweinberger) | Ongoing |
+| 角色   | 姓名             | 组织      | GitHub                                                 | 任期 |
+| ------ | ---------------- | --------- | ------------------------------------------------------ | ---- |
+| 负责人 | Felix Weinberger | Anthropic | [@felixweinberger](https://github.com/felixweinberger) | 持续 |
 
-## Authority & Decision Rights
+## 权限与决策权
 
-| Decision Type                            | Authority Level                                |
-| ---------------------------------------- | ---------------------------------------------- |
-| Meeting logistics & scheduling           | WG Leads (autonomous)                          |
-| Proposal prioritization within WG        | WG Leads (autonomous)                          |
-| SDK tier advancement or relegation       | WG consensus                                   |
-| Cross-SDK design guidance                | WG consensus (advisory to per-SDK maintainers) |
-| Per-SDK releases, versioning, API design | That SDK's maintainers (autonomous)            |
-| Adding or retiring an official SDK       | WG consensus → Core Maintainer approval        |
-| Changes to the tiering criteria          | WG consensus → Core Maintainer approval        |
-| Scope expansion                          | Core Maintainer approval required              |
-| WG Member approval                       | WG Member sponsors                             |
+| 决策类型                        | 权限级别                             |
+| ------------------------------- | ------------------------------------ |
+| 会议后勤与安排                  | WG 负责人（自主）                    |
+| WG 内提案优先级                 | WG 负责人（自主）                    |
+| SDK 层级晋升或降级              | WG 共识                              |
+| 跨 SDK 设计指导                 | WG 共识（对各 SDK 维护者具有建议性） |
+| 各 SDK 发布、版本控制、API 设计 | 该 SDK 的维护者（自主）              |
+| 添加或淘汰官方 SDK              | WG 共识 → 核心维护者批准             |
+| 分层标准的变更                  | WG 共识 → 核心维护者批准             |
+| 范围扩展                        | 需要核心维护者批准                   |
+| WG 成员批准                     | WG 成员赞助者                        |
 
-## Membership
+## 成员
 
-WG Members are the maintainers of each official SDK as recorded in [MAINTAINERS.md](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) and the corresponding roles in [modelcontextprotocol/access](https://github.com/modelcontextprotocol/access). Maintainers of any official SDK are WG Members by default.
+WG 成员是各官方 SDK 的维护者，如 [MAINTAINERS.md](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) 和 [modelcontextprotocol/access](https://github.com/modelcontextprotocol/access) 中相应角色所记录。任何官方 SDK 的维护者默认即为 WG 成员。
 
-## Operations
+## 运营
 
-| Meeting         | Frequency | Duration | Purpose                                              |
-| --------------- | --------- | -------- | ---------------------------------------------------- |
-| Working Session | Biweekly  | 45 min   | Release coordination, tier reviews, cross-SDK design |
+| 会议     | 频率       | 时长    | 目的                            |
+| -------- | ---------- | ------- | ------------------------------- |
+| 工作会议 | 每两周一次 | 45 分钟 | 发布协调、层级评审、跨 SDK 设计 |
 
-Communication happens in the `#general-sdk-dev` Discord channel and the SDK Working Group category in [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions).
+沟通在 `#general-sdk-dev` Discord 频道和 [GitHub Discussions](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions) 的 SDK 工作组类别中进行。
 
-## Deliverables & Success Metrics
+## 交付物与成功指标
 
-### Active Work Items
+### 活跃工作项
 
-| Item                                                | Status      | Target Date | Champion            |
-| --------------------------------------------------- | ----------- | ----------- | ------------------- |
-| 2026-06-30 spec support across Tier-1 SDKs          | Planning    | 2026 Q3     | Per-SDK maintainers |
-| Cross-SDK guidance for stateless transport adoption | In progress | 2026 Q2     | WG Leads            |
-| Quarterly tier review                               | Recurring   | Quarterly   | WG Leads            |
+| 项目                                 | 状态   | 目标日期 | 负责人        |
+| ------------------------------------ | ------ | -------- | ------------- |
+| 跨第 1 层 SDK 的 2026-06-30 规范支持 | 规划中 | 2026 Q3  | 各 SDK 维护者 |
+| 无状态传输采纳的跨 SDK 指导          | 进行中 | 2026 Q2  | WG 负责人     |
+| 季度层级评审                         | 周期性 | 每季度   | WG 负责人     |
 
-### Success Criteria
+### 成功标准
 
-- All official SDKs have a published tier and a passing conformance run on their default branch.
-- Tier-1 SDKs ship support for each released specification version within the timeline their tier requires.
-- Tier advancement and relegation decisions are recorded with rationale in GitHub Discussions.
+- 所有官方 SDK 都有已发布的层级，并在其默认分支上通过一致性测试。
+- 第 1 层 SDK 在其层级要求的时间线内，为每个已发布的规范版本提供支持。
+- 层级晋升和降级决定记录在 GitHub Discussions 中，并附有理由。
 
-## Changelog
+## 变更日志
 
-| Date       | Change          |
-| ---------- | --------------- |
-| 2026-04-28 | Initial charter |
+| 日期       | 更改     |
+| ---------- | -------- |
+| 2026-04-28 | 初始章程 |

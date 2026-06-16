@@ -1,15 +1,15 @@
 ---
-title: How to Automate Publishing with GitHub Actions
+title: 如何通过 GitHub Actions 自动化发布
 sidebarTitle: GitHub Actions
 ---
 
 <Note>
-  The MCP Registry is currently in preview. Breaking changes or data resets may occur before general availability. If you encounter any issues, please report them on [GitHub](https://github.com/modelcontextprotocol/registry/issues).
+  MCP 注册表当前处于预览阶段。在正式发布之前可能发生破坏性变更或数据重置。如果您遇到任何问题，请在 [GitHub](https://github.com/modelcontextprotocol/registry/issues) 上报告。
 </Note>
 
-## Step 1: Create a Workflow File
+## 步骤 1：创建工作流文件
 
-In your server project directory, create a `.github/workflows/publish-mcp.yml` file. Here is an example for npm-based local server, but the MCP Registry publishing steps are the same for all package types:
+在您的服务器项目目录中，创建一个 `.github/workflows/publish-mcp.yml` 文件。以下是一个基于 npm 的本地服务器示例，但 MCP 注册表发布步骤对于所有包类型都是相同的：
 
 <CodeGroup>
 
@@ -190,13 +190,13 @@ jobs:
 
 </CodeGroup>
 
-## Step 2: Add Secrets
+## 步骤 2：添加密钥
 
-You may need to add a secret to the repository depending on which authentication method you choose:
+根据您选择的身份验证方法，您可能需要向仓库添加一个密钥：
 
-- **GitHub OIDC Authentication**: No dedicated secret necessary.
-- **GitHub PAT Authentication**: Add a `MCP_GITHUB_TOKEN` secret with a GitHub Personal Access Token (PAT) that has `read:org` and `read:user` scopes.
-- **DNS Authentication**: Add a `MCP_PRIVATE_KEY` secret with your Ed25519 private key.
+- **GitHub OIDC 身份验证**：无需专用密钥。
+- **GitHub PAT 身份验证**：添加一个 `MCP_GITHUB_TOKEN` 密钥，其值为具有 `read:org` 和 `read:user` 作用域的 GitHub 个人访问令牌（PAT）。
+- **DNS 身份验证**：添加一个 `MCP_PRIVATE_KEY` 密钥，其值为您的 Ed25519 私钥。
 
 You may also need to add secrets for your package registry. For example, the workflow above needs an `NPM_TOKEN` secret with your npm token.
 

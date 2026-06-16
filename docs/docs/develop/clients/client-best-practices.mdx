@@ -1,71 +1,68 @@
 ---
-title: "Client Best Practices"
-description: "Patterns for scaling MCP host applications across many servers and tools."
+title: "Client 最佳实践"
+description: "跨多个 servers 和 tools 扩展 MCP host 应用程序的模式。"
 ---
 
-As MCP host applications, such as agents, connect to more MCP servers and accumulate access to hundreds or thousands of tools, naive approaches to tool management break down. Loading every tool definition into the model's context window upfront wastes tokens, increases latency, and degrades model performance. Passing large intermediate results through the model between sequential tool calls compounds the problem.
+随着 MCP host 应用程序（如 agents）连接到更多 MCP server 并积累对成百上千个 tools 的访问权限，朴素的 tool 管理方法就会失效。预先将每个 tool 定义加载到模型的上下文窗口会浪费令牌、增加延迟并降低模型性能。在顺序 tool 调用之间通过模型传递大量中间结果会加剧这个问题。
 
-Two patterns address these challenges: **progressive discovery**, which controls _when_ tool definitions enter context, and **programmatic tool calling**, which controls _how_ tools are invoked.
+两种模式可以应对这些挑战：**渐进式发现**，控制 tool 定义*何时*进入上下文；以及**编程式 tool 调用**，控制 tools *如何*被调用。
 
-## Progressive Tool Discovery
+## 渐进式 Tool 发现
 
-Naive MCP host implementations pass the tool definitions of every connected server directly to the model at the start of each conversation. For a handful of tools, this is perfectly reasonable. But when a host has access to dozens of servers exposing hundreds of tools, those definitions alone can consume the majority of the context window before the model has even read the user's message.
+朴素的 MCP host 实现会在每次对话开始时将每个已连接 server 的 tool 定义直接传递给模型。对于少量 tools，这完全合理。但当 host 可以访问数十个暴露数百个 tools 的 servers 时，仅这些定义本身就可能消耗大部分上下文窗口，而模型甚至还没有读取用户的消息。
 
 <img
   src="/images/progressive-discovery.svg"
-  alt="Comparison of loading all tools upfront versus discovering tools on demand. The upfront approach consumes ~150,000 tokens on definitions alone, while progressive discovery uses ~2,000 tokens by loading only what the task requires."
+  alt="预先加载所有 tools 与按需发现 tools 的对比。预先加载方法仅定义部分就消耗约 150,000 个令牌，而渐进式发现只加载任务所需的内容，使用约 2,000 个令牌。"
 />
 
-Progressive discovery avoids this:
+渐进式发现避免了这个问题：
 
-- The host fetches tool definitions via `tools/list` as normal, but defers injecting them into the model's context.
-- The host provides a lightweight `search_tools` meta-tool to the model.
-- The host loads full definitions into context only as needed.
+- Host 像往常一样通过 `tools/list` 获取 tool 定义，但延迟将其注入模型的上下文。
+- Host 向模型提供一个轻量级的 `search_tools` 元 tool。
+- Host 仅在需要时将完整定义加载到上下文中。
 
-### When to Use Progressive Discovery
+### 何时使用渐进式发现
 
-Progressive discovery is best used when tool definitions take large parts of the context window. For a small
-set of tools with tool definitions taking up a small part of the context window, loading all tools is fine.
-Once the tool definitions take up a significant part of the available context window, clients should switch to progressive discovery. We recommend that clients implement thresholds to determine when to switch:
+当 tool 定义占用上下文窗口的大部分时，渐进式发现最为适用。对于少量工具集，tool 定义只占上下文窗口的一小部分时，加载所有 tools 是可以的。一旦 tool 定义占用了可用上下文窗口的很大一部分，clients 应切换到渐进式发现。我们建议 clients 实现阈值来确定何时切换：
 
-- Implement a threshold as a percentage of the context window. For example, 1%-5%.
-- Load tool definitions. Once the threshold is reached, switch to progressive discovery.
+- 将阈值设置为上下文窗口的百分比。例如，1%-5%。
+- 加载 tool 定义。一旦达到阈值，切换到渐进式发现。
 
-### Choosing a Discovery Strategy
+### 选择发现策略
 
-Once the model invokes the `search_tools` tool, we need to choose a search strategy:
+当模型调用 `search_tools` tool 后，我们需要选择一种搜索策略：
 
-- **Keyword-based**: Keyword matching (BM25, regex). Simple and effective, particularly for descriptive tool names and descriptions.
-- **Embedding-based**: Vector-similarity retrieval over tool descriptions. Handles synonyms and semantic matching better.
-- **Subagent-based**: A secondary model, often a small and fast model such as Claude Haiku or Gemini Flash, selects tools for the task. This usually works very well but can be more costly than embedding-based or keyword-based solutions.
-- **Hybrid**: Combine approaches. For example, by scoring across keyword and embedding rankings, or choosing
-  different strategies depending on use-case or query.
+- **基于关键字**：关键字匹配（BM25、正则）。简单有效，特别适用于描述性的 tool 名称和描述。
+- **基于 Embedding**：对 tool 描述进行向量相似性检索。能更好地处理同义词和语义匹配。
+- **基于子 Agent**：使用辅助模型（通常是小型快速模型，如 Claude Haiku 或 Gemini Flash）为任务选择 tools。这通常效果非常好，但可能比基于 embedding 或关键字的解决方案成本更高。
+- **混合**：结合多种方法。例如，通过关键字和 embedding 排名进行评分，或根据用例或查询选择不同的策略。
 
-Some model providers already offer built-in tool search. For example, [OpenAI](https://developers.openai.com/api/docs/guides/tools-tool-search) and [Anthropic](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) support this natively; check your provider's documentation for an equivalent. When available, you may prefer the platform's tool search over a custom implementation. Build your own when the provider doesn't offer one or when you need specialized retrieval logic (e.g., domain-specific ranking or access-control filtering).
+一些模型提供商已经提供了内置的 tool 搜索。例如，[OpenAI](https://developers.openai.com/api/docs/guides/tools-tool-search) 和 [Anthropic](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool) 原生支持此功能；请查看你的提供商文档了解等效功能。如果可用，你可能更倾向于使用平台的 tool 搜索而不是自定义实现。当提供商不提供或你需要专门的检索逻辑（例如，特定领域的排名或访问控制过滤）时，再构建自己的实现。
 
-The three-layer pattern below illustrates a custom search-based approach in detail, but the layered principle (catalog, inspect, execute) applies regardless of retrieval mechanism.
+下面的三层模式详细说明了基于自定义搜索的方法，但分层原则（目录、检查、执行）适用于任何检索机制。
 
-### Using Progressive Discovery
+### 使用渐进式发现
 
-One common implementation for progressive discovery uses a search-based three-layer approach:
+渐进式发现的一种常见实现使用基于搜索的三层方法：
 
-**Layer 1: Catalog.** The host exposes a small set of meta-tools for searching available capabilities. A `search_tools` tool accepts a natural-language query and returns matching tool names with brief descriptions.
+**第 1 层：目录。** Host 暴露一小组用于搜索可用能力的元 tools。`search_tools` tool 接受自然语言查询，返回匹配的 tool 名称和简要描述。
 
 ```typescript
-// The model calls a lightweight search tool
+// 模型调用轻量级搜索 tool
 search_tools({ query: "update salesforce record" })
 
-// Returns concise matches: names and one-line descriptions only
+// 返回简洁匹配：仅名称和一行描述
 → [
     { name: "salesforce_updateRecord", description: "Update fields on a Salesforce object" },
     { name: "salesforce_upsertRecord", description: "Insert or update based on external ID" }
   ]
 ```
 
-**Layer 2: Inspect.** Once the model identifies a candidate, it fetches the full definition (input schema, output schema, documentation) for that tool only.
+**第 2 层：检查。** 一旦模型识别出候选 tool，它只获取该 tool 的完整定义（输入 schema、输出 schema、文档）。
 
 ```typescript
-// The model inspects only the tool it needs
+// 模型只检查它需要的 tool
 get_tool_details({ name: "salesforce_updateRecord" });
 ```
 
@@ -90,17 +87,17 @@ This returns the complete schema for a single tool:
 }
 ```
 
-**Layer 3: Execute.** The model calls the tool with full knowledge of its interface, having loaded only the definitions it needed.
+**第 3 层：执行。** 模型在完全了解其接口的情况下调用 tool，仅加载了它需要的定义。
 
-This pattern reduces token usage dramatically and can improve tool selection accuracy: the model focuses on a few relevant tools rather than scanning hundreds of irrelevant ones. Other discovery strategies (embeddings, subagents, etc.) follow the same layered principle but substitute different retrieval mechanisms in the catalog layer.
+这种模式显著减少了令牌使用量，并可以提高 tool 选择准确性：模型专注于少量相关 tools，而不是扫描数百个不相关的 tools。其他发现策略（embeddings、子 agents 等）遵循相同的分层原则，但在目录层使用不同的检索机制。
 
-### Dynamic Server Management
+### 动态 Server 管理
 
-Progressive discovery extends beyond individual tools to entire servers. Rather than connecting to every configured server at startup, a host can:
+渐进式发现不仅限于单个 tools，还扩展到整个 servers。Host 不必在启动时连接到每个已配置的 server，而是可以：
 
-1. Maintain a registry of available servers and their high-level descriptions.
-2. Connect to a server only when the model determines it needs that server's capabilities.
-3. Disconnect servers that are no longer relevant to the current task, freeing context.
+1. 维护可用 servers 及其高级描述的注册表。
+2. 仅在模型确定需要某个 server 的能力时才连接到该 server。
+3. 断开与当前任务不再相关的 servers，释放上下文。
 
 ```mermaid
 sequenceDiagram
@@ -110,69 +107,64 @@ sequenceDiagram
     participant Server
 
     Model->>Host: search_available_servers("CRM")
-    Host->>Registry: Query available servers
-    Registry-->>Host: Salesforce server (not connected)
-    Host-->>Model: Salesforce server available
+    Host->>Registry: 查询可用 servers
+    Registry-->>Host: Salesforce server（未连接）
+    Host-->>Model: Salesforce server 可用
 
     Model->>Host: enable_server("salesforce")
-    Host->>Server: Initialize connection
-    Server-->>Host: Server capabilities + tools
-    Host-->>Model: Salesforce server connected
+    Host->>Server: 初始化连接
+    Server-->>Host: Server 能力 + tools
+    Host-->>Model: Salesforce server 已连接
 
-    Note over Model: Task complete
+    Note over Model: 任务完成
 
     Model->>Host: disable_server("salesforce")
-    Host->>Server: Close connection
-    Host-->>Model: Server disconnected, context freed
+    Host->>Server: 关闭连接
+    Host-->>Model: Server 已断开，上下文已释放
 ```
 
-This works especially well for general-purpose agents, where the user's intent isn't known upfront. The agent starts with a minimal set of always-on servers and connects others as needed. Combined with [agent skills](/docs/develop/build-with-agent-skills), a skill file can declare which MCP servers it needs, and the host connects them only when that skill is invoked.
+这对于通用 agents 特别有效，因为用户意图事先未知。Agent 从一组最小的常开 servers 开始，根据需要连接其他 servers。结合 [agent skills](/docs/develop/build-with-agent-skills)，skill 文件可以声明它需要哪些 MCP servers，host 仅在该 skill 被调用时才连接它们。
 
-### Implementation Guidelines
+### 实现指南
 
-When implementing progressive discovery:
+实现渐进式发现时：
 
-| Guideline                        | Rationale                                                                                                                                                                                          |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Offer multiple detail levels** | Let the model choose between name-only, name-and-description, or full-schema responses.                                                                                                            |
-| **Cache tool definitions**       | Once fetched from a server, memoize the definition host-side so re-injecting it later doesn't need another `tools/list` round trip. This is separate from what's currently in the model's context. |
-| **Refresh on `list_changed`**    | Re-index the search catalog when a server sends `notifications/tools/list_changed`.                                                                                                                |
-| **Group tools by server**        | Present tools organized by their source server so the model can reason about related capabilities.                                                                                                 |
+| 指南                         | 理由                                                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **提供多个详细级别**         | 让模型在仅名称、名称加描述或完整 schema 响应之间进行选择。                                                                 |
+| **缓存 tool 定义**           | 从 server 获取后，在 host 端记忆定义，以便稍后重新注入时无需再次进行 `tools/list` 往返。这与当前在模型上下文中的内容分开。 |
+| **在 `list_changed` 时刷新** | 当 server 发送 `notifications/tools/list_changed` 时，重新索引搜索目录。                                                   |
+| **按 server 分组 tools**     | 按源 server 组织 tools，使模型能够推理相关能力。                                                                           |
 
-### Interaction with Prompt Caching
+### 与 Prompt 缓存的交互
 
-Most providers cache the prompt prefix, including the `tools` array. Adding or removing tool
-definitions mid-conversation invalidates that cache, and the resulting miss can cost more tokens
-than the definitions you removed. To preserve caching:
+大多数提供商缓存 prompt 前缀，包括 `tools` 数组。在对话中途添加或删除 tool 定义会使该缓存失效，由此导致的缓存未命中可能消耗比删除的定义更多的令牌。要保留缓存：
 
-- Append newly discovered definitions after the cache breakpoint rather than re-sorting the
-  `tools` array, or route every call through a single stable `call_tool({name, args})` meta-tool
-  so the array never changes.
-- Treat server disconnection as a conversation-boundary operation rather than a per-turn one.
-- Consult your provider's caching documentation alongside the tool-search links above.
+- 将新发现的定义追加到缓存断点之后，而不是重新排序 `tools` 数组，或通过一个稳定的 `call_tool({name, args})` 元 tool 路由所有调用，使数组永不改变。
+- 将 server 断开连接视为对话边界操作，而不是每个回合的操作。
+- 查阅你的提供商缓存文档以及上面的 tool 搜索链接。
 
-## Programmatic Tool Calling / Code Mode
+## 编程式 Tool 调用 / 代码模式
 
-With direct tool calling, every tool invocation is a round trip: the model generates a tool call, the client executes it, and the full result flows back into the model's context. When a task requires chaining multiple tools (read a document, transform it, write it somewhere else), each intermediate result passes through the model, consuming tokens and adding latency even when it has nothing to do with them.
+使用直接 tool 调用时，每次 tool 调用都是一次往返：模型生成 tool 调用，client 执行它，完整结果流回模型上下文。当任务需要链接多个 tools（读取文档、转换它、写入其他地方）时，每个中间结果都通过模型传递，消耗令牌并增加延迟，即使模型与它们无关。
 
-Programmatic tool calling (sometimes called "code mode") provides a way for clients to **compose tool calls** effectively. Instead of calling tools directly, the model writes code that calls tools. The code executes in a sandboxed environment, and only the final result returns to the model.
+编程式 tool 调用（有时称为"代码模式"）为 clients 提供了一种有效**组合 tool 调用**的方式。模型不直接调用 tools，而是编写调用 tools 的代码。代码在沙箱环境中执行，只有最终结果返回给模型。
 
-Programmatic tool calling is powerful and allows for more efficient use of MCP tools and resources, but requires
-clients to implement a sandbox environment.
+编程式 tool 调用非常强大，可以更有效地使用 MCP tools 和 resources，但要求 clients 实现沙箱环境。
 
 <img
   src="/images/programmatic-tool-calling.svg"
-  alt="Comparison of direct tool calling versus programmatic tool calling. Direct calling passes every intermediate result through the model (~100K+ tokens). Programmatic calling sends a ~200-token script to a sandbox, which executes the tool calls and returns a ~15-token summary."
+  alt="直接 tool 调用与编程式 tool 调用的对比。直接调用将每个中间结果通过模型传递（约 100K+ 令牌）。编程式调用将约 200 令牌的脚本发送到沙箱，沙箱执行 tool 调用并返回约 15 令牌的摘要。"
 />
 
-### How It Works
+### 工作原理
 
-The host converts MCP tool schemas into a typed API available inside a sandbox. When the model needs tools, it writes a script and executes it.
+Host 将 MCP tool schema 转换为沙箱内可用的类型化 API。当模型需要 tools 时，它编写脚本并执行。
 
-**Step 1: Generate a programmatic API from MCP schemas.** The host reads each server's tool definitions and produces typed functions based on each tool's arguments and `outputSchema`:
+**步骤 1：从 MCP schema 生成编程式 API。** Host 读取每个 server 的 tool 定义，并根据每个 tool 的参数和 `outputSchema` 生成类型化函数：
 
 ```typescript
-// Auto-generated from the Logging MCP server's tool schema
+// 从 Logging MCP server 的 tool schema 自动生成
 interface LogEntry {
   timestamp: string;
   message: string;
@@ -186,7 +178,7 @@ function logging_getLogs(input: {
   return mcp.callTool<{ entries: LogEntry[] }>("logging_getLogs", input);
 }
 
-// Auto-generated from the Ticketing MCP server's tool schema
+// 从 Ticketing MCP server 的 tool schema 自动生成
 function ticketing_createIssue(input: {
   title: string;
   body?: string;
@@ -196,23 +188,23 @@ function ticketing_createIssue(input: {
 }
 ```
 
-MCP Servers can provide an optional [`outputSchema`](/specification/draft/server/tools#output-schema) for each tool. When an output schema is present, the host can produce precise return types (like `LogEntry` above).
+MCP Server 可以为每个 tool 提供可选的 [`outputSchema`](/specification/draft/server/tools#output-schema)。当存在输出 schema 时，host 可以生成精确的返回类型（如上面的 `LogEntry`）。
 
-When an output schema is absent, prefer the simple path:
+当没有输出 schema 时，优先选择简单路径：
 
-- **Use a generic type and move on.** Accept `any` or `string` and handle the unstructured output downstream. The real fix is for server authors to provide `outputSchema`.
-- **Extract a typed result using a fast model**, for single-shot calls outside loops. Expose a host-brokered `extract(value, ExpectedType)` helper through the same stub-interception path as MCP tool calls so the sandbox itself never opens a network connection. The helper routes to a small model (for example, Claude Haiku or Gemini Flash) to coerce the value into `ExpectedType`. This adds per-call latency and can hallucinate or drop fields, so validate the result against `ExpectedType` before use.
+- **使用通用类型并继续。** 接受 `any` 或 `string`，并在下游处理非结构化输出。真正的修复方法是让 server 作者提供 `outputSchema`。
+- **使用快速模型提取类型化结果**，用于循环外的单次调用。通过与 MCP tool 调用相同的桩拦截路径暴露 host 代理的 `extract(value, ExpectedType)` 辅助函数，使沙箱本身永远不会打开网络连接。该辅助函数路由到小模型（例如 Claude Haiku 或 Gemini Flash）以将值强制转换为 `ExpectedType`。这会增加每次调用的延迟，并可能产生幻觉或遗漏字段，因此在使用前应针对 `ExpectedType` 验证结果。
 
-**Step 2: The model writes code against these APIs.** Rather than making separate tool calls with full results flowing through context between them, the model writes a single script. Consider a task like "find all error logs from the past hour and file a ticket for each unique error." With direct tool calling, thousands of log entries would flow through the model's context. With code, the model filters in the sandbox:
+**步骤 2：模型针对这些 API 编写代码。** 模型不单独进行 tool 调用（中间结果在它们之间流过上下文），而是编写单个脚本。考虑一个任务，如"查找过去一小时内所有错误日志，并为每个唯一错误提交一个工单。"使用直接 tool 调用，数千条日志条目会流过模型的上下文。使用代码，模型在沙箱中过滤：
 
 ```typescript
-// Model-generated code, executes in sandbox
+// 模型生成的代码，在沙箱中执行
 const logs = await logging_getLogs({
   level: "error",
   since: Date.now() - 3600000,
 });
 
-// Filter and deduplicate inside the sandbox, not in the model's context
+// 在沙箱内过滤和去重，不在模型的上下文中
 const uniqueErrors = new Map<string, LogEntry>();
 for (const log of logs.entries) {
   if (!uniqueErrors.has(log.message)) {
@@ -231,69 +223,64 @@ for (const [message, log] of uniqueErrors) {
 }
 
 console.log(
-  `Filed ${uniqueErrors.size} tickets from ${logs.entries.length} error logs`,
+  `从 ${logs.entries.length} 条错误日志中提交了 ${uniqueErrors.size} 个工单`,
 );
 ```
 
-**Step 3: The sandbox executes the code.** Function calls inside the sandbox are intercepted and routed back to the appropriate MCP server through the host broker. The log data and ticket creation flow directly between servers without ever entering the model's context. Only the `console.log` output, a single summary line, returns to the model.
+**步骤 3：沙箱执行代码。** 沙箱内的函数调用被拦截，并通过 host 代理路由回适当的 MCP server。日志数据和工单创建直接在 servers 之间流动，从不进入模型的上下文。只有 `console.log` 输出（一个摘要行）返回给模型。
 
-### Choosing a Sandbox
+### 选择沙箱
 
-The right sandbox depends on the language you want the model to write, your host application's language, and how much isolation you need. The table lists example runtimes rather than endorsements; evaluate maturity for your use case:
+合适的沙箱取决于你希望模型编写的语言、你的 host 应用程序语言以及你需要多少隔离。下表列出了示例运行时而非推荐；请评估成熟度是否适合你的用例：
 
-| Sandboxed language | Runtime / Library                                             | Host language     | Approach                                                                                        |
-| ------------------ | ------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------- |
-| **JavaScript**     | [Deno](https://github.com/denoland/deno), `isolated-vm`       | Rust / Node / CLI | V8-based runtimes with fine-grained permissions. Can disable all permissions for full lockdown. |
-| **Python**         | [Monty](https://github.com/pydantic/monty) _(experimental)_   | Rust              | Minimal Python interpreter built for AI use cases. No I/O by default.                           |
-| **TypeScript**     | [pctx](https://github.com/portofcontext/pctx) _(early-stage)_ | Python / Rust     | Incorporates code mode concepts as a library, with low-level Rust support.                      |
-| **Any (via Wasm)** | [Wasmtime](https://github.com/bytecodealliance/wasmtime)      | Rust / C / Go     | Compile any language to Wasm and run it with capability-based security.                         |
+| 沙箱语言              | 运行时 / 库                                              | Host 语言         | 方法                                                               |
+| --------------------- | -------------------------------------------------------- | ----------------- | ------------------------------------------------------------------ |
+| **JavaScript**        | [Deno](https://github.com/denoland/deno), `isolated-vm`  | Rust / Node / CLI | 基于 V8 的运行时，具有细粒度权限。可以禁用所有权限以实现完全锁定。 |
+| **Python**            | [Monty](https://github.com/pydantic/monty) _(实验性)_    | Rust              | 为 AI 用例构建的最小 Python 解释器。默认无 I/O。                   |
+| **TypeScript**        | [pctx](https://github.com/portofcontext/pctx) _(早期)_   | Python / Rust     | 将代码模式概念作为库集成，具有底层 Rust 支持。                     |
+| **任意（通过 Wasm）** | [Wasmtime](https://github.com/bytecodealliance/wasmtime) | Rust / C / Go     | 将任何语言编译为 Wasm 并使用基于能力的安全模型运行。               |
 
-Regardless of sandbox, the integration pattern is the same: the host injects function stubs, intercepts calls over an in-process or stdio channel (so network permissions can stay fully denied), and dispatches them as `tools/call` requests to MCP servers.
+无论使用哪种沙箱，集成模式都是相同的：host 注入函数桩，通过进程内或 stdio 通道拦截调用（因此网络权限可以完全被拒绝），并将它们作为 `tools/call` 请求分发到 MCP servers。
 
-### Execution Architecture
+### 执行架构
 
-The implementation has three components:
+实现包含三个组件：
 
 ```mermaid
 flowchart LR
     subgraph Host["MCP Host"]
-        A[LLM] -->|writes code| B[Sandbox]
-        B -->|function call| C[MCP Client]
-        C -->|return value| B
-        B -->|console output| A
+        A[LLM] -->|编写代码| B[沙箱]
+        B -->|函数调用| C[MCP Client]
+        C -->|返回值| B
+        B -->|控制台输出| A
     end
-    C -->|tool call| D[MCP Server A]
-    C -->|tool call| E[MCP Server B]
-    D -->|result| C
-    E -->|result| C
+    C -->|tool 调用| D[MCP Server A]
+    C -->|tool 调用| E[MCP Server B]
+    D -->|结果| C
+    E -->|结果| C
 ```
 
-**The sandbox** runs model-generated code in an isolated environment with no direct network access. Its only interface to the outside world is through the generated function stubs, which route calls back to the host.
+**沙箱** 在隔离环境中运行模型生成的代码，没有直接网络访问权限。它与外部世界的唯一接口是通过生成的函数桩，这些函数桩将调用路由回 host。
 
-**The host** acts as a broker. It receives function calls from the sandbox, maps them to the correct MCP server, executes the tool call, and returns the result to the sandbox. Authorization tokens and credentials are held by the host and never exposed to the generated code.
+**Host** 充当代理。它接收来自沙箱的函数调用，将其映射到正确的 MCP server，执行 tool 调用，并将结果返回给沙箱。授权令牌和凭证由 host 持有，从不暴露给生成的代码。
 
-**The model** sees only what the sandbox returns, typically the output of `console.log` statements or a final return value. This gives the model (and the client developer) precise control over what enters the context window.
+**模型** 只看到沙箱返回的内容，通常是 `console.log` 语句的输出或最终返回值。这使模型（和 client 开发者）能够精确控制进入上下文窗口的内容。
 
-### Security Considerations
+### 安全考虑
 
-Programmatic tool calling introduces a code execution surface that requires careful sandboxing:
+编程式 tool 调用引入了一个需要仔细沙箱化的代码执行面：
 
-- **Per-call authorization**: The broker is still the MCP host for spec purposes. Apply the same human-in-the-loop confirmation policy to sandbox-originated calls that you apply to direct calls (see [Tools: Security](/specification/draft/server/tools#security-considerations)). Approving the script does not grant blanket approval for every tool call it makes at runtime; hosts may grant categorical approval (for example, "allow `ticketing_createIssue` for this script run") rather than prompting per iteration, but the broker must still evaluate each call against that grant.
-- **Cross-server data flow**: Tool results from one server are untrusted input to another. The broker should apply the same input-review policy to brokered calls as to direct ones; output truncation alone does not prevent exfiltration.
-- **Network isolation**: The sandbox should have no direct network access. All external communication flows through the host broker, which enforces authorization and access control.
-- **No credential exposure**: API keys and tokens are held by the host. The generated code calls typed functions; the host adds authentication when forwarding to servers.
-- **Resource limits**: Set timeouts and memory limits on sandbox execution to prevent runaway scripts.
-- **Output filtering**: Validate and truncate sandbox console output before feeding it back to the model.
+- **每次调用授权**：代理仍然是规范意义上的 MCP host。对沙箱发起的调用应用与直接调用相同的人工确认策略（请参阅 [Tools：安全](/specification/draft/server/tools#security-considerations)）。批准脚本并不等于批准它在运行时发出的每个 tool 调用；host 可以授予分类批准（例如，"允许此脚本运行中的 `ticketing_createIssue`"），而不是每次迭代都提示，但代理仍必须根据该授权评估每个调用。
+- **跨 server 数据流**：一个 server 的 tool 结果是另一个 server 的不可信输入。代理应对代理调用应用与直接调用相同的输入审查策略；仅靠输出截断不能防止数据泄露。
+- **网络隔离**：沙箱不应有直接网络访问权限。所有外部通信都通过 host 代理进行，host 代理强制执行授权和访问控制。
+- **不暴露凭证**：API 密钥和令牌由 host 持有。生成的代码调用类型化函数；host 在转发到 servers 时添加认证。
+- **资源限制**：设置沙箱执行的超时时间和内存限制，以防止失控脚本。
+- **输出过滤**：在将沙箱控制台输出反馈给模型之前进行验证和截断。
 
-### Error Handling
+### 错误处理
 
-MCP tool errors arrive as a successful response with
-[`isError: true`](/specification/draft/server/tools#error-handling) rather than a transport
-failure. Generated wrappers should convert this into a thrown exception so model-authored code
-can use `try`/`catch`. If an uncaught error terminates the script, surface it as the script's
-result so the model can self-correct; the model is responsible for reporting any partial side
-effects already committed.
+MCP tool 错误以包含 [`isError: true`](/specification/draft/server/tools#error-handling) 的成功响应形式到达，而不是传输失败。生成的包装器应将其转换为抛出的异常，以便模型编写的代码可以使用 `try`/`catch`。如果未捕获的错误终止了脚本，则将其作为脚本的结果呈现，以便模型可以自我纠正；模型负责报告任何已提交的部分副作用。
 
-## Combining Both Patterns
+## 结合两种模式
 
-Progressive discovery and programmatic tool calling work well together. The model uses discovery tools to identify which tools it needs, loads their schemas, and then writes a single script that calls multiple tools in one execution pass. This combination minimizes both the token cost of tool definitions _and_ the token cost of tool results, keeping the model's context focused on reasoning rather than passing data through it.
+渐进式发现和编程式 tool 调用可以很好地协同工作。模型使用发现工具识别它需要哪些 tools，加载它们的 schema，然后编写一个在单次执行中调用多个 tools 的脚本。这种组合最小化了 tool 定义的令牌成本*和* tool 结果的令牌成本，使模型的上下文专注于推理而不是传递数据。

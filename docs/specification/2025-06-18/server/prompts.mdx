@@ -1,34 +1,26 @@
 ---
-title: Prompts
+title: 提示（Prompts）
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to expose prompt
-templates to clients. Prompts allow servers to provide structured messages and
-instructions for interacting with language models. Clients can discover available
-prompts, retrieve their contents, and provide arguments to customize them.
+Model Context Protocol (MCP) 提供了一种标准化的方式，让服务器向客户端暴露提示模板。提示允许服务器提供结构化的消息和指令，用于与语言模型交互。客户端可以发现可用的提示、检索其内容，并提供参数来自定义它们。
 
-## User Interaction Model
+## 用户交互模型
 
-Prompts are designed to be **user-controlled**, meaning they are exposed from servers to
-clients with the intention of the user being able to explicitly select them for use.
+提示被设计为**用户控制**的，这意味着它们从服务器暴露给客户端，目的是让用户能够明确选择使用它们。
 
-Typically, prompts would be triggered through user-initiated commands in the user
-interface, which allows users to naturally discover and invoke available prompts.
+通常，提示将通过用户界面中用户发起的命令触发，这允许用户自然地发现和调用可用的提示。
 
-For example, as slash commands:
+例如，作为斜杠命令：
 
-![Example of prompt exposed as slash command](/specification/2025-06-18/server/slash-command.png)
+![提示作为斜杠命令显示的示例](/specification/2025-06-18/server/slash-command.png)
 
-However, implementors are free to expose prompts through any interface pattern that suits
-their needs&mdash;the protocol itself does not mandate any specific user interaction
-model.
+然而，实现者可以自由地通过任何适合其需求的界面模式来暴露提示——协议本身并不强制规定任何特定的用户交互模型。
 
-## Capabilities
+## 能力
 
-Servers that support prompts **MUST** declare the `prompts` capability during
-[initialization](/specification/2025-06-18/basic/lifecycle#initialization):
+支持提示的服务器 **MUST** 在[初始化](/specification/2025-06-18/basic/lifecycle#initialization)期间声明 `prompts` 能力：
 
 ```json
 {
@@ -40,17 +32,15 @@ Servers that support prompts **MUST** declare the `prompts` capability during
 }
 ```
 
-`listChanged` indicates whether the server will emit notifications when the list of
-available prompts changes.
+`listChanged` 指示服务器是否会在可用提示列表变化时发出通知。
 
-## Protocol Messages
+## 协议消息
 
-### Listing Prompts
+### 列出提示
 
-To retrieve available prompts, clients send a `prompts/list` request. This operation
-supports [pagination](/specification/2025-06-18/server/utilities/pagination).
+要检索可用的提示，客户端发送 `prompts/list` 请求。此操作支持[分页](/specification/2025-06-18/server/utilities/pagination)。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -63,7 +53,7 @@ supports [pagination](/specification/2025-06-18/server/utilities/pagination).
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -73,12 +63,12 @@ supports [pagination](/specification/2025-06-18/server/utilities/pagination).
     "prompts": [
       {
         "name": "code_review",
-        "title": "Request Code Review",
-        "description": "Asks the LLM to analyze code quality and suggest improvements",
+        "title": "请求代码审查",
+        "description": "要求 LLM 分析代码质量并提出改进建议",
         "arguments": [
           {
             "name": "code",
-            "description": "The code to review",
+            "description": "要审查的代码",
             "required": true
           }
         ]
@@ -89,12 +79,11 @@ supports [pagination](/specification/2025-06-18/server/utilities/pagination).
 }
 ```
 
-### Getting a Prompt
+### 获取提示
 
-To retrieve a specific prompt, clients send a `prompts/get` request. Arguments may be
-auto-completed through [the completion API](/specification/2025-06-18/server/utilities/completion).
+要检索特定提示，客户端发送 `prompts/get` 请求。参数可以通过[补全 API](/specification/2025-06-18/server/utilities/completion) 自动补全。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -110,20 +99,20 @@ auto-completed through [the completion API](/specification/2025-06-18/server/uti
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
   "jsonrpc": "2.0",
   "id": 2,
   "result": {
-    "description": "Code review prompt",
+    "description": "代码审查提示",
     "messages": [
       {
         "role": "user",
         "content": {
           "type": "text",
-          "text": "Please review this Python code:\ndef hello():\n    print('world')"
+          "text": "请审查这段 Python 代码：\ndef hello():\n    print('world')"
         }
       }
     ]
@@ -131,10 +120,9 @@ auto-completed through [the completion API](/specification/2025-06-18/server/uti
 }
 ```
 
-### List Changed Notification
+### 列表变更通知
 
-When the list of available prompts changes, servers that declared the `listChanged`
-capability **SHOULD** send a notification:
+当可用提示列表发生变化时，声明了 `listChanged` 能力的服务器 **SHOULD** 发送通知：
 
 ```json
 {
@@ -143,39 +131,39 @@ capability **SHOULD** send a notification:
 }
 ```
 
-## Message Flow
+## 消息流
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Server
+    participant 客户端
+    participant 服务器
 
-    Note over Client,Server: Discovery
-    Client->>Server: prompts/list
-    Server-->>Client: List of prompts
+    Note over 客户端,服务器: 发现
+    客户端->>服务器: prompts/list
+    服务器-->>客户端: 提示列表
 
-    Note over Client,Server: Usage
-    Client->>Server: prompts/get
-    Server-->>Client: Prompt content
+    Note over 客户端,服务器: 使用
+    客户端->>服务器: prompts/get
+    服务器-->>客户端: 提示内容
 
     opt listChanged
-      Note over Client,Server: Changes
-      Server--)Client: prompts/list_changed
-      Client->>Server: prompts/list
-      Server-->>Client: Updated prompts
+      Note over 客户端,服务器: 变更
+      服务器--)客户端: prompts/list_changed
+      客户端->>服务器: prompts/list
+      服务器-->>客户端: 更新后的提示
     end
 ```
 
-## Data Types
+## 数据类型
 
 ### Prompt
 
-A prompt definition includes:
+一个提示定义包含：
 
-- `name`: Unique identifier for the prompt
-- `title`: Optional human-readable name of the prompt for display purposes.
-- `description`: Optional human-readable description
-- `arguments`: Optional list of arguments for customization
+- `name`：提示的唯一标识符
+- `title`：可选的用于显示目的的人类可读提示名称
+- `description`：可选的人类可读描述
+- `arguments`：可选的用于自定义的参数列表
 
 ### PromptMessage
 

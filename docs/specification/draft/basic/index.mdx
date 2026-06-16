@@ -1,36 +1,35 @@
 ---
-title: Overview
+title: 概述
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol consists of several key components that work together:
+Model Context Protocol 由几个协同工作的关键组件组成：
 
-- **Base Protocol**: Core JSON-RPC message types
-- **Versioning and Compatibility**: Protocol version negotiation, extension negotiation, and interoperability with earlier protocol revisions
-- **Message Patterns**: Messaging patterns supported by the core protocol including request and response, multi round-trip requests (MRTR), and subscribe and notify
-- **Authorization**: Authentication and authorization framework for HTTP-based transports
-- **Server Features**: Resources, prompts, and tools exposed by servers
-- **Client Features**: Elicitation, sampling and root directory lists provided by clients
-- **Utilities**: Cross-cutting concerns like logging and argument completion
+- **基础协议**：核心 JSON-RPC 消息类型
+- **版本控制和兼容性**：协议版本协商、扩展协商以及与早期协议修订版的互操作性
+- **消息模式**：核心协议支持的消息模式，包括请求和响应、多轮请求（MRTR）以及订阅和通知
+- **授权**：基于 HTTP 的传输的身份验证和授权框架
+- **服务器特性**：服务器暴露的资源、提示和工具
+- **客户端特性**：客户端提供的引导、采样和根目录列表
+- **实用工具**：日志记录和参数补全等横切关注点
 
-All implementations **MUST** support the base protocol, versioning,
-and the message patterns. Other components **MAY** be implemented based on the specific needs of the
-application.
+所有实现 **MUST** 支持基础协议、版本控制
+和消息模式。其他组件 **MAY** 根据应用程序的特定需求来实现。
 
-These protocol layers establish clear separation of concerns while enabling rich
-interactions between clients and servers. The modular design allows implementations to
-support exactly the features they need.
+这些协议层建立了清晰的关注点分离，同时支持客户端
+和服务器之间的丰富交互。模块化设计允许实现
+精确支持它们所需的特性。
 
-## Messages
+## 消息
 
-All messages between MCP clients and servers **MUST** follow the
-[JSON-RPC 2.0](https://www.jsonrpc.org/specification) specification. The protocol defines
-these types of messages:
+MCP 客户端和服务器之间的所有消息 **MUST** 遵循
+[JSON-RPC 2.0](https://www.jsonrpc.org/specification) 规范。协议定义了
+以下类型的消息：
 
-### Requests
+### 请求
 
-[Requests](/specification/draft/schema#jsonrpcrequest) are sent from the client to the server, to initiate an operation.
+[请求](/specification/draft/schema#jsonrpcrequest)从客户端发送到服务器，以启动一个操作。
 
 ```typescript
 {
@@ -43,18 +42,17 @@ these types of messages:
 }
 ```
 
-- Requests **MUST** include a string or integer ID.
-- Unlike base JSON-RPC, the ID **MUST NOT** be `null`.
-- The request ID **MUST NOT** match the ID of any other request the sender has issued and
-  not yet received a response for.
+- 请求 **MUST** 包含一个字符串或整数 ID。
+- 与基础 JSON-RPC 不同，ID **MUST NOT** 为 `null`。
+- 请求 ID **MUST NOT** 与发送者已发出但尚未收到响应的任何其他请求的 ID 相同。
 
-### Responses
+### 响应
 
-Responses are sent in reply to requests, containing either the result or error of the operation.
+响应作为对请求的回复发送，包含操作的结果或错误。
 
-#### Result Responses
+#### 结果响应
 
-[Result responses](/specification/draft/schema#jsonrpcresultresponse) are sent when the operation completes successfully.
+[结果响应](/specification/draft/schema#jsonrpcresultresponse)在操作成功完成时发送。
 
 ```typescript
 {
@@ -67,26 +65,26 @@ Responses are sent in reply to requests, containing either the result or error o
 }
 ```
 
-- Result responses **MUST** include the same ID as the request they correspond to.
-- Result responses **MUST** include a `result` field.
-- The `result` **MAY** follow any JSON object structure.
-- The `result` **MUST** include a `resultType` field to indicate the type of the result.
+- 结果响应 **MUST** 包含与其对应的请求相同的 ID。
+- 结果响应 **MUST** 包含一个 `result` 字段。
+- `result` **MAY** 遵循任何 JSON 对象结构。
+- `result` **MUST** 包含一个 `resultType` 字段以指示结果的类型。
 
 ##### ResultType
 
-The `resultType` field in a result indicates the type of the result being returned. MCP supports polymorphic result types,
-allowing servers to return different structures based on the outcome of the request. The `resultType` field is a string that clients
-can use to determine how to parse and handle the `result` object.
+结果中的 `resultType` 字段指示返回结果的类型。MCP 支持多态结果类型，
+允许服务器根据请求的结果返回不同的结构。`resultType` 字段是一个字符串，客户端
+可以用它来确定如何解析和处理 `result` 对象。
 
-- A `resultType` of `"complete"` indicates the request completed successfully and the result contains the final content.
-- A `resultType` of `"input_required"` indicates the request is incomplete and more information is needed to process the request. The result contains an [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult) object with additional information needed.
-- Extensions **MAY** add additional `ResultType` values. The set of supported `ResultType` values **MUST** be created from the set defined in the core protocol and include any additional values of supported extensions that are advertised via capabilities.
-- A `resultType` of any value unrecognized by the client **MUST** be considered invalid.
-- For backward compatibility with servers implementing earlier protocol versions, which do not include `resultType`, clients **MUST** treat an absent `resultType` as `"complete"`.
+- `"complete"` 的 `resultType` 表示请求成功完成，结果包含最终内容。
+- `"input_required"` 的 `resultType` 表示请求不完整，需要更多信息来处理请求。结果包含一个 [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult) 对象，其中包含所需的额外信息。
+- 扩展 **MAY** 添加额外的 `ResultType` 值。支持的 `ResultType` 值集合 **MUST** 从核心协议中定义的集合创建，并包含通过能力通告的支持扩展的任何额外值。
+- 客户端无法识别的任何 `resultType` 值 **MUST** 被视为无效。
+- 为了与实现早期协议版本（不包含 `resultType`）的服务器向后兼容，客户端 **MUST** 将缺失的 `resultType` 视为 `"complete"`。
 
-#### Error Responses
+#### 错误响应
 
-[Error responses](/specification/draft/schema#jsonrpcerrorresponse) are sent when the operation fails or encounters an error.
+[错误响应](/specification/draft/schema#jsonrpcerrorresponse)在操作失败或遇到错误时发送。
 
 ```typescript
 {
@@ -100,14 +98,14 @@ can use to determine how to parse and handle the `result` object.
 }
 ```
 
-- Error responses **MUST** include the same ID as the request they correspond to (except in error cases where the ID could not be read due a malformed request).
-- Error responses **MUST** include an `error` field with a `code` and `message`.
-- Error codes **MUST** be integers.
+- 错误响应 **MUST** 包含与其对应的请求相同的 ID（除非出现因格式错误的请求而无法读取 ID 的错误情况）。
+- 错误响应 **MUST** 包含一个带有 `code` 和 `message` 的 `error` 字段。
+- 错误代码 **MUST** 是整数。
 
-### Notifications
+### 通知
 
-[Notifications](/specification/draft/schema#jsonrpcnotification) are sent from the client to the server or vice versa, as a one-way message.
-The receiver **MUST NOT** send a response.
+[通知](/specification/draft/schema#jsonrpcnotification)从客户端发送到服务器，或反之，作为单向消息。
+接收者 **MUST NOT** 发送响应。
 
 ```typescript
 {
@@ -119,84 +117,77 @@ The receiver **MUST NOT** send a response.
 }
 ```
 
-- Notifications **MUST NOT** include an ID.
+- 通知 **MUST NOT** 包含 ID。
 
-### Message Patterns
+### 消息模式
 
-The Model Context Protocol (MCP) supports several [Message Patterns](/specification/draft/basic/patterns) that define how clients and servers interact:
+Model Context Protocol (MCP) 支持几种[消息模式](/specification/draft/basic/patterns)，定义了客户端和服务器如何交互：
 
-1. **[Request and Response](/specification/draft/basic/patterns#request-and-response)**: A client sends a request to the server, and the server responds with a result or error.
-2. **[Multi Round-Trip Requests (MRTR)](/specification/draft/basic/patterns#multi-round-trip-requests)**: A server requires additional client input (sampling, elicitation, or roots) to complete a request.
-3. **[Subscribe and Notify](/specification/draft/basic/patterns#subscribe-and-notify)**: A client subscribes to a stream of notifications from the server, which are sent as they occur.
+1. **[请求和响应](/specification/draft/basic/patterns#request-and-response)**：客户端向服务器发送请求，服务器用结果或错误进行响应。
+2. **[多轮请求 (MRTR)](/specification/draft/basic/patterns#multi-round-trip-requests)**：服务器需要额外的客户端输入（采样、引导或 roots）来完成请求。
+3. **[订阅和通知](/specification/draft/basic/patterns#subscribe-and-notify)**：客户端订阅来自服务器的通知流，通知在发生时发送。
 
-## Statelessness
+## 无状态性
 
-The Model Context Protocol (MCP) is a **stateless protocol**: all the
-information needed to process a request is contained in the request itself.
-A server processes each request independently; no state should be inferred
-from previous requests, even those on the same connection or stream.
+Model Context Protocol (MCP) 是一个**无状态协议**：处理请求所需的
+所有信息都包含在请求本身中。
+服务器独立处理每个请求；不应从先前的请求中推断任何状态，
+即使是同一连接或流上的请求。
 
-Specifically:
+具体来说：
 
-- Servers **MUST NOT** rely on prior requests over the same connection to
-  establish context (e.g., capabilities, protocol version, client identity).
-  Every request supplies this metadata in its [`_meta`](#meta) field.
-- Servers **SHOULD** be prepared to handle requests associated with multiple
-  tasks, threads, or conversations.
-- Servers **SHOULD NOT** require that a client reuse the same connection or process to
-  perform related operations.
-- Clients **SHOULD NOT** use an individual task, thread, or conversation as the
-  lifetime boundary for the stdio process.
-- State that needs to span multiple requests (e.g., long-running tasks,
-  application-level handles) **MUST** be referenced by an explicit identifier
-  the client passes on each request.
+- 服务器 **MUST NOT** 依赖同一连接上的先前请求来
+  建立上下文（例如，能力、协议版本、客户端标识）。
+  每个请求在其 [`_meta`](#meta) 字段中提供此元数据。
+- 服务器 **SHOULD** 准备好处理与多个任务、线程或对话相关联的请求。
+- 服务器 **SHOULD NOT** 要求客户端重用同一连接或进程来执行相关操作。
+- 客户端 **SHOULD NOT** 将单个任务、线程或对话用作 stdio 进程的生命周期边界。
+- 需要跨多个请求的状态（例如，长时间运行的任务、应用程序级句柄）**MUST** 通过客户端在每个请求上传递的显式标识符来引用。
 
 <Note>
-  This implies that an open connection, such as a STDIO process, is not a
-  conversation or session: clients may interleave unrelated requests on the same
-  transport, and a server must not treat connection or process identity as a
-  proxy for conversation or session continuity.
+  这意味着开放的连接（如 STDIO 进程）不是对话或会话：
+  客户端可以在同一传输上交错发送不相关的请求，
+  服务器不得将连接或进程标识视为对话或会话连续性的代理。
 </Note>
 
-Long-lived requests like
-[`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions)
-remain request/response; the response is just an open stream of notifications.
-Their state is scoped to the request itself, not to the connection underneath.
+长时间运行的请求，如
+[`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions)，
+仍然是请求/响应模式；响应只是一个开放的通知流。
+它们的状态限定在请求本身，而不是底层的连接。
 
 <Info>
-  For a walkthrough of how the per-request model maps to SDK code, see the
-  [Architecture guide](/docs/learn/architecture#example).
+  有关按请求模型如何映射到 SDK 代码的演练，请参见
+  [架构指南](/docs/learn/architecture#example)。
 </Info>
 
-## Auth
+## 身份验证
 
-MCP provides an [Authorization](/specification/draft/basic/authorization) framework for use with HTTP.
-Implementations using an HTTP-based transport **SHOULD** conform to this specification,
-whereas implementations using STDIO transport **SHOULD NOT** follow this specification,
-and instead retrieve credentials from the environment.
+MCP 提供了一个[授权](/specification/draft/basic/authorization)框架，用于 HTTP。
+使用基于 HTTP 的传输的实现 **SHOULD** 遵循此规范，
+而使用 STDIO 传输的实现 **SHOULD NOT** 遵循此规范，
+而应从环境中获取凭据。
 
-Additionally, clients and servers **MAY** negotiate their own custom authentication and
-authorization strategies.
+此外，客户端和服务器 **MAY** 协商它们自己的自定义身份验证和
+授权策略。
 
-For further discussions and contributions to the evolution of MCP's auth mechanisms, join
-us in
-[GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions)
-to help shape the future of the protocol!
+有关 MCP 身份验证机制演进的进一步讨论和贡献，请加入
+我们的
+[GitHub 讨论](https://github.com/modelcontextprotocol/specification/discussions)，
+帮助塑造协议的未来！
 
 ## Schema
 
-The full specification of the protocol is defined as a
-[TypeScript schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/draft/schema.ts).
-This is the source of truth for all protocol messages and structures.
+协议的完整规范定义为一个
+[TypeScript schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/draft/schema.ts)。
+这是所有协议消息和结构的唯一真实来源。
 
-There is also a
-[JSON Schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/draft/schema.json),
-which is automatically generated from the TypeScript source of truth, for use with
-various automated tooling.
+还有一个
+[JSON Schema](https://github.com/modelcontextprotocol/specification/blob/main/schema/draft/schema.json)，
+它是从 TypeScript 真实来源自动生成的，用于各种自动化工具。
 
-## JSON Schema Usage
+## JSON Schema 用法
 
-The Model Context Protocol uses JSON Schema for validation throughout the protocol. This section clarifies how JSON Schema should be used within MCP messages.
+Model Context Protocol 在整个协议中使用 JSON Schema 进行验证。本节阐明了 JSON Schema 在 MCP 消息中应如何使用。
 
 ### Schema Dialect
 

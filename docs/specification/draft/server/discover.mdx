@@ -1,16 +1,14 @@
 ---
-title: Discovery
+title: 发现
 ---
 
 <div id="enable-section-numbers" />
 
-`server/discover` lets a client query a server's supported protocol versions,
-capabilities, and identity before sending any other requests. Servers **MUST**
-implement it.
+`server/discover` 允许客户端在发送任何其他请求之前查询服务器支持的协议版本、能力和标识。服务器 **MUST** 实现它。
 
-## Request
+## 请求
 
-The request carries no body parameters beyond the standard `_meta`:
+请求除标准的 `_meta` 外不携带任何消息体参数：
 
 ```json
 {
@@ -30,10 +28,9 @@ The request carries no body parameters beyond the standard `_meta`:
 }
 ```
 
-## Response
+## 响应
 
-The server replies with its supported protocol versions, capabilities, and
-identity. This operation supports [caching](/specification/draft/server/utilities/caching).
+服务器回复其支持的协议版本、能力和标识。此操作支持[缓存](/specification/draft/server/utilities/caching)。
 
 ```json
 {
@@ -57,33 +54,20 @@ identity. This operation supports [caching](/specification/draft/server/utilitie
 }
 ```
 
-### Response Fields
+### 响应字段
 
-| Field               | Type                 | Required | Description                                                                                  |
-| ------------------- | -------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `supportedVersions` | `string[]`           | yes      | Protocol versions the server supports. The client should choose one for subsequent requests. |
-| `capabilities`      | `ServerCapabilities` | yes      | Capabilities the server supports (tools, resources, prompts, etc.).                          |
-| `serverInfo`        | `Implementation`     | yes      | Name and version of the server software.                                                     |
-| `instructions`      | `string`             | no       | Natural-language guidance for LLMs on how to use this server effectively.                    |
+| 字段                | 类型                 | 必填 | 描述                                                  |
+| ------------------- | -------------------- | ---- | ----------------------------------------------------- |
+| `supportedVersions` | `string[]`           | 是   | 服务器支持的协议版本。客户端应为后续请求选择一个。    |
+| `capabilities`      | `ServerCapabilities` | 是   | 服务器支持的能力（工具、资源、提示等）。              |
+| `serverInfo`        | `Implementation`     | 是   | 服务器软件的名称和版本。                              |
+| `instructions`      | `string`             | 否   | 为 LLM 提供的自然语言指导，说明如何有效使用此服务器。 |
 
-## When to Call
+## 何时调用
 
-Calling `server/discover` is optional for clients — a client may invoke any
-RPC inline and handle
-[`UnsupportedProtocolVersionError`](/specification/draft/schema#unsupportedprotocolversionerror)
-if the server does not support the requested version. However, `server/discover`
-is useful in two scenarios:
+调用 `server/discover` 对于客户端是可选的 — 客户端可以内联调用任何 RPC，如果服务器不支持请求的版本，则处理 [`UnsupportedProtocolVersionError`](/specification/draft/schema#unsupportedprotocolversionerror)。然而，`server/discover` 在两种情况下很有用：
 
-- **Up-front version selection.** The client learns the server's supported
-  versions before sending any other request, avoiding a round-trip error.
-- **stdio backward-compatibility probe.** On stdio, there is no per-request
-  HTTP status code to drive fallback. A client that supports both modern
-  (per-request `_meta`) and legacy (`initialize` handshake) servers **SHOULD**
-  send `server/discover` first; see
-  [stdio: Backward Compatibility](/specification/draft/basic/transports/stdio#backward-compatibility)
-  for the fallback rules.
+- **预先版本选择。** 客户端在发送任何其他请求之前了解服务器支持的版本，避免了往返错误。
+- **stdio 向后兼容性探测。** 在 stdio 上，没有按请求的 HTTP 状态码来驱动回退。同时支持现代（按请求 `_meta`）和遗留（`initialize` 握手）服务器的客户端 **SHOULD** 首先发送 `server/discover`；有关回退规则，请参见 [stdio：向后兼容性](/specification/draft/basic/transports/stdio#backward-compatibility)。
 
-See [Protocol Version Negotiation](/specification/draft/basic/versioning#protocol-version-negotiation)
-for the full version-selection flow. For HTTP-specific status codes returned for
-unknown methods, see the [Protocol Version Header](/specification/draft/basic/transports/streamable-http#protocol-version-header)
-section in Transports.
+有关完整的版本选择流程，请参见[协议版本协商](/specification/draft/basic/versioning#protocol-version-negotiation)。有关为未知方法返回的 HTTP 特定状态码，请参见传输中的[协议版本头部](/specification/draft/basic/transports/streamable-http#protocol-version-header)部分。

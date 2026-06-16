@@ -1,16 +1,15 @@
 ---
-title: Versioning and Compatibility
+title: 版本控制与兼容性
 ---
 
 <div id="enable-section-numbers" />
 
-This page defines how a client and server agree on what they are speaking:
-the protocol version, declared on every request; optional extensions,
-negotiated through capabilities; and interoperability with earlier,
-handshake-based protocol revisions.
+本页定义了客户端和服务器如何就它们所使用的协议达成一致：
+在每个请求上声明的协议版本；通过能力协商的可选扩展；
+以及与早期的、基于握手的协议修订版的互操作性。
 
-There is no negotiation handshake. Every request carries its protocol
-version, and the server accepts or rejects each request independently:
+没有协商握手。每个请求携带其协议版本，
+服务器独立地接受或拒绝每个请求：
 
 ```mermaid
 sequenceDiagram
@@ -26,30 +25,23 @@ sequenceDiagram
     end
 ```
 
-## Terminology
+## 术语
 
-This page uses the following terms for interoperability across protocol
-revisions:
+本页使用以下术语来说明跨协议修订版的互操作性：
 
-- **Modern**: protocol versions that convey version, identity, and
-  capabilities as per-request metadata (revision `2026-07-28` and later).
-- **Legacy**: protocol versions that establish a session with an
-  `initialize` handshake (`2025-11-25` and earlier).
-- **Dual-era**: an implementation that supports both modern and legacy
-  versions.
+- **现代（Modern）**：将版本、标识和能力作为按请求元数据传递的协议版本（`2026-07-28` 及之后的修订版）。
+- **遗留（Legacy）**：通过 `initialize` 握手建立会话的协议版本（`2025-11-25` 及更早的修订版）。
+- **双时代（Dual-era）**：同时支持现代和遗留版本的实现。
 
-## Protocol Version Negotiation
+## 协议版本协商
 
-Every request declares the protocol version it is using in its
-[`_meta`](/specification/draft/basic/index#meta) field. On HTTP, this is
-also carried in the
-[`MCP-Protocol-Version` header](/specification/draft/basic/transports/streamable-http#protocol-version-header).
+每个请求在其 [`_meta`](/specification/draft/basic/index#meta) 字段中声明所使用的协议版本。在 HTTP 上，这也通过
+[`MCP-Protocol-Version` 头部](/specification/draft/basic/transports/streamable-http#protocol-version-header)携带。
 
-If the server does not implement the requested version (whether the version
-is unknown to the server, or is a known version the server has chosen not to
-support), it **MUST** respond with an
+如果服务器未实现所请求的版本（无论是服务器未知的版本，
+还是服务器选择不支持的已知版本），它 **MUST** 以
 [`UnsupportedProtocolVersionError`](/specification/draft/schema#unsupportedprotocolversionerror)
-listing the versions it does support:
+响应，列出它支持的版本：
 
 ```json
 {
@@ -77,14 +69,12 @@ supported versions up front, but are not required to: a client is free to
 invoke any RPC inline and handle `UnsupportedProtocolVersionError` if its
 preferred version is not supported.
 
-## Extension Negotiation
+## 扩展协商
 
-Clients and servers can negotiate support for optional
-[extensions](/docs/extensions/overview) beyond the core protocol. Extensions
-are advertised in the `extensions` field of capabilities, which is a map of
-extension identifiers to per-extension settings objects. Extension identifiers
-**MUST** follow the [`_meta` key naming rules](/specification/draft/basic/index#meta),
-with a mandatory prefix.
+客户端和服务器可以协商对核心协议之外的可选[扩展](/docs/extensions/overview)的支持。扩展
+在能力的 `extensions` 字段中通告，这是一个从扩展标识符到每个扩展设置对象的映射。扩展标识符
+**MUST** 遵循 [`_meta` 键命名规则](/specification/draft/basic/index#meta)，
+带有必需的前缀。
 
 The following is an example of a client that advertises the
 [MCP Apps extension](/extensions/apps/overview) identified as `io.modelcontextprotocol/ui`:
@@ -123,61 +113,49 @@ party **MUST** either revert to core protocol behavior or reject the request
 with an appropriate error. Extensions **SHOULD** document their expected
 fallback behavior.
 
-## Backward Compatibility with Initialization-Based Versions
+## 与基于初始化的版本的向后兼容性
 
-A server that wishes to support both [legacy](#terminology) clients (which
-expect an `initialize` handshake) and [modern](#terminology) clients (which
-use per-request metadata) **MAY** implement both behaviors.
+希望同时支持[遗留](#terminology)客户端（期望 `initialize` 握手）和[现代](#terminology)客户端（使用按请求元数据）的服务器 **MAY** 实现这两种行为。
 
-A client that needs to interoperate with both kinds of servers detects the
-server's era with transport-specific mechanics, specified in the binding
-pages:
+需要与两种服务器互操作的客户端通过传输特定的机制检测服务器的
+时代，具体在绑定页面中说明：
 
-- [stdio](/specification/draft/basic/transports/stdio#backward-compatibility):
-  probe with `server/discover` and fall back on any error that is not a
-  recognized modern error.
-- [Streamable HTTP](/specification/draft/basic/transports/streamable-http#backward-compatibility):
-  attempt a modern request and inspect the body of a `400 Bad Request`
-  before falling back.
+- [stdio](/specification/draft/basic/transports/stdio#backward-compatibility)：
+  使用 `server/discover` 探测，并在任何不是可识别的现代错误时回退。
+- [Streamable HTTP](/specification/draft/basic/transports/streamable-http#backward-compatibility)：
+  尝试一个现代请求，在回退之前检查 `400 Bad Request` 的响应体。
 
-In both cases, a recognized modern JSON-RPC error (such as
-[`UnsupportedProtocolVersionError`](/specification/draft/schema#unsupportedprotocolversionerror))
-identifies a modern server: the client retries with a supported version
-rather than falling back. Anything else identifies a legacy server.
+在这两种情况下，可识别的现代 JSON-RPC 错误（如
+[`UnsupportedProtocolVersionError`](/specification/draft/schema#unsupportedprotocolversionerror)）
+识别出现代服务器：客户端使用支持的版本重试，而不是回退。
+其他任何情况都标识遗留服务器。
 
-The era determination is a property of the server, not of an individual
-request. Clients **SHOULD** cache the result for the lifetime of the server
-process (stdio) or origin (HTTP), and **MAY** persist it across restarts of
-the same server configuration, re-probing if the cached assumption later
-fails.
+时代的确定是服务器的属性，而不是单个请求的属性。
+客户端 **SHOULD** 在服务器进程（stdio）或源（HTTP）的整个生命周期内缓存结果，
+并且 **MAY** 在相同服务器配置的重启之间持久化它，
+如果缓存的假设后来失败，则重新探测。
 
-A server that supports only [modern](#terminology) versions **SHOULD** name
-the protocol versions it supports in any error it returns to an `initialize`
-request, on any transport: legacy clients have no fall-forward mechanism, and
-this message may be the only diagnostic they can surface to users.
+只支持[现代](#terminology)版本的服务器 **SHOULD** 在它返回给 `initialize`
+请求的任何错误中命名它支持的协议版本，在任何传输上：
+遗留客户端没有前向回退机制，这条消息可能是它们能向用户显示的唯一的诊断信息。
 
-### Compatibility Matrix
+### 兼容性矩阵
 
-The following matrix summarizes the expected outcome of every combination of
-client and server era:
+以下矩阵总结了客户端和服务器时代每种组合的预期结果：
 
-| Client   | Server   | Outcome                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Modern   | Modern   | Works. `server/discover` is optional; version mismatches surface as `UnsupportedProtocolVersionError` and the client retries with a mutually supported version.                                                                                                                                                                                                                                                                                                                                                                        |
-| Modern   | Legacy   | Fails. The server may reject the request with an implementation-defined error, stay silent, or even process an era-ambiguous method under legacy semantics. On stdio, clients **SHOULD** send `server/discover` first to fail deterministically; the client then surfaces an actionable error to the user.                                                                                                                                                                                                                             |
-| Dual-era | Modern   | Works. The stdio probe returns a `DiscoverResult` (or `UnsupportedProtocolVersionError`); on HTTP, the first modern request succeeds or returns a modern error. The client stays modern.                                                                                                                                                                                                                                                                                                                                               |
-| Dual-era | Legacy   | Works. stdio: the probe returns a non-modern error or times out, and the client falls back to `initialize`. HTTP: the modern request returns a `4xx` without a recognized modern error body, and the client falls back to `initialize` (and possibly further to the deprecated HTTP+SSE transport).                                                                                                                                                                                                                                    |
-| Legacy   | Modern   | Fails. stdio: the server rejects `initialize` with a JSON-RPC error; the exact code is implementation-defined (`initialize` is an unknown method and the request also lacks the required `_meta` fields). HTTP: the request is missing the required headers and is rejected per [server validation](/specification/draft/basic/transports/streamable-http#server-validation) with `400 Bad Request` (a client on the deprecated HTTP+SSE transport fails at its opening `GET` instead). Legacy clients have no fall-forward mechanism. |
-| Legacy   | Dual-era | Works. The server answers `initialize` and serves the client according to the negotiated legacy revision.                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Legacy   | Legacy   | Works according to the legacy revision; out of scope for this document.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 客户端 | 服务器 | 结果                                                                                                                                                                                                                                                                                                                                                                              |
+| ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 现代   | 现代   | 正常工作。`server/discover` 是可选的；版本不匹配会显示为 `UnsupportedProtocolVersionError`，客户端使用互支持的版本重试。                                                                                                                                                                                                                                                          |
+| 现代   | 遗留   | 失败。服务器可能以实现定义的错误拒绝请求、保持沉默，甚至在遗留语义下处理时代模糊的方法。在 stdio 上，客户端 **SHOULD** 首先发送 `server/discover` 以确定性方式失败；然后客户端向用户显示可操作的错误。                                                                                                                                                                            |
+| 双时代 | 现代   | 正常工作。stdio 探测返回 `DiscoverResult`（或 `UnsupportedProtocolVersionError`）；在 HTTP 上，第一个现代请求成功或返回现代错误。客户端保持现代。                                                                                                                                                                                                                                 |
+| 双时代 | 遗留   | 正常工作。stdio：探测返回非现代错误或超时，客户端回退到 `initialize`。HTTP：现代请求返回 `4xx` 但没有可识别的现代错误体，客户端回退到 `initialize`（并且可能进一步回退到已弃用的 HTTP+SSE 传输）。                                                                                                                                                                                |
+| 遗留   | 现代   | 失败。stdio：服务器以 JSON-RPC 错误拒绝 `initialize`；确切的代码是实现定义的（`initialize` 是未知方法，且请求也缺少所需的 `_meta` 字段）。HTTP：请求缺少所需的头，根据[服务器验证](/specification/draft/basic/transports/streamable-http#server-validation)以 `400 Bad Request` 拒绝（使用已弃用的 HTTP+SSE 传输的客户端在其初始 `GET` 时就失败了）。遗留客户端没有前向回退机制。 |
+| 遗留   | 双时代 | 正常工作。服务器响应 `initialize` 并根据协商的遗留修订版为客户端服务。                                                                                                                                                                                                                                                                                                            |
+| 遗留   | 遗留   | 根据遗留修订版工作；本文档不涉及。                                                                                                                                                                                                                                                                                                                                                |
 
-A dual-era **server** selects its behavior from how the client opens:
+一个双时代**服务器**根据客户端打开连接的方式选择其行为：
 
-- A request carrying modern per-request `_meta` is served statelessly
-  according to this revision.
-- An `initialize` request selects legacy semantics, scoped to the stdio
-  process (stdio) or the session (HTTP), as specified by the negotiated
-  legacy protocol version.
+- 携带现代按请求 `_meta` 的请求根据此修订版以无状态方式服务。
+- 一个 `initialize` 请求选择遗留语义，限定在 stdio 进程（stdio）或会话（HTTP），按协商的遗留协议版本指定。
 
-A dual-era server **MAY** serve both eras concurrently on the same endpoint
-or process.
+双时代服务器 **MAY** 在同一端点或进程上同时服务两个时代。

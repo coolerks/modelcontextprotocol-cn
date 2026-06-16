@@ -1,32 +1,31 @@
 ---
-title: Overview
+title: 概述
 ---
 
 <div id="enable-section-numbers" />
 
-This page defines the message patterns of the core protocol: the ways a
-client and server compose JSON-RPC
-[requests, responses, and notifications](/specification/draft/basic/index#messages)
-into interactions. Every
-[transport](/specification/draft/basic/transports) carries all of these
-patterns; transports differ only in how messages are framed and delivered.
+本页定义了核心协议的消息模式：客户端和服务器将 JSON-RPC
+[请求、响应和通知](/specification/draft/basic/index#messages)
+组合成交互的方式。每个
+[传输](/specification/draft/basic/transports)都支持所有这些模式；
+传输仅在消息的帧封装和传递方式上有所不同。
 
-Every interaction begins with the client:
+每次交互都从客户端开始：
 
-- The **client** sends JSON-RPC _requests_ and _notifications_.
-- The **server** answers each request with a JSON-RPC _response_ (a result
-  or error), optionally preceded by _notifications_ scoped to that request.
+- **客户端**发送 JSON-RPC _请求_ 和 _通知_。
+- **服务器**以 JSON-RPC _响应_（结果或错误）回应每个请求，
+  可选地在其前面加上限定于该请求的 _通知_。
 
-Servers **MUST NOT** initiate JSON-RPC requests, and clients do not send
-JSON-RPC responses.
+服务器 **MUST NOT** 发起 JSON-RPC 请求，客户端也不发送
+JSON-RPC 响应。
 
-## Request and Response
+## 请求和响应
 
-The client sends a request; the server answers it with a result or an error.
-While the request is in flight, the server **MAY** send notifications scoped
-to it, such as
+客户端发送请求；服务器用结果或错误进行回应。
+当请求正在进行时，服务器 **MAY** 发送限定于该请求的通知，
+如
 [`notifications/progress`](/specification/draft/basic/patterns/progress)
-and [`notifications/message`](/specification/draft/server/utilities/logging).
+和 [`notifications/message`](/specification/draft/server/utilities/logging)。
 
 ```mermaid
 sequenceDiagram
@@ -38,13 +37,12 @@ sequenceDiagram
     Server-->>Client: response
 ```
 
-## Multi Round-Trip Requests
+## 多轮请求
 
-When a server needs client input (sampling, elicitation, or roots) to
-complete a request, it answers with an
-[`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult)
-and the client retries the request with the matching `inputResponses`. See
-[Multi Round-Trip Requests](/specification/draft/basic/patterns/mrtr).
+当服务器需要客户端输入（采样、引导或 roots）来完成请求时，
+它以 [`InputRequiredResult`](/specification/draft/basic/patterns/mrtr#inputrequiredresult)
+回应，客户端使用匹配的 `inputResponses` 重试请求。
+请参见[多轮请求](/specification/draft/basic/patterns/mrtr)。
 
 ```mermaid
 sequenceDiagram
@@ -57,14 +55,12 @@ sequenceDiagram
     Server-->>Client: response
 ```
 
-## Subscribe and Notify
+## 订阅和通知
 
-To receive change notifications (list changes, resource updates), the client
-sends a
+为接收变更通知（列表变更、资源更新），客户端发送
 [`subscriptions/listen`](/specification/draft/basic/patterns/subscriptions)
-request; the reply is a long-lived stream of the requested notification
-types. Stream state is scoped to the request: if the underlying channel is
-lost, the client re-issues the request.
+请求；回复是一个长期存在的请求通知类型流。
+流状态限定在请求内：如果底层通道丢失，客户端重新发出请求。
 
 ```mermaid
 sequenceDiagram
@@ -77,9 +73,6 @@ sequenceDiagram
     Server-->>Client: notifications/* (tagged with subscriptionId)
 ```
 
-## Adding Patterns
+## 添加模式
 
-All core protocol features are built from these patterns. A protocol
-revision that adds a pattern defines it on this page. Transports carry new
-patterns without changes, because patterns are expressed entirely in terms
-of requests, responses, and notifications.
+所有核心协议特性都构建在这些模式之上。添加模式的协议修订版在本页上定义它。传输无需更改即可承载新模式，因为模式完全以请求、响应和通知来表达。

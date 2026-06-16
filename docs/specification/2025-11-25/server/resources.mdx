@@ -1,35 +1,28 @@
 ---
-title: Resources
+title: 资源（Resources）
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) provides a standardized way for servers to expose
-resources to clients. Resources allow servers to share data that provides context to
-language models, such as files, database schemas, or application-specific information.
-Each resource is uniquely identified by a
-[URI](https://datatracker.ietf.org/doc/html/rfc3986).
+Model Context Protocol (MCP) 提供了一种标准化的方式，让服务器向客户端暴露资源。资源允许服务器共享为语言模型提供上下文的数据，例如文件、数据库模式或应用程序特定信息。每个资源通过 [URI](https://datatracker.ietf.org/doc/html/rfc3986) 唯一标识。
 
-## User Interaction Model
+## 用户交互模型
 
-Resources in MCP are designed to be **application-driven**, with host applications
-determining how to incorporate context based on their needs.
+MCP 中的资源被设计为**应用程序驱动**的，由主机应用程序决定如何根据其需求合并上下文。
 
-For example, applications could:
+例如，应用程序可以：
 
-- Expose resources through UI elements for explicit selection, in a tree or list view
-- Allow the user to search through and filter available resources
-- Implement automatic context inclusion, based on heuristics or the AI model's selection
+- 通过 UI 元素以树形或列表视图暴露资源以供明确选择
+- 允许用户搜索和过滤可用资源
+- 基于启发式规则或 AI 模型的选择实现自动上下文包含
 
-![Example of resource context picker](/specification/2025-11-25/server/resource-picker.png)
+![资源上下文选择器示例](/specification/2025-11-25/server/resource-picker.png)
 
-However, implementations are free to expose resources through any interface pattern that
-suits their needs&mdash;the protocol itself does not mandate any specific user
-interaction model.
+然而，实现可以自由地通过任何适合其需求的界面模式来暴露资源——协议本身并不强制规定任何特定的用户交互模型。
 
-## Capabilities
+## 能力
 
-Servers that support resources **MUST** declare the `resources` capability:
+支持资源的服务器 **MUST** 声明 `resources` 能力：
 
 ```json
 {
@@ -42,20 +35,17 @@ Servers that support resources **MUST** declare the `resources` capability:
 }
 ```
 
-The capability supports two optional features:
+该能力支持两个可选特性：
 
-- `subscribe`: whether the client can subscribe to be notified of changes to individual
-  resources.
-- `listChanged`: whether the server will emit notifications when the list of available
-  resources changes.
+- `subscribe`：客户端是否可以订阅以接收单个资源变更的通知。
+- `listChanged`：服务器是否会在可用资源列表变化时发出通知。
 
-Both `subscribe` and `listChanged` are optional&mdash;servers can support neither,
-either, or both:
+`subscribe` 和 `listChanged` 都是可选的——服务器可以不支持、支持其中之一或两者都支持：
 
 ```json
 {
   "capabilities": {
-    "resources": {} // Neither feature supported
+    "resources": {} // 两个特性都不支持
   }
 }
 ```
@@ -64,7 +54,7 @@ either, or both:
 {
   "capabilities": {
     "resources": {
-      "subscribe": true // Only subscriptions supported
+      "subscribe": true // 仅支持订阅
     }
   }
 }
@@ -74,20 +64,19 @@ either, or both:
 {
   "capabilities": {
     "resources": {
-      "listChanged": true // Only list change notifications supported
+      "listChanged": true // 仅支持列表变更通知
     }
   }
 }
 ```
 
-## Protocol Messages
+## 协议消息
 
-### Listing Resources
+### 列出资源
 
-To discover available resources, clients send a `resources/list` request. This operation
-supports [pagination](/specification/2025-11-25/server/utilities/pagination).
+要发现可用资源，客户端发送 `resources/list` 请求。此操作支持[分页](/specification/2025-11-25/server/utilities/pagination)。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -100,7 +89,7 @@ supports [pagination](/specification/2025-11-25/server/utilities/pagination).
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -111,8 +100,8 @@ supports [pagination](/specification/2025-11-25/server/utilities/pagination).
       {
         "uri": "file:///project/src/main.rs",
         "name": "main.rs",
-        "title": "Rust Software Application Main File",
-        "description": "Primary application entry point",
+        "title": "Rust 软件应用程序主文件",
+        "description": "主要应用程序入口点",
         "mimeType": "text/x-rust",
         "icons": [
           {
@@ -128,11 +117,11 @@ supports [pagination](/specification/2025-11-25/server/utilities/pagination).
 }
 ```
 
-### Reading Resources
+### 读取资源
 
-To retrieve resource contents, clients send a `resources/read` request:
+要检索资源内容，客户端发送 `resources/read` 请求：
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -145,7 +134,7 @@ To retrieve resource contents, clients send a `resources/read` request:
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -163,13 +152,11 @@ To retrieve resource contents, clients send a `resources/read` request:
 }
 ```
 
-### Resource Templates
+### 资源模板
 
-Resource templates allow servers to expose parameterized resources using
-[URI templates](https://datatracker.ietf.org/doc/html/rfc6570). Arguments may be
-auto-completed through [the completion API](/specification/2025-11-25/server/utilities/completion).
+资源模板允许服务器使用 [URI 模板](https://datatracker.ietf.org/doc/html/rfc6570) 暴露参数化的资源。参数可以通过[补全 API](/specification/2025-11-25/server/utilities/completion) 自动补全。
 
-**Request:**
+**请求：**
 
 ```json
 {
@@ -179,7 +166,7 @@ auto-completed through [the completion API](/specification/2025-11-25/server/uti
 }
 ```
 
-**Response:**
+**响应：**
 
 ```json
 {
@@ -189,9 +176,9 @@ auto-completed through [the completion API](/specification/2025-11-25/server/uti
     "resourceTemplates": [
       {
         "uriTemplate": "file:///{path}",
-        "name": "Project Files",
-        "title": "📁 Project Files",
-        "description": "Access files in the project directory",
+        "name": "项目文件",
+        "title": "📁 项目文件",
+        "description": "访问项目目录中的文件",
         "mimeType": "application/octet-stream",
         "icons": [
           {

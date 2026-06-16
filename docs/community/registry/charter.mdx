@@ -1,113 +1,113 @@
 ---
-title: Registry Charter
-description: Charter for the MCP Registry Working Group.
+title: 注册中心章程
+description: MCP 注册中心工作组的章程。
 ---
 
-## Group Type
+## 小组类型
 
-**Working Group**
+**工作组**
 
-## Mission Statement
+## 使命宣言
 
-The Registry Working Group exists to build and maintain the official MCP Registry — an open catalog and API for publicly available MCP servers — so that clients, sub-registries, and end users can discover, evaluate, and install servers with confidence. The WG owns the registry service, the `server.json` schema, the registry API specification, and the sub-registry ecosystem that further distributes server metadata.
+注册中心工作组旨在构建和维护官方 MCP 注册中心——一个公开可用的 MCP 服务器的开放目录和 API——以便客户端、子注册中心和最终用户可以自信地发现、评估和安装服务器。该工作组拥有注册中心服务、`server.json` 模式、注册中心 API 规范以及进一步分发服务器元数据的子注册中心生态系统。
 
-## Scope
+## 范围
 
-### In Scope
+### 范围内
 
-- **Registry Service**: Operation, reliability, and evolution of the hosted registry at `registry.modelcontextprotocol.io`, including uptime, monitoring, and incident response.
-- **Registry API Specification**: The OpenAPI spec defining how any registry (official or private) exposes server metadata.
-- **`server.json` Schema**: The standardized format for describing MCP server identity, packages, runtime configuration, and capabilities — coordinated with the Server Card WG to keep Server Card a coherent subset.
-- **Client SDKs**: Generated or hand-maintained client libraries that make it easy for clients and sub-registries to integrate with the registry API.
-- **Publishing & Trust**: Authentication flows (GitHub OAuth, GitHub OIDC, DNS/HTTP verification), namespace ownership, moderation tooling, and community-driven flagging.
-- **Adoption & Outreach**: Documentation, onboarding guides, and outreach to drive catalog coverage.
-- **Issue Triage & Automation**: Labeling system, triage, and contributor workflow for the registry repo.
+- **注册中心服务**：托管在 `registry.modelcontextprotocol.io` 的注册中心的运营、可靠性和演进，包括正常运行时间、监控和事件响应。
+- **注册中心 API 规范**：定义任何注册中心（官方或私有）如何暴露服务器元数据的 OpenAPI 规范。
+- **`server.json` 模式**：描述 MCP 服务器身份、包、运行时配置和能力的标准化格式——与 Server Card WG 协调，使 Server Card 保持一致子集。
+- **客户端 SDK**：生成的或手动维护的客户端库，使客户端和子注册中心能够轻松与注册中心 API 集成。
+- **发布与信任**：身份验证流程（GitHub OAuth、GitHub OIDC、DNS/HTTP 验证）、命名空间所有权、审核工具和社区驱动的标记。
+- **采纳与推广**：文档、入门指南和推广活动，以提高目录覆盖率。
+- **问题分类与自动化**：注册中心仓库的标签系统、分类和贡献者工作流程。
 
-### Out of Scope
+### 范围外
 
-- Any runtime-related MCP protocol specification aspects (owned by Core Maintainers and other WGs).
-- Server Card format and discovery mechanism (owned by the Server Card WG; this WG coordinates on `server.json` alignment).
-- Ranking/choosing between MCP server implementations on behalf of MCP clients or end-users.
-- Hosting, distributing, or executing MCP server code or binaries — the registry is a metadata catalog, not a package registry.
-- Any commitment to delivering an enterprise-ready or reusable registry implementation. The codebase supports this instance only and is not intended for external deployments.
+- 任何与运行时相关的 MCP 协议规范方面（由核心维护者和其他工作组负责）。
+- Server Card 格式和发现机制（由 Server Card 工作组负责；本工作组在 `server.json` 对齐上进行协调）。
+- 代表 MCP 客户端或最终用户在 MCP 服务器实现之间进行排名/选择。
+- 托管、分发或执行 MCP 服务器代码或二进制文件——注册中心是一个元数据目录，而非包注册中心。
+- 交付企业级或可复用的注册中心实现的任何承诺。代码库仅支持此实例，不适用于外部部署。
 
-### Related Groups
+### 相关小组
 
-- **Server Card WG** — `server.json` and Server Card must stay aligned; the registry will expose Server Cards + local package-related metadata for published entries. Tight coordination required to avoid schema divergence.
+- **Server Card WG** — `server.json` 和 Server Card 必须保持一致；注册中心将为已发布的条目暴露 Server Cards 和本地包相关元数据。需要紧密协调以避免模式分歧。
 
-## Leadership
+## 领导层
 
-| Role | Name               | Organization | GitHub                                     | Term    |
-| ---- | ------------------ | ------------ | ------------------------------------------ | ------- |
-| Lead | Tadas Antanavicius | PulseMCP     | [@tadasant](https://github.com/tadasant)   | Initial |
-| Lead | Radoslav Dimitrov  | Stacklok     | [@rdimitrov](https://github.com/rdimitrov) | Initial |
+| 角色   | 姓名               | 组织     | GitHub                                     | 任期 |
+| ------ | ------------------ | -------- | ------------------------------------------ | ---- |
+| 负责人 | Tadas Antanavicius | PulseMCP | [@tadasant](https://github.com/tadasant)   | 初始 |
+| 负责人 | Radoslav Dimitrov  | Stacklok | [@rdimitrov](https://github.com/rdimitrov) | 初始 |
 
-## Authority & Decision Rights
+## 权限与决策权
 
-| Decision Type                       | Authority Level                                        |
-| ----------------------------------- | ------------------------------------------------------ |
-| Meeting logistics & scheduling      | WG Leads (autonomous)                                  |
-| Proposal prioritization within WG   | WG Leads (autonomous)                                  |
-| SEP triage & closure (in scope)     | WG Leads (autonomous, with documented rationale)       |
-| Technical design within scope       | WG consensus                                           |
-| Spec changes (additive)             | WG consensus → Core Maintainer approval                |
-| Spec changes (breaking/fundamental) | WG consensus → Core Maintainer approval + wider review |
-| Scope expansion                     | Core Maintainer approval required                      |
-| WG Member approval                  | WG Member sponsors                                     |
+| 决策类型                  | 权限级别                                |
+| ------------------------- | --------------------------------------- |
+| 会议后勤与安排            | WG 负责人（自主）                       |
+| WG 内提案优先级           | WG 负责人（自主）                       |
+| SEP 分类与关闭（范围内）  | WG 负责人（自主，附记录理由）           |
+| 范围内技术设计            | WG 共识                                 |
+| 规范变更（新增）          | WG 共识 → 核心维护者批准                |
+| 规范变更（破坏性/根本性） | WG 共识 → 核心维护者批准 + 更广泛的评审 |
+| 范围扩展                  | 需要核心维护者批准                      |
+| WG 成员批准               | WG 成员赞助者                           |
 
-## Membership
+## 成员
 
-| Name               | Organization | GitHub                                           | Discord    | Level     | Maintainer? |
-| ------------------ | ------------ | ------------------------------------------------ | ---------- | --------- | ----------- |
-| Tadas Antanavicius | PulseMCP     | [@tadasant](https://github.com/tadasant)         | tadasant\_ | Lead      | Yes         |
-| Radoslav Dimitrov  | Stacklok     | [@rdimitrov](https://github.com/rdimitrov)       | dimitrovr  | Lead      | Yes         |
-| Bob Dickinson      | TeamSpark    | [@BobDickinson](https://github.com/BobDickinson) | rddthree   | WG Member | Yes         |
-| Preeti Dewani      | Ravenmail    | [@pree-dew](https://github.com/pree-dew)         | pree_dew   | WG Member | No          |
+| 姓名               | 组织      | GitHub                                           | Discord    | 级别    | 维护者？ |
+| ------------------ | --------- | ------------------------------------------------ | ---------- | ------- | -------- |
+| Tadas Antanavicius | PulseMCP  | [@tadasant](https://github.com/tadasant)         | tadasant\_ | 负责人  | 是       |
+| Radoslav Dimitrov  | Stacklok  | [@rdimitrov](https://github.com/rdimitrov)       | dimitrovr  | 负责人  | 是       |
+| Bob Dickinson      | TeamSpark | [@BobDickinson](https://github.com/BobDickinson) | rddthree   | WG 成员 | 是       |
+| Preeti Dewani      | Ravenmail | [@pree-dew](https://github.com/pree-dew)         | pree_dew   | WG 成员 | 否       |
 
-## Emeritus Membership
+## 荣誉成员
 
-| Name         | Organization | GitHub                                     | Discord   | Level     | Maintainer? |
-| ------------ | ------------ | ------------------------------------------ | --------- | --------- | ----------- |
-| Adam Jones   | Anthropic    | [@domdomegg](https://github.com/domdomegg) | domdomegg | WG Member | Yes         |
-| Toby Padilla | GitHub       | [@toby](https://github.com/toby)           |           | WG Member | Yes         |
+| 姓名         | 组织      | GitHub                                     | Discord   | 级别    | 维护者？ |
+| ------------ | --------- | ------------------------------------------ | --------- | ------- | -------- |
+| Adam Jones   | Anthropic | [@domdomegg](https://github.com/domdomegg) | domdomegg | WG 成员 | 是       |
+| Toby Padilla | GitHub    | [@toby](https://github.com/toby)           |           | WG 成员 | 是       |
 
-## Operations
+## 运营
 
-| Meeting         | Frequency | Duration | Purpose                                           |
-| --------------- | --------- | -------- | ------------------------------------------------- |
-| Working Session | Weekly    | 30 min   | Technical discussion, triage, and proposal review |
+| 会议     | 频率 | 时长    | 目的                     |
+| -------- | ---- | ------- | ------------------------ |
+| 工作会议 | 每周 | 30 分钟 | 技术讨论、分类和提案评审 |
 
-Discord: `#registry-dev`
+Discord：`#registry-dev`
 
-## Resources
+## 资源
 
-- Registry service repository: [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry)
+- 注册中心服务仓库：[modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry)
 
-## Deliverables & Success Metrics
+## 交付物与成功指标
 
-### Active Work Items
+### 活跃工作项
 
-| Item                                                                  | Status      | Target Date | Champion                                 |
-| --------------------------------------------------------------------- | ----------- | ----------- | ---------------------------------------- |
-| Server Card / `server.json` alignment                                 | In Progress | Q2 2026     | [@tadasant](https://github.com/tadasant) |
-| Uptime & monitoring automation                                        | Planned     | Q2 2026     | TBD                                      |
-| Issue triage automation & labeling system                             | Planned     | Q2 2026     | TBD                                      |
-| Adoption outreach to popular server maintainers                       | Ideating    | Q3 2026     | TBD                                      |
-| Cataloging specification support by clients and sub-registry products | Ideating    | Q3 2026     | TBD                                      |
-| Client SDK generation / publication                                   | Ideating    | Q3 2026     | TBD                                      |
-| Registry API v1 GA                                                    | Ideating    | TBD         | TBD                                      |
+| 项目                                 | 状态   | 目标日期 | 负责人                                   |
+| ------------------------------------ | ------ | -------- | ---------------------------------------- |
+| Server Card / `server.json` 对齐     | 进行中 | 2026 Q2  | [@tadasant](https://github.com/tadasant) |
+| 正常运行时间与监控自动化             | 规划中 | 2026 Q2  | 待定                                     |
+| 问题分类自动化与标签系统             | 规划中 | 2026 Q2  | 待定                                     |
+| 向流行服务器维护者的推广             | 构思中 | 2026 Q3  | 待定                                     |
+| 客户端和子注册中心产品的编目规范支持 | 构思中 | 2026 Q3  | 待定                                     |
+| 客户端 SDK 生成/发布                 | 构思中 | 2026 Q3  | 待定                                     |
+| Registry API v1 正式发布             | 构思中 | 待定     | 待定                                     |
 
-### Success Criteria
+### 成功标准
 
-- Registry uptime ≥ 99.9% with automated monitoring and alerting.
-- `server.json` schema and Server Card format aligned with no unintentional divergence.
-- Majority of popular, publicly available MCP servers published to the registry.
-- At least one client SDK (generated or maintained) available for registry consumers.
-- Registry API v1 specification finalized and stable.
-- Active sub-registry ecosystem consuming the official registry API.
+- 注册中心正常运行时间 ≥ 99.9%，具有自动化监控和告警。
+- `server.json` 模式和 Server Card 格式对齐，无意外的分歧。
+- 大多数流行、公开可用的 MCP 服务器已发布到注册中心。
+- 至少一个客户端 SDK（生成的或维护的）可供注册中心消费者使用。
+- Registry API v1 规范最终确定并保持稳定。
+- 活跃的子注册中心生态系统消费官方注册中心 API。
 
-## Changelog
+## 变更日志
 
-| Date       | Change          |
-| ---------- | --------------- |
-| 2026-04-08 | Initial charter |
+| 日期       | 更改     |
+| ---------- | -------- |
+| 2026-04-08 | 初始章程 |

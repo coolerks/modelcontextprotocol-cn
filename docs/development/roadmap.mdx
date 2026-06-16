@@ -1,97 +1,97 @@
 ---
-title: Roadmap
-description: Our plans for evolving Model Context Protocol
+title: 路线图
+description: 我们演进模型上下文协议的计划
 ---
 
-<Info>Last updated: **2026-03-05**</Info>
+<Info>最后更新：**2026-03-05**</Info>
 
-This page describes our strategic priorities and what we expect **Working Groups** and **Interest Groups** to deliver against them.
+此页面描述了我们的战略优先级以及我们期望**工作组**和**兴趣组**据此交付的内容。
 
 <Note>
 
-The ideas presented here are not commitments. We may solve these challenges differently than described. Some items may not materialize at all. This is also not an _exhaustive_ list. We may incorporate work that isn't mentioned here.
+此处提出的想法并非承诺。我们可能会以与描述不同的方式解决这些挑战。某些事项可能根本不会实现。这也不是一个*详尽*的列表。我们可能会纳入此处未提及的工作。
 
 </Note>
 
-## SEP Prioritization
+## SEP 优先级
 
-**SEPs that fall within the priority areas below will receive expedited review and have the highest chance of acceptance.** SEPs outside these areas are not automatically rejected, but contributors should expect longer review timelines and a higher bar for justification. Maintainer capacity is finite. We direct it toward these priorities first.
+**属于以下优先领域的 SEP 将获得加速审查，并且最有可能被接受。** 不属于这些领域的 SEP 不会自动被拒绝，但贡献者应预期更长的审查时间和更高的论证标准。维护者的能力是有限的。我们首先将资源投入到这些优先级上。
 
-If you are considering a SEP, check whether it aligns with one of the areas below, discuss it in the relevant [Working Group or Interest Group](/community/working-interest-groups), and bring that group's backing with you. SEPs with WG support and a clear connection to the roadmap move fastest. See the [SEP guidelines](/community/sep-guidelines) for the full process.
+如果您正在考虑提交 SEP，请检查它是否与以下领域之一相符，在相关的[工作组或兴趣组](/community/working-interest-groups)中讨论，并获得该组的支持。有工作组支持且与路线图有明确关联的 SEP 进展最快。请参阅 [SEP 指南](/community/sep-guidelines)了解完整流程。
 
-## Priority Areas
+## 优先领域
 
-### 1. Transport Evolution and Scalability
+### 1. 传输演进与可扩展性
 
-Streamable HTTP gave MCP a production-ready transport, but running it at scale has revealed gaps around horizontal scaling, stateless operation, and middleware patterns.
+Streamable HTTP 为 MCP 提供了生产就绪的传输，但在规模运行时暴露了水平扩展、无状态操作和中间件模式方面的不足。
 
-**What we want to achieve:**
+**我们想要实现的目标：**
 
-- **Next-generation transport**: evolve Streamable HTTP to run statelessly across multiple server instances and behave correctly behind load balancers and proxies.
-- **Scalable session handling**: define how sessions are created, resumed, and migrated so that server restarts and scale-out events are transparent to connected clients.
-- **MCP Server Cards**: a standard for exposing structured server metadata via a `.well-known` URL, so browsers, crawlers, and registries can discover a server's capabilities without connecting to it.
+- **下一代传输**：演进 Streamable HTTP 以跨多个服务器实例无状态运行，并在负载均衡器和代理后面正确运行。
+- **可扩展的会话处理**：定义如何创建、恢复和迁移会话，使服务器重启和扩展事件对连接的客户端透明。
+- **MCP 服务器卡片**：一种通过 `.well-known` URL 公开结构化服务器元数据的标准，使浏览器、爬虫和注册表可以在不连接的情况下发现服务器的能力。
 
-**Working Group ownership:**
+**工作组归属：**
 
-- **Transports WG** owns the transport and session work: a series of SEPs covering the wire format, session model, and resumption protocol, plus conformance guidance for SDK authors.
-- **Server Card WG** owns the Server Card format and its distribution, coordinating with the broader industry AI-catalog effort.
+- **传输工作组**负责传输和会话工作：一系列涵盖线路格式、会话模型和恢复协议的 SEP，以及针对 SDK 作者的合规性指南。
+- **服务器卡片工作组**负责服务器卡片格式及其分发，与更广泛的行业 AI 目录工作协调。
 
-We will **not** be introducing additional official transports this cycle. Keeping the set small protects ecosystem compatibility; the community should experiment via custom transports.
+我们**不会**在本周期引入额外的官方传输。保持较小的集合可保护生态系统的兼容性；社区应通过自定义传输进行实验。
 
-### 2. Agent Communication
+### 2. 代理通信
 
-The Tasks primitive ([SEP-1686](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1686)) gave agents a reliable call-now / fetch-later pattern. Running it in production has surfaced gaps in the lifecycle semantics that the **Agents WG** should close:
+任务原语（[SEP-1686](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1686)）为代理提供了可靠的即时调用/后续获取模式。在生产中运行暴露了生命周期语义方面的不足，**代理工作组**应弥补这些不足：
 
-- **Retry semantics**: what happens when a task fails transiently, and who decides whether to retry.
-- **Expiry policies**: how long results are retained after completion, and how clients learn a result has expired.
+- **重试语义**：当任务暂时失败时会发生什么，以及由谁决定是否重试。
+- **过期策略**：完成后结果保留多长时间，以及客户端如何得知结果已过期。
 
-These are the gaps we can point to today. The Agents WG should also collect and triage operational issues from production deployments—this list will grow as more of the ecosystem runs Tasks at scale.
+这些是我们今天可以指出的不足。代理工作组还应收集和分类生产部署中的操作问题——随着生态系统中更多的规模化任务运行，此列表将会增长。
 
-### 3. Governance Maturation
+### 3. 治理成熟化
 
-MCP has grown into a multi-company open standard under the Linux Foundation. [SEP-1302](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1302) formalized Working Groups and Interest Groups, and [SEP-2085](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2085) established succession and amendment procedures. The next step is giving the community a clear path to leadership so the project does not depend on a small set of individuals.
+MCP 已发展成为 Linux 基金会下的多公司开放标准。[SEP-1302](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1302) 正式确立了工作组和兴趣组，[SEP-2085](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2085) 建立了继任和修正程序。下一步是为社区提供清晰的领导路径，使项目不依赖于少数个人。
 
-The **Governance WG** should deliver:
+**治理工作组**应交付：
 
-- **A Contributor Ladder SEP** defining the progression from community participant → WG contributor → WG facilitator → lead maintainer → core maintainer, with explicit nomination and review criteria at each step.
-- **A delegation model** allowing WGs with a proven track record to accept SEPs and publish extension updates within their domain without a full core-maintainer review cycle.
-- **A charter template** that every WG and IG maintains publicly: scope, active deliverables, success criteria, and retirement conditions, reviewed quarterly.
+- **贡献者阶梯 SEP**，定义从社区参与者 → 工作组贡献者 → 工作组促进者 → 主导维护者 → 核心维护者的晋升路径，每一步都有明确的提名和评审标准。
+- **委托模型**，允许具有良好记录的工作组在其领域内接受 SEP 和发布扩展更新，而无需完整的核心维护者审查周期。
+- **章程模板**，每个工作组和兴趣组公开维护：范围、活跃交付物、成功标准和退休条件，每季度审查一次。
 
-### 4. Enterprise Readiness
+### 4. 企业就绪
 
-Enterprises are deploying MCP at scale and hitting gaps the protocol does not yet address.
+企业正在大规模部署 MCP，并遇到了协议尚未解决的不足。
 
-Areas where we need clear problem statements and directional proposals:
+我们需要明确问题陈述和方向性提案的领域：
 
-- **Audit trails and observability**: end-to-end visibility into what a client requested and what a server did, in a form enterprises can feed into their existing logging and compliance pipelines.
-- **Enterprise-managed auth**: paved paths away from static client secrets and toward SSO-integrated flows ([Cross-App Access](https://xaa.dev)), so IT can manage MCP access the same way they manage everything else.
-- **Gateway and proxy patterns**: well-defined behavior when a client does not connect directly to a server but routes through an intermediary. This may include authorization propagation, session semantics, and what the gateway is allowed to see.
-- **Configuration portability**: a way to configure a server once and have that configuration work across different MCP clients.
+- **审计追踪和可观测性**：对客户端请求了什么以及服务器做了什么提供端到端的可见性，以企业可以输入其现有日志和合规性管道的形式。
+- **企业托管授权**：从静态客户端密钥到 SSO 集成流程（[Cross-App Access](https://xaa.dev)）的铺平路径，使 IT 部门能够像管理其他一切一样管理 MCP 访问。
+- **网关和代理模式**：当客户端不直接连接到服务器而是通过中间人路由时的明确行为。这可能包括授权传播、会话语义以及网关允许查看的内容。
+- **配置可移植性**：一种一次性配置服务器并使该配置在不同 MCP 客户端间工作的方法。
 
-We expect an **Enterprise WG** to form to own this. Much of the output will likely land as extensions rather than core specification changes.
+我们预计将成立一个**企业工作组**来负责此领域。大部分产出很可能以扩展的形式落地，而非核心规范的变更。
 
-## On the Horizon
+## 展望
 
-These areas have community interest and interest from core maintainers but are not top priorities. We will support a community-formed Working Group in any of them and review SEPs on these topics if time permits.
+这些领域有社区和核心维护者的兴趣，但不是最高优先级。我们将支持社区在其中任何一个领域成立工作组，并在时间允许的情况下审查这些主题的 SEP。
 
-- **Triggers and Event-Driven Updates** — clients currently learn about server-side state changes by polling or holding an SSE connection open. A standardized callback mechanism (webhooks or similar) would let servers proactively notify clients when new data is available, with defined ordering guarantees across all transports.
-- **Result Type Improvements** — tool calls, resource reads, and task results all arrive complete and inline. Streamed results would let clients receive output incrementally for interactive scenarios (generated text, audio, video frames); reference-based results would let clients decide when to pull large payloads into context rather than polluting it by default. This is cross-cutting: streaming touches transport, references touch the schema.
-- **Security & Authorization** — finer-grained least-privilege scopes, clearer guidance on avoiding OAuth mix-up attacks, secure credential management on both client and server, and a community-driven vulnerability disclosure program routed through the Linux Foundation. Sponsored work is already underway: [SEP-1932 (DPoP)](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1932) and [SEP-1933 (Workload Identity Federation)](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1933).
-- **Extensions Ecosystem** — the `ext-auth` and `ext-apps` tracks are early proof that the extension mechanism works. Maturing them, investigating a Skills primitive for composed capabilities, and adding first-class extension support to the registry would all strengthen the path from experiment to standard.
+- **触发器和事件驱动更新**——客户端目前通过轮询或保持 SSE 连接打开来了解服务器端状态变化。标准化的回调机制（webhook 或类似）将让服务器在新数据可用时主动通知客户端，并在所有传输上具有定义的排序保证。
+- **结果类型改进**——工具调用、资源读取和任务结果都以完整内联的方式到达。流式结果将让客户端在交互场景（生成的文本、音频、视频帧）中增量接收输出；基于引用的结果将让客户端决定何时将大型有效负载拉取到上下文中，而不是默认污染上下文。这是跨领域的：流式涉及传输，引用涉及模式。
+- **安全与授权**——更细粒度的最小权限范围、关于避免 OAuth 混淆攻击的更清晰指南、客户端和服务器上的安全凭据管理，以及通过 Linux 基金会路由的社区驱动的漏洞披露计划。赞助工作已经在进行中：[SEP-1932 (DPoP)](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1932) 和 [SEP-1933 (工作负载身份联合)](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/1933)。
+- **扩展生态系统**——`ext-auth` 和 `ext-apps` 轨道是扩展机制有效性的早期证明。使其成熟、研究用于组合能力的技能原语、以及向注册表添加一流的扩展支持，都将加强从实验到标准的路径。
 
-## Validation
+## 验证
 
-A protocol specification is only as good as the implementations that follow it. Alongside the areas above, we continue to invest in:
+协议规范的好坏取决于遵循它的实现。除了上述领域外，我们将继续投资于：
 
-- **Conformance Test Suites**: automated verification that clients, servers, and SDKs correctly implement the specification, with coverage expanding alongside each new feature area.
-- **SDK Tiers**: the tiering system introduced in [SEP-1730](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1730) gives developers a clear signal of which SDKs track the specification most closely.
-- **Reference Implementations**: canonical implementations of new features to anchor community development and unblock early adopters.
+- **合规性测试套件**：自动验证客户端、服务器和 SDK 是否正确实现规范，覆盖范围随着每个新功能领域而扩展。
+- **SDK 层级**：[SEP-1730](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1730) 引入的分层系统为开发者提供了哪些 SDK 最紧密跟踪规范的明确信号。
+- **参考实现**：新功能的规范实现，以锚定社区发展并解除早期采用者的阻碍。
 
-## Get Involved
+## 参与其中
 
-MCP's roadmap is built by its community:
+MCP 的路线图由其社区构建：
 
-- **Join a Working Group or Interest Group**: see the [Working Groups & Interest Groups](/community/working-interest-groups) page and the [community communication channels](/community/communication) to connect with the groups active in each area above.
-- **Propose or comment on SEPs**: review the [SEP guidelines](/community/sep-guidelines) and open or weigh in on proposals.
-- **Start an experimental extension**: [SEP-2133](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2133) lets any WG or IG experiment in an `experimental-ext-` repository before a formal SEP is required.
-- **Contribute to the project**: read the [contributing guide](/community/contributing) for how to get involved with the specification, SDKs, and tooling.
+- **加入工作组或兴趣组**：查看[工作组和兴趣组](/community/working-interest-groups)页面和[社区沟通渠道](/community/communication)，与上述每个领域活跃的组建立联系。
+- **提议或评论 SEP**：审阅 [SEP 指南](/community/sep-guidelines)并开启或参与提案讨论。
+- **启动实验性扩展**：[SEP-2133](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2133) 允许任何工作组或兴趣组在需要正式 SEP 之前，在 `experimental-ext-` 仓库中进行实验。
+- **为项目做贡献**：阅读[贡献指南](/community/contributing)了解如何参与规范、SDK 和工具的开发。

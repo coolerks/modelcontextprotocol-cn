@@ -1,54 +1,52 @@
 ---
-title: Lifecycle
+title: 生命周期
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol (MCP) defines a rigorous lifecycle for client-server
-connections that ensures proper capability negotiation and state management.
+Model Context Protocol (MCP) 为客户端-服务器连接定义了严格的生命周期，确保适当的能力协商和状态管理。
 
-1. **Initialization**: Capability negotiation and protocol version agreement
-2. **Operation**: Normal protocol communication
-3. **Shutdown**: Graceful termination of the connection
+1. **初始化**：能力协商和协议版本协商
+2. **操作**：正常的协议通信
+3. **关闭**：优雅地终止连接
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Server
+    participant 客户端
+    participant 服务器
 
-    Note over Client,Server: Initialization Phase
-    activate Client
-    Client->>+Server: initialize request
-    Server-->>Client: initialize response
-    Client--)Server: initialized notification
+    Note over 客户端,服务器: 初始化阶段
+    activate 客户端
+    客户端->>+服务器: 初始化请求
+    服务器-->>客户端: 初始化响应
+    客户端--)服务器: 已初始化通知
 
-    Note over Client,Server: Operation Phase
+    Note over 客户端,服务器: 操作阶段
     rect rgb(200, 220, 250)
-        note over Client,Server: Normal protocol operations
+        note over 客户端,服务器: 正常协议操作
     end
 
-    Note over Client,Server: Shutdown
-    Client--)-Server: Disconnect
-    deactivate Server
-    Note over Client,Server: Connection closed
+    Note over 客户端,服务器: 关闭
+    客户端--)-服务器: 断开连接
+    deactivate 服务器
+    Note over 客户端,服务器: 连接已关闭
 ```
 
-## Lifecycle Phases
+## 生命周期阶段
 
-### Initialization
+### 初始化
 
-The initialization phase **MUST** be the first interaction between client and server.
-During this phase, the client and server:
+初始化阶段 **MUST** 是客户端和服务器之间的首次交互。在此阶段，客户端和服务器：
 
-- Establish protocol version compatibility
-- Exchange and negotiate capabilities
-- Share implementation details
+- 建立协议版本兼容性
+- 交换和协商能力
+- 共享实现详情
 
-The client **MUST** initiate this phase by sending an `initialize` request containing:
+客户端 **MUST** 通过发送包含以下内容的 `initialize` 请求来发起此阶段：
 
-- Protocol version supported
-- Client capabilities
-- Client implementation information
+- 支持的协议版本
+- 客户端能力
+- 客户端实现信息
 
 ```json
 {
@@ -79,9 +77,9 @@ The client **MUST** initiate this phase by sending an `initialize` request conta
     },
     "clientInfo": {
       "name": "ExampleClient",
-      "title": "Example Client Display Name",
+      "title": "示例客户端显示名称",
       "version": "1.0.0",
-      "description": "An example MCP client application",
+      "description": "一个示例 MCP 客户端应用程序",
       "icons": [
         {
           "src": "https://example.com/icon.png",
@@ -95,7 +93,7 @@ The client **MUST** initiate this phase by sending an `initialize` request conta
 }
 ```
 
-The server **MUST** respond with its own capabilities and information:
+服务器 **MUST** 使用其自身的能力和信息进行响应：
 
 ```json
 {
@@ -127,9 +125,9 @@ The server **MUST** respond with its own capabilities and information:
     },
     "serverInfo": {
       "name": "ExampleServer",
-      "title": "Example Server Display Name",
+      "title": "示例服务器显示名称",
       "version": "1.0.0",
-      "description": "An example MCP server providing tools and resources",
+      "description": "一个提供工具和资源的示例 MCP 服务器",
       "icons": [
         {
           "src": "https://example.com/server-icon.svg",
@@ -139,13 +137,12 @@ The server **MUST** respond with its own capabilities and information:
       ],
       "websiteUrl": "https://example.com/server"
     },
-    "instructions": "Optional instructions for the client"
+    "instructions": "可选的客户端指令"
   }
 }
 ```
 
-After successful initialization, the client **MUST** send an `initialized` notification
-to indicate it is ready to begin normal operations:
+初始化成功后，客户端 **MUST** 发送一个 `initialized` 通知以指示其已准备好开始正常操作：
 
 ```json
 {
@@ -154,54 +151,43 @@ to indicate it is ready to begin normal operations:
 }
 ```
 
-- The client **SHOULD NOT** send requests other than
-  [pings](/specification/2025-11-25/basic/utilities/ping) before the server has responded to the
-  `initialize` request.
-- The server **SHOULD NOT** send requests other than
-  [pings](/specification/2025-11-25/basic/utilities/ping) and
-  [logging](/specification/2025-11-25/server/utilities/logging) before receiving the `initialized`
-  notification.
+- 在服务器响应 `initialize` 请求之前，客户端 **SHOULD NOT** 发送除 [ping](/specification/2025-11-25/basic/utilities/ping) 之外的请求。
+- 在收到 `initialized` 通知之前，服务器 **SHOULD NOT** 发送除 [ping](/specification/2025-11-25/basic/utilities/ping) 和 [日志记录](/specification/2025-11-25/server/utilities/logging) 之外的请求。
 
-#### Version Negotiation
+#### 版本协商
 
-In the `initialize` request, the client **MUST** send a protocol version it supports.
-This **SHOULD** be the _latest_ version supported by the client.
+在 `initialize` 请求中，客户端 **MUST** 发送其支持的协议版本。这 **SHOULD** 是客户端支持的 _最新_ 版本。
 
-If the server supports the requested protocol version, it **MUST** respond with the same
-version. Otherwise, the server **MUST** respond with another protocol version it
-supports. This **SHOULD** be the _latest_ version supported by the server.
+如果服务器支持所请求的协议版本，它 **MUST** 使用相同版本进行响应。否则，服务器 **MUST** 使用其支持的另一个协议版本进行响应。这 **SHOULD** 是服务器支持的 _最新_ 版本。
 
-If the client does not support the version in the server's response, it **SHOULD**
-disconnect.
+如果客户端不支持服务器响应中的版本，它 **SHOULD** 断开连接。
 
 <Note>
-If using HTTP, the client **MUST** include the `MCP-Protocol-Version:
-<protocol-version>` HTTP header on all subsequent requests to the MCP
-server.
-For details, see [the Protocol Version Header section in Transports](/specification/2025-11-25/basic/transports#protocol-version-header).
+如果使用 HTTP，客户端 **MUST** 在随后发送到 MCP 服务器的所有请求中
+包含 `MCP-Protocol-Version: <protocol-version>` HTTP 头部。
+有关详细信息，请参见[传输中的协议版本头部部分](/specification/2025-11-25/basic/transports#protocol-version-header)。
 </Note>
 
-#### Capability Negotiation
+#### 能力协商
 
-Client and server capabilities establish which optional protocol features will be
-available during the session.
+客户端和服务器能力确定会话期间哪些可选的协议特性可用。
 
-Key capabilities include:
+关键能力包括：
 
-| Category | Capability     | Description                                                                                   |
-| -------- | -------------- | --------------------------------------------------------------------------------------------- |
-| Client   | `roots`        | Ability to provide filesystem [roots](/specification/2025-11-25/client/roots)                 |
-| Client   | `sampling`     | Support for LLM [sampling](/specification/2025-11-25/client/sampling) requests                |
-| Client   | `elicitation`  | Support for server [elicitation](/specification/2025-11-25/client/elicitation) requests       |
-| Client   | `tasks`        | Support for [task-augmented](/specification/2025-11-25/basic/utilities/tasks) client requests |
-| Client   | `experimental` | Describes support for non-standard experimental features                                      |
-| Server   | `prompts`      | Offers [prompt templates](/specification/2025-11-25/server/prompts)                           |
-| Server   | `resources`    | Provides readable [resources](/specification/2025-11-25/server/resources)                     |
-| Server   | `tools`        | Exposes callable [tools](/specification/2025-11-25/server/tools)                              |
-| Server   | `logging`      | Emits structured [log messages](/specification/2025-11-25/server/utilities/logging)           |
-| Server   | `completions`  | Supports argument [autocompletion](/specification/2025-11-25/server/utilities/completion)     |
-| Server   | `tasks`        | Support for [task-augmented](/specification/2025-11-25/basic/utilities/tasks) server requests |
-| Server   | `experimental` | Describes support for non-standard experimental features                                      |
+| 类别   | 能力           | 描述                                                                                          |
+| ------ | -------------- | --------------------------------------------------------------------------------------------- |
+| 客户端 | `roots`        | 提供文件系统[根目录](/specification/2025-11-25/client/roots)的能力                            |
+| 客户端 | `sampling`     | 支持 LLM [采样](/specification/2025-11-25/client/sampling)请求                                |
+| 客户端 | `elicitation`  | 支持服务器[征询](/specification/2025-11-25/client/elicitation)请求                            |
+| 客户端 | `tasks`        | 支持[任务增强型](/specification/2025-11-25/basic/utilities/tasks)客户端请求                   |
+| 客户端 | `experimental` | 描述对非标准实验性特性的支持                                                                  |
+| 服务器 | `prompts`      | 提供[提示模板](/specification/2025-11-25/server/prompts)                                      |
+| 服务器 | `resources`    | 提供可读的[资源](/specification/2025-11-25/server/resources)                                  |
+| 服务器 | `tools`        | 暴露可调用的[工具](/specification/2025-11-25/server/tools)                                    |
+| Server | `logging`      | Emits structured [log messages](/specification/2025-11-25/server/utilities/logging)           |
+| Server | `completions`  | Supports argument [autocompletion](/specification/2025-11-25/server/utilities/completion)     |
+| Server | `tasks`        | Support for [task-augmented](/specification/2025-11-25/basic/utilities/tasks) server requests |
+| Server | `experimental` | Describes support for non-standard experimental features                                      |
 
 Capability objects can describe sub-capabilities like:
 

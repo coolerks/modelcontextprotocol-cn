@@ -1,27 +1,25 @@
 ---
-title: Client Registration
+title: 客户端注册
 ---
 
 <div id="enable-section-numbers" />
 
-MCP supports three client registration mechanisms. Choose based on your scenario:
+MCP 支持三种客户端注册机制。根据您的场景选择：
 
-- **[Client ID Metadata Documents](#client-id-metadata-documents)**: When client and server have no prior relationship (most common)
-- **[Pre-registration](#pre-registration)**: When client and server have an existing relationship
-- **[Dynamic Client Registration](#dynamic-client-registration)**: For backwards compatibility or specific requirements
+- **[客户端 ID 元数据文档](#client-id-metadata-documents)**：当客户端和服务器没有事先关系时（最常见）
+- **[预注册](#pre-registration)**：当客户端和服务器有现有关系时
+- **[动态客户端注册](#dynamic-client-registration)**：用于向后兼容或特定需求
 
-Clients supporting all options **SHOULD** use the following priority order:
+支持所有选项的客户端 **SHOULD** 使用以下优先级顺序：
 
-1. Use pre-registered client information for the server if the client has it available
-2. Use Client ID Metadata Documents if the Authorization Server indicates that it supports them (via `client_id_metadata_document_supported` in OAuth Authorization Server Metadata)
-3. Use Dynamic Client Registration as a fallback if the Authorization Server supports it (via `registration_endpoint` in OAuth Authorization Server Metadata)
-4. Prompt the user to enter the client information if no other option is available
+1. 如果客户端有可用的服务器预注册客户端信息，则使用它
+2. 如果授权服务器指示支持客户端 ID 元数据文档（通过 OAuth 授权服务器元数据中的 `client_id_metadata_document_supported`），则使用客户端 ID 元数据文档
+3. 如果授权服务器支持动态客户端注册（通过 OAuth 授权服务器元数据中的 `registration_endpoint`），则将其作为回退使用
+4. 如果没有其他选项可用，则提示用户输入客户端信息
 
-## Client ID Metadata Documents
+## 客户端 ID 元数据文档
 
-MCP clients and authorization servers **SHOULD** support OAuth Client ID Metadata Documents as specified in
-[OAuth Client ID Metadata Document](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00)
-for client registration.
+MCP 客户端和授权服务器 **SHOULD** 支持 [OAuth 客户端 ID 元数据文档](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00) 中指定的 OAuth 客户端 ID 元数据文档进行客户端注册。
 
 This approach enables clients to use HTTPS URLs as client identifiers, where the URL points to a JSON document
 containing client metadata. This addresses the common MCP scenario where servers and clients have
@@ -125,23 +123,20 @@ MCP clients **SHOULD** check for this capability and **MAY** fall back to
 [Dynamic Client Registration](#dynamic-client-registration)
 or [pre-registration](#pre-registration) if unavailable.
 
-## Pre-registration
+## 预注册
 
-MCP clients **SHOULD** support an option for static client credentials such as those supplied by a pre-registration flow. This could be:
+MCP 客户端 **SHOULD** 支持用于静态客户端凭据的选项，例如由预注册流程提供的凭据。这可以是：
 
-1. Hardcode a client ID (and, if applicable, client credentials) specifically for the MCP client to use when
-   interacting with that authorization server, or
-2. Present a UI to users that allows them to enter these details, after registering an
-   OAuth client themselves (e.g., through a configuration interface hosted by the
-   server).
+1. 硬编码一个专门用于 MCP 客户端与该授权服务器交互时使用的客户端 ID（以及适用的客户端凭据），或者
+2. 向用户提供一个 UI，允许他们在自行注册 OAuth 客户端后输入这些详细信息
+   （例如，通过服务器托管的配置界面）。
 
-## Dynamic Client Registration
+## 动态客户端注册
 
 <Warning>
-  Dynamic Client Registration is deprecated. New implementations should use
-  [Client ID Metadata Documents](#client-id-metadata-documents) instead. This
-  option remains available for backwards compatibility with authorization
-  servers that do not support Client ID Metadata Documents.
+  动态客户端注册已弃用。新实现应使用 [客户端 ID
+  元数据文档](#client-id-metadata-documents) 替代。此
+  选项仍然可用，用于与不支持客户端 ID 元数据文档的授权 服务器向后兼容。
 </Warning>
 
 MCP clients and authorization servers **MAY** support the
@@ -178,12 +173,9 @@ developer. Clients **MAY** retry registration with an adjusted
 authorization server's requirements for the given application
 type.
 
-## Authorization Server Binding
+## 授权服务器绑定
 
-Clients that use pre-registered credentials, or persist client credentials obtained via Dynamic Client
-Registration, **MUST** associate those
-credentials with the specific authorization server that issued them,
-keyed by the authorization server's `issuer` identifier. When the
+使用预注册凭据或持久化通过动态客户端注册获得的客户端凭据的客户端，**MUST** 将这些凭据与颁发它们的特定授权服务器关联，以授权服务器的 `issuer` 标识符作为键。 When the
 authorization server changes (detected via updated
 [protected resource metadata](/specification/draft/basic/authorization/authorization-server-discovery#authorization-server-location)),
 clients **MUST NOT** reuse client credentials

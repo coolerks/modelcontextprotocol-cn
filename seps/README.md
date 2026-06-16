@@ -1,3 +1,3 @@
-# Specification Enhancement Proposals (SEPs)
+# 规范增强提案（SEP）
 
-See https://modelcontextprotocol.io/community/sep-guidelines
+参见 https://modelcontextprotocol.io/community/sep-guidelines

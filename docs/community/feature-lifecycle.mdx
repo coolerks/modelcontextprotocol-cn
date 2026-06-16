@@ -1,154 +1,118 @@
 ---
-title: Feature Lifecycle and Deprecation Policy
-description: How individual MCP specification features move through Active, Deprecated, and Removed states, and the timeline implementers can plan against.
+title: 功能生命周期与弃用策略
+description: MCP 规范各个功能如何经历活跃、已弃用和已移除状态，以及实现者可以规划的时间线。
 ---
 
-This policy defines a lifecycle for individual features within the Model
-Context Protocol specification. It defines three feature states (Active,
-Deprecated, Removed), the criteria and procedure for moving between them, a
-minimum window between deprecation and removal, and the documentation required
-at each transition.
+本策略定义了 Model Context Protocol 规范中各个功能的生命周期。它定义了三种功能状态
+（活跃、已弃用、已移除），状态间转换的标准和程序，弃用到移除之间的
+最短时间窗口，以及每个转换所需的文档。
 
-This policy was adopted via
-[SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596).
+本策略通过
+[SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596) 采纳。
 
-## Scope
+## 范围
 
-This policy governs **features** of the MCP core specification: protocol
-messages, capabilities, transports, schema types, and normative behavioral
-requirements. The revision lifecycle of the specification document itself
-(Draft, Current, Final) is defined in the [versioning guide](/docs/learn/versioning).
+本策略管理 MCP 核心规范的**功能**：协议消息、能力、传输、模式类型和规范性行为
+要求。规范文档本身的修订生命周期（草稿、当前、最终）在
+[版本控制指南](/docs/learn/versioning) 中定义。
 
-## Feature States
+## 功能状态
 
-A specification feature is in exactly one of three states:
+一个规范功能处于以下三种状态之一：
 
-| State          | Meaning                                                                                                                                                       | Implementer expectation                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Active**     | The feature is part of the Current specification revision.                                                                                                    | Implement per the feature's normative requirements.                                                                         |
-| **Deprecated** | The feature remains in the specification but is scheduled for removal. A migration path is documented (see below).                                            | New implementations should not adopt the feature. Existing implementations should migrate before the earliest removal date. |
-| **Removed**    | The feature has been deleted from `draft` and will be absent from the next Current revision. It remains documented in the Final revision it last appeared in. | Implementations targeting that next Current revision must not depend on the feature.                                        |
+| 状态       | 含义                                                                                          | 实现者预期                                                 |
+| ---------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **活跃**   | 该功能是当前规范修订版的一部分。                                                              | 按照功能的规范性要求实现。                                 |
+| **已弃用** | 该功能仍保留在规范中，但计划移除。已记录迁移路径（见下文）。                                  | 新的实现不应采用此功能。现有实现应在最早移除日期之前迁移。 |
+| **已移除** | 该功能已从 `draft` 中删除，不会出现在下一个当前修订版中。它仍然记录在最后出现的最终修订版中。 | 针对下一个当前修订版的实现不得依赖此功能。                 |
 
-A Deprecated feature MAY be restored to Active by a SEP that supersedes the
-deprecation SEP and documents the changed circumstances. Restoration follows
-the same approval path as deprecation. If the feature is later deprecated
-again, the minimum deprecation window in
-[Deprecating a feature](#deprecating-a-feature) is measured afresh from the
-revision in which the new deprecation takes effect.
+已弃用的功能 MAY 通过发布一个取代弃用 SEP 并记录情况变化的 SEP 恢复为活跃状态。恢复遵循
+与弃用相同的批准路径。如果该功能后来再次被弃用，
+[弃用功能](#弃用功能)中的最短弃用窗口从新弃用生效的修订版开始重新计算。
 
-### SDKs
+### SDK
 
-Removal from the specification does not oblige an SDK to drop the feature from
-releases. That timeline is governed by the SDK's own revision-support policy.
+从规范中移除并不强制 SDK 从发布版本中删除该功能。该时间线由 SDK 自身的修订支持策略管理。
 
-## Deprecating a Feature
+## 弃用功能
 
-A feature may be proposed for deprecation when:
+在以下情况下，可以提议弃用一个功能：
 
-- it has been superseded by another feature that covers the same use cases,
-- it presents a security, privacy, or interoperability risk that cannot be
-  mitigated in place,
-- ecosystem telemetry or SDK maintainer consensus indicates negligible adoption
-  relative to its maintenance cost,
-- or any other reasons the Core Maintainers deem appropriate.
+- 它已被覆盖相同用例的其他功能取代，
+- 它存在无法就地缓解的安全、隐私或互操作风险，
+- 生态系统遥测或 SDK 维护者共识表明相对于其维护成本，采用率可忽略不计，
+- 或核心维护者认为适当的任何其他原因。
 
-Deprecation is a specification change and therefore requires a SEP per the
-[SEP guidelines](/community/sep-guidelines). The deprecation SEP must:
+弃用是一项规范变更，因此需要按照 [SEP 指南](/community/sep-guidelines) 提交 SEP。弃用 SEP 必须：
 
-1. Identify the feature by name and link to its definition in `schema.ts`
-   (where applicable) and the specification prose.
-2. State the rationale against the criteria above.
-3. Document the migration path, or state explicitly that none is required. If
-   the migration path names a replacement feature, that feature must be Active
-   in the revision in which the deprecation takes effect; the replacement and
-   the deprecation may land in the same revision.
-4. Specify the **minimum deprecation window**: the number of months, at least
-   twelve, that the feature must remain Deprecated before it is eligible for
-   removal. The window is measured from the release of the specification
-   revision in which the feature is first marked Deprecated, not from the date
-   the SEP reaches Final. The feature becomes eligible for removal in the first
-   specification revision released as Current on or after the window elapses;
-   that point is the feature's **earliest removal**.
+1. 按名称标识该功能，并链接到其在 `schema.ts`（如适用）和规范文本中的定义。
+2. 根据上述标准说明理由。
+3. 记录迁移路径，或明确说明不需要迁移路径。如果迁移路径指定了替代功能，
+   该功能在弃用生效的修订版中必须是活跃状态；替代功能和弃用可以在同一修订版中落地。
+4. 指定**最短弃用窗口**：该功能在被移除之前必须保持已弃用状态的月数，
+   至少十二个月。该窗口从该功能首次标记为已弃用的规范修订版发布开始计算，
+   而非从 SEP 达到最终状态的日期开始。该功能在窗口到期后或到期时
+   作为当前版本发布的第一个规范修订版中有资格被移除；
+   该时间点是该功能的**最早移除**日期。
 
-When the deprecation SEP is accepted and reaches Final, the deprecation is scheduled.
+弃用 SEP 被接受并达到最终状态后，弃用被安排。
 
-- The feature's entry in `schema.ts` gains a `@deprecated` JSDoc tag
-  referencing the deprecation SEP and the revision in which the deprecation
-  takes effect.
-- The specification prose for the feature gains a deprecation notice with the
-  same information.
-- The `changelog.mdx` for that revision gains an entry under a "Deprecated"
-  heading. "Deprecated" and "Removed" are standing changelog headings alongside
-  the existing Major/Minor/Other groupings.
-- The feature is added to the
-  [deprecated registry](#the-deprecated-registry) with its deprecation SEP, the
-  revision in which it became Deprecated, its migration path, and its earliest
-  removal.
+- 该功能在 `schema.ts` 中的条目获得一个 `@deprecated` JSDoc 标签，
+  引用弃用 SEP 和弃用生效的修订版。
+- 该功能的规范文本获得了包含相同信息的弃用通知。
+- 该修订版的 `changelog.mdx` 在"已弃用"标题下获得一个条目。
+  "已弃用"和"已移除"是与现有的主要/次要/其他分组并列的常设变更日志标题。
+- 该功能被添加到[已弃用注册表](#已弃用注册表)，包含其弃用 SEP、
+  变为已弃用的修订版、迁移路径和最早移除日期。
 
 The feature becomes Deprecated when the revision carrying these changes is released
 and becomes the new Current revision (see [versioning guide](/docs/learn/versioning)).
 The minimum deprecation window is counted from that release.
 
-## The Deprecated Registry
+## 已弃用注册表
 
-[`docs/specification/draft/deprecated.mdx`](/specification/draft/deprecated) is
-a single page listing every feature in a Deprecated or Removed state. It is
-the canonical answer to "what is on its way out, and by when," so that an
-implementer does not have to reconstruct that picture from deprecation entries
-spread across revision changelogs.
+[`docs/specification/draft/deprecated.mdx`](/specification/draft/deprecated) 是
+一个列出所有处于已弃用或已移除状态功能的单页。它是"什么功能正在被淘汰，以及何时淘汰"
+的权威答案，这样实现者不必从分散在各个修订版变更日志中的弃用条目重建该图景。
 
-## Tier 1 SDK Obligations
+## 第 1 层 SDK 义务
 
-Once the revision in which a feature becomes Deprecated is
-released as Current, Tier 1 SDKs:
+一旦功能变为已弃用的修订版作为当前版本发布，第 1 层 SDK：
 
-- Must mark the corresponding API surface deprecated using the language's
-  native mechanism (for example `@Deprecated` in Java, `[Obsolete]` in .NET,
-  `@deprecated` JSDoc in TypeScript, the `Deprecated:` doc convention in Go) in
-  their next release, referencing the deprecation SEP and the earliest removal
-  date where the mechanism permits.
-- Should emit a runtime warning when a deprecated feature is exercised, using
-  the language's idiomatic mechanism (for example Python's
-  `DeprecationWarning`, Node.js's `process.emitWarning`, or a configurable
-  logger).
+- 必须在其下一个版本中使用语言的原生机制（例如 Java 中的 `@Deprecated`、.NET 中的 `[Obsolete]`、
+  TypeScript 中的 `@deprecated` JSDoc、Go 中的 `Deprecated:` 文档约定）标记相应的 API 表面为已弃用，
+  并在机制允许的情况下引用弃用 SEP 和最早移除日期。
+- 当已弃用功能被使用时，应使用语言的惯用机制（例如 Python 的 `DeprecationWarning`、
+  Node.js 的 `process.emitWarning`，或可配置的日志记录器）发出运行时警告。
 
-A Tier 1 SDK that consistently fails to surface a Deprecated feature is subject to the
-[Tier Relegation Process](/community/sdk-tiers#tier-relegation).
+持续未能展示已弃用功能的第 1 层 SDK 将受到[层级降级流程](/community/sdk-tiers#tier-relegation)的约束。
 
-## Removing a Feature
+## 移除功能
 
-1. Once a feature is set for removal, the removal is executed at the discretion
-   of the Core Maintainers after the minimum deprecation window has elapsed.
-2. The removal needs to be documented in the `changelog.mdx` and [registry](#the-deprecated-registry).
-3. A SEP is required for any change to the original deprecation or removal SEP, for
-   example extending or shortening the timeline
-   ([Expedited removal](#expedited-removal)) or restoring the feature to Active
-   ([Feature states](#feature-states)).
+1. 一旦某个功能被设定为移除，移除由核心维护者酌情在最短弃用窗口到期后执行。
+2. 移除需要在 `changelog.mdx` 和[注册表](#已弃用注册表)中记录。
+3. 对原始弃用或移除 SEP 的任何更改都需要 SEP，例如延长或缩短时间线
+   （[加速移除](#加速移除)）或将功能恢复到活跃状态（[功能状态](#功能状态)）。
 
-Features may remain Deprecated, without removal, for much longer than the minimum deprecation window.
+功能可能保持已弃用状态（不进行移除）远超过最短弃用窗口。
 
-## Expedited Removal
+## 加速移除
 
-The twelve-month floor may be shortened when the feature presents an active
-security risk, meaning a vulnerability with a published security advisory or
-documented in-the-wild exploitation for which no in-place mitigation exists.
-Shortening the window requires Core Maintainer approval under the
-[governance decision process](/community/governance#decision-process), recorded
-in the deprecation SEP or, where the risk surfaces after that SEP is already
-Final, in a short expedited-removal SEP that references it. The shortened
-window must still provide at least ninety days between the feature becoming
-Deprecated and its earliest removal.
+当该功能存在活跃的安全风险时，十二个月的最低期限可以缩短，即存在已发布安全公告或
+记录在案的实际利用漏洞，且没有就地缓解措施。缩短窗口需要根据
+[治理决策流程](/community/governance#decision-process)获得核心维护者批准，
+记录在弃用 SEP 中，或者如果风险在该 SEP 已定稿后才出现，则在引用它的简短加速移除 SEP 中记录。
+缩短后的窗口仍必须在功能变为已弃用和最早移除之间提供至少九十天。
 
-## Roles
+## 角色
 
-| Action                                         | Who                                                                                             |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Propose deprecation, extension, or restoration | Any contributor, per the SEP process                                                            |
-| Sponsor                                        | A Maintainer or Core Maintainer, per the SEP process                                            |
-| Approve a deprecation SEP                      | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
-| Decide a removal during release preparation    | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
-| Approve an extension or restoration SEP        | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
-| Approve expedited removal                      | Core Maintainers, per the [governance decision process](/community/governance#decision-process) |
+| 操作                   | 负责人                                                                 |
+| ---------------------- | ---------------------------------------------------------------------- |
+| 提议弃用、延长或恢复   | 任何贡献者，遵循 SEP 流程                                              |
+| 赞助                   | 维护者或核心维护者，遵循 SEP 流程                                      |
+| 批准弃用 SEP           | 核心维护者，根据[治理决策流程](/community/governance#decision-process) |
+| 在发布准备期间决定移除 | 核心维护者，根据[治理决策流程](/community/governance#decision-process) |
+| 批准延长或恢复 SEP     | 核心维护者，根据[治理决策流程](/community/governance#decision-process) |
+| 批准加速移除           | 核心维护者，根据[治理决策流程](/community/governance#decision-process) |
 
-Lead Maintainers retain veto authority over each of the approvals
-above, per the [governance roles](/community/governance#roles) definition.
+主导维护者保留对上述每个审批的否决权，根据[治理角色](/community/governance#roles)定义。

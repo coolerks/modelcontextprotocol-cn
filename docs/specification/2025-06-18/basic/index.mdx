@@ -1,18 +1,17 @@
 ---
-title: Overview
+title: 概述
 ---
 
 <div id="enable-section-numbers" />
 
-The Model Context Protocol consists of several key components that work together:
+Model Context Protocol 由几个协同工作的关键组件组成：
 
-- **Base Protocol**: Core JSON-RPC message types
-- **Lifecycle Management**: Connection initialization, capability negotiation, and
-  session control
-- **Authorization**: Authentication and authorization framework for HTTP-based transports
-- **Server Features**: Resources, prompts, and tools exposed by servers
-- **Client Features**: Sampling and root directory lists provided by clients
-- **Utilities**: Cross-cutting concerns like logging and argument completion
+- **基础协议**：核心 JSON-RPC 消息类型
+- **生命周期管理**：连接初始化、能力协商和会话控制
+- **授权**：基于 HTTP 的传输的身份验证和授权框架
+- **服务器特性**：服务器暴露的资源、提示和工具
+- **客户端特性**：客户端提供的采样和根目录列表
+- **实用工具**：日志记录和参数补全等横切关注点
 
 All implementations **MUST** support the base protocol and lifecycle management
 components. Other components **MAY** be implemented based on the specific needs of the
@@ -102,10 +101,7 @@ and instead retrieve credentials from the environment.
 Additionally, clients and servers **MAY** negotiate their own custom authentication and
 authorization strategies.
 
-For further discussions and contributions to the evolution of MCP’s auth mechanisms, join
-us in
-[GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions)
-to help shape the future of the protocol!
+有关 MCP 认证机制演进的进一步讨论和贡献，请加入我们的 [GitHub Discussions](https://github.com/modelcontextprotocol/specification/discussions)，帮助塑造协议的未来！
 
 ## Schema
 
