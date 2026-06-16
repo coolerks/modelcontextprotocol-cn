@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "rm -rf docs/.mintlify/skills/draft-sep && mkdir -p docs/.mintlify/skills/draft-sep public && cp plugins/mcp-spec/skills/draft-sep/SKILL.md docs/.mintlify/skills/draft-sep/SKILL.md && cd docs && npx mint export --output ../public/docs.zip && cd ../public && unzip -q docs.zip && rm docs.zip",
+  "buildCommand": "rm -rf docs/.mintlify/skills && mkdir -p docs/.mintlify/skills public && cp -RL plugins/mcp-spec/skills/. docs/.mintlify/skills/ && cd docs && npx mint export --output ../public/docs.zip && cd ../public && unzip -q docs.zip && rm docs.zip",
   "outputDirectory": "public",
   "cleanUrls": true
 }
